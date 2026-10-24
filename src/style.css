@@ -68,3 +68,9 @@
 .fp-context-label,.floorplan-svg .fp-dim{font-size:18px}
 .fp-zone-label{font-size:16px}
 }
+.fp-tree.heritage circle{fill:#7fb06a66;stroke:#4f8a3f;stroke-width:2}
+.fp-tree.lost circle{fill:#e0745a2e;stroke:#c2553b;stroke-dasharray:4 3}
+.fp-tree.lost .fp-trunk{fill:#b9a48c}
+.fp-tree-lost{stroke:#c2553b;stroke-width:3;stroke-linecap:round;pointer-events:none}
+.result-extra{font-weight:800}
+.fp-tree-label{paint-order:stroke;stroke:#ffffffcc;stroke-width:4px;stroke-linejoin:round}

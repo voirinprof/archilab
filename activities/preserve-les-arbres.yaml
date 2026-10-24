@@ -1,0 +1,201 @@
+id: preserve-les-arbres
+engine: floorplan
+category: site
+difficulty: intermediate
+duration_minutes: 8
+icon: trees
+color: yellow
+title:
+  fr: "Préserve les arbres"
+  en: "Save the Trees"
+description:
+  fr: "Implante une maison et son allée en sauvant le plus d'arbres possible."
+  en: "Place a house and its driveway while saving as many trees as possible."
+mission:
+  fr: "Ce terrain boisé compte 12 arbres, dont deux chênes centenaires. La famille veut une maison d'au moins 100 m² et une allée jusqu'à la rue. Implante-les en sauvant le plus d'arbres possible."
+  en: "This wooded lot has 12 trees, including two hundred-year-old oaks. The family wants a house of at least 100 m² and a driveway to the street. Place them while saving as many trees as possible."
+concepts:
+  fr: ["Implantation", "Arbres et racines", "Environnement", "Compromis"]
+  en: ["Siting", "Trees and roots", "Environment", "Trade-offs"]
+parameters:
+  boundary: lot
+  scale: 16
+  plan: {width: 26, depth: 20}
+  reveal_zone_hint: 4
+  best_possible: 9
+  rooms:
+    - id: house
+      label: {fr: "Maison", en: "House"}
+      color: yellow
+      initial: {x: 8, y: 7, width: 10, depth: 8}
+      width: {min: 4, max: 20}
+      depth: {min: 4, max: 14}
+    - id: driveway
+      label: {fr: "Allée", en: "Driveway"}
+      color: grey
+      initial: {x: 14, y: 0, width: 3, depth: 4}
+      width: {min: 3, max: 3}
+      depth: {min: 2, max: 14}
+  context:
+    - id: street
+      kind: street
+      label: {fr: "Rue", en: "Street"}
+      rect: {x: -1, y: -4, width: 28, depth: 3}
+    - id: oak-back
+      kind: tree
+      label: {fr: "Chêne centenaire", en: "Hundred-year-old oak"}
+      rect: {x: 8, y: 18, width: 1, depth: 1}
+      root_radius: 4
+      blocking: false
+      heritage: true
+    - id: oak-front
+      kind: tree
+      label: {fr: "Chêne centenaire", en: "Hundred-year-old oak"}
+      rect: {x: 5, y: 1, width: 1, depth: 1}
+      root_radius: 4
+      blocking: false
+      heritage: true
+    - id: maple-1
+      kind: tree
+      label: {fr: "Érable", en: "Maple"}
+      rect: {x: 10, y: 11, width: 1, depth: 1}
+      root_radius: 3
+      blocking: false
+      hide_label: true
+    - id: maple-2
+      kind: tree
+      label: {fr: "Érable", en: "Maple"}
+      rect: {x: 20, y: 13, width: 1, depth: 1}
+      root_radius: 3
+      blocking: false
+      hide_label: true
+    - id: maple-3
+      kind: tree
+      label: {fr: "Érable", en: "Maple"}
+      rect: {x: 3, y: 13, width: 1, depth: 1}
+      root_radius: 3
+      blocking: false
+      hide_label: true
+    - id: maple-4
+      kind: tree
+      label: {fr: "Érable", en: "Maple"}
+      rect: {x: 23, y: 8, width: 1, depth: 1}
+      root_radius: 3
+      blocking: false
+      hide_label: true
+    - id: birch-1
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 13, y: 16, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+    - id: birch-2
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 10, y: 5, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+    - id: birch-3
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 23, y: 2, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+    - id: birch-4
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 11, y: 1, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+    - id: birch-5
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 16, y: 16, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+    - id: birch-6
+      kind: tree
+      label: {fr: "Jeune bouleau", en: "Young birch"}
+      rect: {x: 20, y: 17, width: 1, depth: 1}
+      root_radius: 2
+      blocking: false
+      hide_label: true
+constraints:
+  - type: min_setback
+    room: house
+    sides: [north]
+    value: 6
+    label:
+      fr: "Marge avant : au moins 6 m entre la maison et la limite côté rue."
+      en: "Front setback: at least 6 m between the house and the street-side lot line."
+  - type: min_setback
+    room: house
+    sides: [west, east]
+    value: 3
+    label:
+      fr: "Marges latérales : au moins 3 m de chaque côté."
+      en: "Side setbacks: at least 3 m on each side."
+  - type: min_setback
+    room: house
+    sides: [south]
+    value: 5
+    label:
+      fr: "Marge arrière : au moins 5 m, pour garder un jardin."
+      en: "Rear setback: at least 5 m, to keep a garden."
+  - type: min_area
+    room: house
+    value: 100
+    label:
+      fr: "La maison mesure au moins 100 m² (demande du client)."
+      en: "The house is at least 100 m² (the client's request)."
+  - type: touches_side
+    room: driveway
+    side: north
+    label:
+      fr: "L'allée rejoint la rue."
+      en: "The driveway reaches the street."
+  - type: adjacent
+    rooms: [driveway, house]
+    min_shared: 3
+    label:
+      fr: "L'allée mène jusqu'à la maison (au moins 3 m de contact)."
+      en: "The driveway leads to the house (at least 3 m of contact)."
+  - type: keep_trees
+    trees: [oak-front, oak-back]
+    label:
+      fr: "Les deux chênes centenaires sont conservés."
+      en: "Both hundred-year-old oaks are kept."
+  - type: min_trees_kept
+    value: 8
+    label:
+      fr: "Au moins 8 arbres sur 12 sont conservés."
+      en: "At least 8 of the 12 trees are kept."
+hints:
+  fr:
+    - "Le cercle autour de chaque arbre montre ses racines : elles s'étendent à peu près jusqu'au bord du feuillage. Construire dedans fait mourir l'arbre."
+    - "Les deux chênes centenaires sont intouchables. Repère les grands espaces libres entre les cercles."
+    - "L'allée compte aussi ! Elle peut arriver par le haut de la maison ou longer un de ses côtés : essaie les deux."
+    - "Regarde la zone en pointillés : c'est là que les marges de recul te permettent de construire. Une maison de 13 m × 8 m, tout à gauche de cette zone, peut sauver 9 arbres."
+  en:
+    - "The circle around each tree shows its roots: they spread roughly to the edge of the foliage. Building inside it kills the tree."
+    - "Both hundred-year-old oaks are off-limits. Look for the large open spaces between the circles."
+    - "The driveway counts too! It can reach the top of the house or run along one of its sides: try both."
+    - "Look at the dashed area: that's where the setbacks let you build. A 13 m × 8 m house at the far left of that area can save 9 trees."
+feedback:
+  success:
+    fr: "Bravo ! La famille a sa maison, et le terrain garde l'essentiel de ses arbres."
+    en: "Well done! The family has its house, and the lot keeps most of its trees."
+  failure:
+    fr: "Pas encore. Regarde les arbres barrés en rouge et les règles non cochées."
+    en: "Not yet. Look at the trees crossed out in red and the unticked rules."
+  best:
+    fr: "Tu as conservé 9 arbres : c'est le maximum possible sur ce terrain !"
+    en: "You kept 9 trees: that's the best possible result on this lot!"
+explanation:
+  fr: "Un arbre adulte rafraîchit l'air en été, absorbe l'eau de pluie, abrite oiseaux et insectes, et met des dizaines d'années à pousser. Ses racines s'étendent à peu près jusqu'au bord de son feuillage : y creuser des fondations ou y faire rouler des machines suffit à le tuer. Avant d'implanter une maison, l'architecte fait donc le relevé des arbres et adapte le projet au terrain, au lieu de raser le terrain pour le projet. Dans ce défi, les zones de racines sont simplifiées : en réalité, un spécialiste les évalue arbre par arbre."
+  en: "A mature tree cools the air in summer, soaks up rainwater, shelters birds and insects, and takes decades to grow. Its roots spread roughly to the edge of its foliage: digging foundations or driving machines there is enough to kill it. So before siting a house, the architect surveys the trees and adapts the project to the site, instead of clearing the site for the project. In this challenge root zones are simplified: in reality, a specialist assesses them tree by tree."

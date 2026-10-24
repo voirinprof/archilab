@@ -39,13 +39,13 @@ const game = YAML.parse(readFileSync(new URL('../activities/attention-aux-voisin
 const { plan, rooms, context: contextSpecs } = game.parameters;
 const context = contextRects(contextSpecs);
 const failing = (layout: PlacedRoom[]) => {
-  const result = evaluate(game.constraints, layout, plan, { context });
+  const result = evaluate(game.constraints, layout, plan, { context: contextSpecs });
   return game.constraints.filter((_, i) => !result.constraints[i]).map(c => c.label.en.split(':')[0].split(' (')[0]);
 };
-const solved = (layout: PlacedRoom[]) => evaluate(game.constraints, layout, plan, { context }).solved;
+const solved = (layout: PlacedRoom[]) => evaluate(game.constraints, layout, plan, { context: contextSpecs }).solved;
 
 test('Attention aux voisins : the starting house is on the lot but breaks the rules', () => {
-  const result = evaluate(game.constraints, initialLayout(rooms), plan, { context });
+  const result = evaluate(game.constraints, initialLayout(rooms), plan, { context: contextSpecs });
   assert.equal(result.inside && result.noOverlap, true);
   assert.equal(result.solved, false);
   assert.equal(failing(initialLayout(rooms)).length, 4);
