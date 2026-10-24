@@ -44,9 +44,14 @@ If you use a custom domain at the root, change `GITHUB_PAGES_BASE` in `.github/w
 
 Create a new `.yaml` file in `activities/`. Copy an existing file and change its unique `id`, bilingual strings, dimensions, and constraints. Run `npm run generate` to validate and rebuild the catalogue. `npm run build` also runs this step. Committing the YAML automatically publishes it via GitHub Actions.
 
-Supported constraint types: `area_equals`, `min_width`, `min_area`, `perimeter_equals`, `square`, `not_square`.
+YAML describes the mission, not executable code. Each game picks an engine:
 
-The current V1 implements the `dimensions` engine. Additional mechanics (3D, sunlight, furniture, etc.) will require additional JavaScript engines. YAML describes the mission, not executable code.
+- **`dimensions`**: one rectangular room sized with two sliders. Constraints: `area_equals`, `min_width`, `min_area`, `perimeter_equals`, `square`, `not_square`.
+- **`floorplan`**: several rooms on a grid plan (1 m cells, north at the top). Two modes, set by `parameters.mode`:
+  - `layout` (default): rooms can be moved and resized within their `width`/`depth` bounds, never overlapping or leaving the plan. Constraints: `min_area`, `max_area`, `adjacent`, `not_adjacent` (shared wall ≥ `min_shared`, default 1 m), `touches_side`.
+  - `doors`: rooms are fixed and the free cells form a circulation space (`parameters.circulation` gives its name). The player opens doors in 1 m wall pieces. Constraints: `entrance`, `all_reachable`, `door_between`, `no_door_between`, `reachable_avoiding`, `max_doors`; `circulation` can be used as a room id.
+
+See `activities/tetris-architectural.yaml` and `activities/ou-mettre-la-porte.yaml` for complete examples. Run `npm test` to check engine rules. Additional mechanics (3D, sunlight, furniture, etc.) will require additional engines.
 
 ## Technical notes
 

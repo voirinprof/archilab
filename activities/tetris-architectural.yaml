@@ -1,0 +1,113 @@
+id: tetris-architectural
+engine: floorplan
+category: spaces
+difficulty: intermediate
+duration_minutes: 8
+icon: layout
+color: blue
+title:
+  fr: "Tetris architectural"
+  en: "Architectural Tetris"
+description:
+  fr: "Fais entrer quatre pièces dans un petit logement, sans rien oublier."
+  en: "Fit four rooms into a small home without forgetting anything."
+mission:
+  fr: "Une famille emménage dans un logement de 10 m × 7 m. Place et dimensionne le salon, la cuisine, la chambre et la salle de bain pour répondre à tous ses besoins."
+  en: "A family is moving into a 10 m × 7 m home. Place and size the living room, kitchen, bedroom and bathroom to meet all of their needs."
+concepts:
+  fr: ["Organisation des espaces", "Voisinage des pièces", "Surface", "Orientation"]
+  en: ["Space planning", "Room adjacency", "Area", "Orientation"]
+parameters:
+  plan: {width: 10, depth: 7}
+  rooms:
+    - id: living
+      label: {fr: "Salon", en: "Living room"}
+      color: yellow
+      initial: {x: 0, y: 0, width: 4, depth: 3}
+      width: {min: 2, max: 7}
+      depth: {min: 2, max: 5}
+    - id: kitchen
+      label: {fr: "Cuisine", en: "Kitchen"}
+      color: coral
+      initial: {x: 5, y: 0, width: 2, depth: 2}
+      width: {min: 2, max: 5}
+      depth: {min: 2, max: 4}
+    - id: bedroom
+      label: {fr: "Chambre", en: "Bedroom"}
+      color: blue
+      initial: {x: 0, y: 4, width: 3, depth: 3}
+      width: {min: 2, max: 5}
+      depth: {min: 2, max: 5}
+    - id: bathroom
+      label: {fr: "Salle de bain", en: "Bathroom"}
+      color: mint
+      initial: {x: 8, y: 5, width: 2, depth: 2}
+      width: {min: 2, max: 4}
+      depth: {min: 2, max: 4}
+constraints:
+  - type: min_area
+    room: living
+    value: 18
+    label:
+      fr: "Le salon mesure au moins 18 m² (toute la famille s'y réunit)."
+      en: "The living room is at least 18 m² (the whole family gathers there)."
+  - type: touches_side
+    room: living
+    side: south
+    label:
+      fr: "Le salon touche la façade sud, la plus ensoleillée."
+      en: "The living room touches the south façade, the sunniest one."
+  - type: min_area
+    room: kitchen
+    value: 8
+    label:
+      fr: "La cuisine mesure au moins 8 m²."
+      en: "The kitchen is at least 8 m²."
+  - type: adjacent
+    rooms: [kitchen, living]
+    label:
+      fr: "La cuisine est voisine du salon, pour servir les repas facilement."
+      en: "The kitchen is next to the living room, so meals are easy to serve."
+  - type: min_area
+    room: bedroom
+    value: 10
+    label:
+      fr: "La chambre mesure au moins 10 m²."
+      en: "The bedroom is at least 10 m²."
+  - type: not_adjacent
+    rooms: [bedroom, kitchen]
+    label:
+      fr: "La chambre n'est pas collée à la cuisine (bruits et odeurs)."
+      en: "The bedroom does not share a wall with the kitchen (noise and smells)."
+  - type: min_area
+    room: bathroom
+    value: 5
+    label:
+      fr: "La salle de bain mesure au moins 5 m²."
+      en: "The bathroom is at least 5 m²."
+  - type: adjacent
+    rooms: [bathroom, bedroom]
+    label:
+      fr: "La salle de bain est voisine de la chambre."
+      en: "The bathroom is next to the bedroom."
+hints:
+  fr:
+    - "Commence par le salon : c'est la plus grande pièce. Colle-le contre le bas du plan, côté sud."
+    - "Deux pièces sont voisines quand elles partagent au moins 1 m de mur. Se toucher par un coin ne suffit pas."
+    - "Regroupe les pièces de jour (salon, cuisine) d'un côté et les pièces de nuit (chambre, salle de bain) de l'autre."
+    - "Une piste : salon de 6 m × 4 m en bas à gauche, cuisine à sa droite, chambre et salle de bain au-dessus du salon."
+  en:
+    - "Start with the living room: it is the biggest room. Push it against the bottom of the plan, on the south side."
+    - "Two rooms are neighbours when they share at least 1 m of wall. Touching at a corner is not enough."
+    - "Group the daytime rooms (living room, kitchen) on one side and the night-time rooms (bedroom, bathroom) on the other."
+    - "One idea: a 6 m × 4 m living room in the bottom left, the kitchen to its right, the bedroom and bathroom above the living room."
+feedback:
+  success:
+    fr: "Bravo ! Ce logement répond à tous les besoins de la famille."
+    en: "Well done! This home meets all of the family's needs."
+  failure:
+    fr: "Ton plan ne répond pas encore à tous les besoins. Regarde la liste : chaque besoin non coché est un indice."
+    en: "Your plan doesn't meet every need yet. Check the list: each unticked need is a clue."
+explanation:
+  fr: "Les architectes organisent un logement en zones. Les pièces de jour (salon, cuisine) sont proches l'une de l'autre et tournées vers la lumière. Les pièces de nuit (chambre, salle de bain) sont regroupées au calme. L'espace qui reste n'est pas perdu : il sert à circuler d'une pièce à l'autre."
+  en: "Architects organize a home into zones. Daytime rooms (living room, kitchen) sit close together and face the light. Night-time rooms (bedroom, bathroom) are grouped somewhere quiet. Leftover space is not wasted: it is used to move from one room to another."
