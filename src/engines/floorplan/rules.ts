@@ -1,4 +1,7 @@
-import type { Bounds, FloorplanConstraint, PlacedRoom, Plan, Rect, RoomSpec, Side } from './types.ts';
+import type { Bounds, FloorplanConstraint, PlacedRoom, Plan, Rect, RoomSpec, Side, WallSegment } from './types.ts';
+
+export const OUTSIDE = 'outside';
+export const CIRCULATION = 'circulation';
 
 export function area(r: Rect): number {
   return r.width * r.depth;
@@ -35,8 +38,13 @@ export function clamp(value: number, bounds: Bounds): number {
   return Math.min(bounds.max, Math.max(bounds.min, value));
 }
 
+export function sizeBounds(spec: RoomSpec, key: 'width' | 'depth'): Bounds {
+  return spec[key] ?? { min: spec.initial[key], max: spec.initial[key] };
+}
+
 export function hasValidSize(r: Rect, spec: RoomSpec): boolean {
-  return r.width >= spec.width.min && r.width <= spec.width.max && r.depth >= spec.depth.min && r.depth <= spec.depth.max;
+  const w = sizeBounds(spec, 'width'), d = sizeBounds(spec, 'depth');
+  return r.width >= w.min && r.width <= w.max && r.depth >= d.min && r.depth <= d.max;
 }
 
 /** Keeps a room inside the plan by sliding it, without changing its size. */
@@ -65,8 +73,68 @@ export function noOverlap(layout: PlacedRoom[]): boolean {
   return layout.every((a, i) => layout.slice(i + 1).every(b => !overlaps(a, b)));
 }
 
-export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], plan: Plan): boolean {
+/** Which space covers the 1 m cell whose north-west corner is (cx, cy). */
+export function spaceAt(layout: PlacedRoom[], plan: Plan, cx: number, cy: number): string {
+  if (cx < 0 || cy < 0 || cx >= plan.width || cy >= plan.depth) return OUTSIDE;
+  return layout.find(r => cx >= r.x && cx < r.x + r.width && cy >= r.y && cy < r.y + r.depth)?.id ?? CIRCULATION;
+}
+
+/** Every room, plus the circulation if some of the plan is left free. */
+export function spacesOf(layout: PlacedRoom[], plan: Plan): string[] {
+  const free = plan.width * plan.depth > layout.reduce((sum, r) => sum + area(r), 0);
+  return [...layout.map(r => r.id), ...(free ? [CIRCULATION] : [])];
+}
+
+/**
+ * Cuts every wall into 1 m segments. Vertical segment v:x:y separates cells (x-1, y) [a] and (x, y) [b];
+ * horizontal segment h:x:y separates cells (x, y-1) [a] and (x, y) [b].
+ */
+export function wallSegments(layout: PlacedRoom[], plan: Plan): WallSegment[] {
+  const segments: WallSegment[] = [];
+  for (let x = 0; x <= plan.width; x++) {
+    for (let y = 0; y < plan.depth; y++) {
+      const a = spaceAt(layout, plan, x - 1, y), b = spaceAt(layout, plan, x, y);
+      if (a !== b) segments.push({ key: `v:${x}:${y}`, x1: x, y1: y, x2: x, y2: y + 1, a, b, side: x === 0 ? 'west' : x === plan.width ? 'east' : undefined });
+    }
+  }
+  for (let y = 0; y <= plan.depth; y++) {
+    for (let x = 0; x < plan.width; x++) {
+      const a = spaceAt(layout, plan, x, y - 1), b = spaceAt(layout, plan, x, y);
+      if (a !== b) segments.push({ key: `h:${x}:${y}`, x1: x, y1: y, x2: x + 1, y2: y, a, b, side: y === 0 ? 'north' : y === plan.depth ? 'south' : undefined });
+    }
+  }
+  return segments;
+}
+
+/** The wall segments that hold a door. */
+export function doorLinks(layout: PlacedRoom[], plan: Plan, doors: string[]): WallSegment[] {
+  return wallSegments(layout, plan).filter(s => doors.includes(s.key));
+}
+
+export function links(segment: WallSegment, p: string, q: string): boolean {
+  return (segment.a === p && segment.b === q) || (segment.a === q && segment.b === p);
+}
+
+/** Spaces that can be reached from outside through doors, never entering `avoid`. */
+export function reachableSpaces(doorSegments: WallSegment[], avoid?: string): Set<string> {
+  const seen = new Set<string>([OUTSIDE]);
+  const queue = [OUTSIDE];
+  while (queue.length) {
+    const current = queue.shift()!;
+    for (const d of doorSegments) {
+      const next = d.a === current ? d.b : d.b === current ? d.a : null;
+      if (next && next !== avoid && !seen.has(next)) {
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+  }
+  return seen;
+}
+
+export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], plan: Plan, doors: string[] = []): boolean {
   const find = (id: string) => layout.find(r => r.id === id);
+  const placedDoors = () => doorLinks(layout, plan, doors);
   switch (c.type) {
     case 'min_area':
     case 'max_area': {
@@ -85,14 +153,32 @@ export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], pl
       const room = find(c.room);
       return !!room && touchesSide(room, plan, c.side);
     }
+    case 'entrance':
+      return placedDoors().some(d => {
+        const inside = d.a === OUTSIDE ? d.b : d.b === OUTSIDE ? d.a : null;
+        return !!inside && (!c.side || d.side === c.side) && (!c.spaces || c.spaces.includes(inside));
+      });
+    case 'all_reachable': {
+      const reached = reachableSpaces(placedDoors());
+      return spacesOf(layout, plan).every(s => reached.has(s));
+    }
+    case 'door_between':
+    case 'no_door_between': {
+      const exists = placedDoors().some(d => links(d, c.rooms[0], c.rooms[1]));
+      return c.type === 'door_between' ? exists : !exists;
+    }
+    case 'reachable_avoiding':
+      return reachableSpaces(placedDoors(), c.avoid).has(c.room);
+    case 'max_doors':
+      return placedDoors().length <= c.value;
   }
 }
 
 export type Evaluation = { inside: boolean; noOverlap: boolean; constraints: boolean[]; solved: boolean };
 
-export function evaluate(constraints: FloorplanConstraint[], layout: PlacedRoom[], plan: Plan): Evaluation {
+export function evaluate(constraints: FloorplanConstraint[], layout: PlacedRoom[], plan: Plan, doors: string[] = []): Evaluation {
   const inside = allInside(layout, plan);
   const separate = noOverlap(layout);
-  const results = constraints.map(c => checkConstraint(c, layout, plan));
+  const results = constraints.map(c => checkConstraint(c, layout, plan, doors));
   return { inside, noOverlap: separate, constraints: results, solved: inside && separate && results.every(Boolean) };
 }

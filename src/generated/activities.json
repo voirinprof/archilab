@@ -71,6 +71,215 @@
     }
   },
   {
+    "id": "ou-mettre-la-porte",
+    "engine": "floorplan",
+    "category": "spaces",
+    "difficulty": "intermediate",
+    "duration_minutes": 6,
+    "icon": "door",
+    "color": "coral",
+    "title": {
+      "fr": "Où mettre la porte ?",
+      "en": "Where Does the Door Go?"
+    },
+    "description": {
+      "fr": "Perce les bonnes portes pour que chacun circule facilement.",
+      "en": "Add the right doors so everyone can move around easily."
+    },
+    "mission": {
+      "fr": "Les murs de ce logement sont construits, mais il n'y a encore aucune porte ! Indique à l'entrepreneur où les percer pour que la famille circule facilement, sans perdre son intimité.",
+      "en": "The walls of this home are built, but there are no doors yet! Tell the builder where to put them so the family can move around easily without losing their privacy."
+    },
+    "concepts": {
+      "fr": [
+        "Circulation",
+        "Distribution",
+        "Intimité"
+      ],
+      "en": [
+        "Circulation",
+        "Distribution",
+        "Privacy"
+      ]
+    },
+    "parameters": {
+      "mode": "doors",
+      "plan": {
+        "width": 10,
+        "depth": 7
+      },
+      "circulation": {
+        "fr": "Couloir",
+        "en": "Hallway"
+      },
+      "rooms": [
+        {
+          "id": "bedroom",
+          "label": {
+            "fr": "Chambre",
+            "en": "Bedroom"
+          },
+          "color": "blue",
+          "initial": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "depth": 4
+          }
+        },
+        {
+          "id": "bathroom",
+          "label": {
+            "fr": "Salle de bain",
+            "en": "Bathroom"
+          },
+          "color": "mint",
+          "initial": {
+            "x": 6,
+            "y": 0,
+            "width": 4,
+            "depth": 2
+          }
+        },
+        {
+          "id": "kitchen",
+          "label": {
+            "fr": "Cuisine",
+            "en": "Kitchen"
+          },
+          "color": "coral",
+          "initial": {
+            "x": 6,
+            "y": 2,
+            "width": 4,
+            "depth": 2
+          }
+        },
+        {
+          "id": "living",
+          "label": {
+            "fr": "Salon",
+            "en": "Living room"
+          },
+          "color": "yellow",
+          "initial": {
+            "x": 0,
+            "y": 4,
+            "width": 10,
+            "depth": 3
+          }
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "entrance",
+        "side": "north",
+        "spaces": [
+          "circulation"
+        ],
+        "label": {
+          "fr": "La porte d'entrée est sur la façade nord (côté rue) et donne dans le couloir.",
+          "en": "The front door is on the north façade (street side) and opens into the hallway."
+        }
+      },
+      {
+        "type": "all_reachable",
+        "label": {
+          "fr": "Chaque pièce est accessible depuis l'entrée, au besoin en traversant d'autres pièces.",
+          "en": "Every room can be reached from the entrance, walking through other rooms if needed."
+        }
+      },
+      {
+        "type": "reachable_avoiding",
+        "room": "living",
+        "avoid": "kitchen",
+        "label": {
+          "fr": "On peut aller de l'entrée au salon sans traverser la cuisine.",
+          "en": "You can get from the entrance to the living room without walking through the kitchen."
+        }
+      },
+      {
+        "type": "no_door_between",
+        "rooms": [
+          "bedroom",
+          "living"
+        ],
+        "label": {
+          "fr": "La chambre ne s'ouvre pas sur le salon (intimité).",
+          "en": "The bedroom does not open onto the living room (privacy)."
+        }
+      },
+      {
+        "type": "reachable_avoiding",
+        "room": "bathroom",
+        "avoid": "bedroom",
+        "label": {
+          "fr": "Un invité peut aller à la salle de bain sans traverser la chambre.",
+          "en": "A guest can get to the bathroom without walking through the bedroom."
+        }
+      },
+      {
+        "type": "no_door_between",
+        "rooms": [
+          "bathroom",
+          "kitchen"
+        ],
+        "label": {
+          "fr": "La salle de bain ne s'ouvre pas sur la cuisine (hygiène).",
+          "en": "The bathroom does not open onto the kitchen (hygiene)."
+        }
+      },
+      {
+        "type": "door_between",
+        "rooms": [
+          "kitchen",
+          "living"
+        ],
+        "label": {
+          "fr": "La cuisine s'ouvre sur le salon, pour partager les repas.",
+          "en": "The kitchen opens onto the living room, to share meals."
+        }
+      },
+      {
+        "type": "max_doors",
+        "value": 5,
+        "label": {
+          "fr": "5 portes au maximum : chaque porte coûte cher et prend de la place sur les murs.",
+          "en": "5 doors at most: each door is expensive and takes up wall space."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Commence par la porte d'entrée : touche un morceau de mur du couloir, tout en haut du plan (côté nord).",
+        "Les pièces grisées ne sont pas encore accessibles. Relie-les au couloir ou à une pièce déjà accessible.",
+        "Le couloir sert à distribuer les pièces : une porte qui donne sur le couloir évite de traverser une autre pièce.",
+        "Avec 5 portes : l'entrée, la chambre, la salle de bain, le salon depuis le couloir… et la cuisine reliée au salon."
+      ],
+      "en": [
+        "Start with the front door: tap a piece of hallway wall at the very top of the plan (north side).",
+        "Greyed-out rooms can't be reached yet. Connect them to the hallway or to a room that is already reachable.",
+        "The hallway distributes the rooms: a door onto the hallway means you don't have to walk through another room.",
+        "With 5 doors: the front door, the bedroom, the bathroom, the living room from the hallway… and the kitchen connected to the living room."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Toute la famille circule facilement, et chacun garde son intimité.",
+        "en": "Well done! The whole family moves around easily and everyone keeps their privacy."
+      },
+      "failure": {
+        "fr": "Pas tout à fait. Regarde les besoins non cochés et les pièces grisées : ce sont tes indices.",
+        "en": "Not quite. Look at the unticked needs and the greyed-out rooms: they are your clues."
+      }
+    },
+    "explanation": {
+      "fr": "Les architectes parlent de « distribution » : un couloir ou un hall dessert les pièces, sans qu'on ait à les traverser. Ils organisent aussi les espaces du plus public (l'entrée, le salon) au plus privé (la chambre, la salle de bain). Chaque porte est un choix : elle relie deux espaces, mais elle prend de la place sur les murs et pour s'ouvrir.",
+      "en": "Architects talk about \"distribution\": a hallway or entrance hall serves the rooms so you don't have to walk through them. They also arrange spaces from the most public (entrance, living room) to the most private (bedroom, bathroom). Every door is a choice: it connects two spaces, but it takes up wall space and room to swing open."
+    }
+  },
+  {
     "id": "perimetre-24",
     "engine": "dimensions",
     "category": "spaces",
