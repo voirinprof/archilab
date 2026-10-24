@@ -1,4 +1,4 @@
-import type { Bounds, FloorplanConstraint, PlacedRoom, Plan, Rect, RoomSpec, Side, WallSegment } from './types.ts';
+import type { Bounds, ContextSpec, DimensionLine, FloorplanConstraint, PlacedRoom, Plan, Rect, RoomSpec, Side, WallSegment } from './types.ts';
 
 export const OUTSIDE = 'outside';
 export const CIRCULATION = 'circulation';
@@ -56,9 +56,49 @@ export function clampPosition(r: Rect, plan: Plan): Rect {
   };
 }
 
-/** A room can take this rectangle if it stays inside the plan and overlaps no other room. */
-export function canPlace(layout: PlacedRoom[], id: string, r: Rect, plan: Plan): boolean {
-  return isInside(r, plan) && layout.every(other => other.id === id || !overlaps(r, other));
+/** A room can take this rectangle if it stays inside the plan and overlaps no other room or fixed obstacle. */
+export function canPlace(layout: PlacedRoom[], id: string, r: Rect, plan: Plan, obstacles: Rect[] = []): boolean {
+  return isInside(r, plan) && layout.every(other => other.id === id || !overlaps(r, other)) && obstacles.every(o => !overlaps(r, o));
+}
+
+/** Distance from a room to one edge of the plan (negative if it sticks out). */
+export function distanceToSide(r: Rect, plan: Plan, side: Side): number {
+  switch (side) {
+    case 'north': return r.y;
+    case 'south': return plan.depth - (r.y + r.depth);
+    case 'west': return r.x;
+    case 'east': return plan.width - (r.x + r.width);
+  }
+}
+
+/** For each axis: the two facing edges if the ranges are apart, otherwise the middle of their overlap. */
+function facing(a0: number, a1: number, b0: number, b1: number): [number, number] {
+  if (a1 <= b0) return [a1, b0];
+  if (b1 <= a0) return [a0, b1];
+  const mid = (Math.max(a0, b0) + Math.min(a1, b1)) / 2;
+  return [mid, mid];
+}
+
+/** The closest points between two rectangles: [point on a, point on b]. */
+export function closestPoints(a: Rect, b: Rect): [[number, number], [number, number]] {
+  const [ax, bx] = facing(a.x, a.x + a.width, b.x, b.x + b.width);
+  const [ay, by] = facing(a.y, a.y + a.depth, b.y, b.y + b.depth);
+  return [[ax, ay], [bx, by]];
+}
+
+/** Shortest distance between two rectangles (0 if they touch or overlap). */
+export function gap(a: Rect, b: Rect): number {
+  const [[ax, ay], [bx, by]] = closestPoints(a, b);
+  return Math.hypot(bx - ax, by - ay);
+}
+
+/** Share of the plan covered by rooms, from 0 to 1. */
+export function coverage(layout: PlacedRoom[], plan: Plan): number {
+  return layout.reduce((sum, r) => sum + area(r), 0) / (plan.width * plan.depth);
+}
+
+export function contextRects(context: ContextSpec[] = []): PlacedRoom[] {
+  return context.map(c => ({ id: c.id, ...c.rect }));
 }
 
 export function initialLayout(rooms: RoomSpec[]): PlacedRoom[] {
@@ -132,8 +172,14 @@ export function reachableSpaces(doorSegments: WallSegment[], avoid?: string): Se
   return seen;
 }
 
-export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], plan: Plan, doors: string[] = []): boolean {
+/** What a constraint may look at besides the rooms: placed doors and fixed context elements. */
+export type Extras = { doors?: string[]; context?: PlacedRoom[] };
+
+const EPSILON = 1e-9;
+
+export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], plan: Plan, { doors = [], context = [] }: Extras = {}): boolean {
   const find = (id: string) => layout.find(r => r.id === id);
+  const findAny = (id: string) => find(id) ?? context.find(r => r.id === id);
   const placedDoors = () => doorLinks(layout, plan, doors);
   switch (c.type) {
     case 'min_area':
@@ -171,14 +217,74 @@ export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], pl
       return reachableSpaces(placedDoors(), c.avoid).has(c.room);
     case 'max_doors':
       return placedDoors().length <= c.value;
+    case 'min_setback': {
+      const room = find(c.room);
+      return !!room && c.sides.every(side => distanceToSide(room, plan, side) >= c.value - EPSILON);
+    }
+    case 'min_distance': {
+      const [a, b] = c.rooms.map(findAny);
+      return !!a && !!b && gap(a, b) >= c.value - EPSILON;
+    }
+    case 'max_coverage':
+      return coverage(layout, plan) * 100 <= c.value + EPSILON;
   }
+}
+
+/** Dimension lines for every distance constraint, so the player can read the measures on the plan. */
+export function dimensionLines(constraints: FloorplanConstraint[], layout: PlacedRoom[], plan: Plan, context: PlacedRoom[] = []): DimensionLine[] {
+  const lines: DimensionLine[] = [];
+  const findAny = (id: string) => layout.find(r => r.id === id) ?? context.find(r => r.id === id);
+  for (const c of constraints) {
+    if (c.type === 'min_setback') {
+      const r = layout.find(room => room.id === c.room);
+      if (!r) continue;
+      const mx = r.x + r.width / 2, my = r.y + r.depth / 2;
+      for (const side of c.sides) {
+        const value = distanceToSide(r, plan, side);
+        const ends: Record<Side, [[number, number], [number, number]]> = {
+          north: [[mx, r.y], [mx, 0]],
+          south: [[mx, r.y + r.depth], [mx, plan.depth]],
+          west: [[r.x, my], [0, my]],
+          east: [[r.x + r.width, my], [plan.width, my]],
+        };
+        lines.push({ kind: 'setback', from: ends[side][0], to: ends[side][1], value, ok: value >= c.value - EPSILON });
+      }
+    } else if (c.type === 'min_distance') {
+      const [a, b] = c.rooms.map(findAny);
+      if (!a || !b) continue;
+      const [from, to] = closestPoints(a, b);
+      const value = gap(a, b);
+      lines.push({ kind: 'distance', from, to, value, ok: value >= c.value - EPSILON });
+    }
+  }
+  return lines;
+}
+
+/** Where a room may stand according to its setbacks, plus the keep-away distance around each fixed element. */
+export function buildableZone(constraints: FloorplanConstraint[], roomId: string, plan: Plan, context: PlacedRoom[] = []) {
+  let x0 = 0, y0 = 0, x1 = plan.width, y1 = plan.depth;
+  const halos: { rect: Rect; radius: number }[] = [];
+  for (const c of constraints) {
+    if (c.type === 'min_setback' && c.room === roomId) {
+      for (const side of c.sides) {
+        if (side === 'north') y0 = Math.max(y0, c.value);
+        if (side === 'south') y1 = Math.min(y1, plan.depth - c.value);
+        if (side === 'west') x0 = Math.max(x0, c.value);
+        if (side === 'east') x1 = Math.min(x1, plan.width - c.value);
+      }
+    } else if (c.type === 'min_distance' && c.rooms.includes(roomId)) {
+      const other = context.find(r => r.id === c.rooms.find(id => id !== roomId));
+      if (other) halos.push({ rect: other, radius: c.value });
+    }
+  }
+  return { zone: { x: x0, y: y0, width: Math.max(0, x1 - x0), depth: Math.max(0, y1 - y0) }, halos };
 }
 
 export type Evaluation = { inside: boolean; noOverlap: boolean; constraints: boolean[]; solved: boolean };
 
-export function evaluate(constraints: FloorplanConstraint[], layout: PlacedRoom[], plan: Plan, doors: string[] = []): Evaluation {
+export function evaluate(constraints: FloorplanConstraint[], layout: PlacedRoom[], plan: Plan, extras: Extras = {}): Evaluation {
   const inside = allInside(layout, plan);
   const separate = noOverlap(layout);
-  const results = constraints.map(c => checkConstraint(c, layout, plan, doors));
+  const results = constraints.map(c => checkConstraint(c, layout, plan, extras));
   return { inside, noOverlap: separate, constraints: results, solved: inside && separate && results.every(Boolean) };
 }

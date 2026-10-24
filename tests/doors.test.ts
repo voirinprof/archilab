@@ -8,9 +8,9 @@ import type { FloorplanActivity, PlacedRoom } from '../src/engines/floorplan/typ
 const game = YAML.parse(readFileSync(new URL('../activities/ou-mettre-la-porte.yaml', import.meta.url), 'utf8')) as FloorplanActivity;
 const { plan, rooms } = game.parameters;
 const layout = initialLayout(rooms);
-const solved = (doors: string[]) => evaluate(game.constraints, layout, plan, doors).solved;
+const solved = (doors: string[]) => evaluate(game.constraints, layout, plan, { doors }).solved;
 const failing = (doors: string[]) => {
-  const result = evaluate(game.constraints, layout, plan, doors);
+  const result = evaluate(game.constraints, layout, plan, { doors });
   return game.constraints.filter((_, i) => !result.constraints[i]).map(c => c.type);
 };
 

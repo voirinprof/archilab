@@ -5,6 +5,7 @@ const dir = new URL('../activities/', import.meta.url);
 const files = (await readdir(dir)).filter(f=>f.endsWith('.yaml')||f.endsWith('.yml')).sort();
 const ids = new Set();
 const known = new Set(['area_equals','min_width','min_area','perimeter_equals','square','not_square']);
+const categories = new Set(['client','site','spaces','shapes','light','structure','materials','comfort','plans','city']); // keep in sync with src/main.tsx
 const localized=(v)=>typeof v?.fr==='string'&&v.fr!==''&&typeof v?.en==='string'&&v.en!=='';
 const isInt=(v)=>Number.isInteger(v);
 function validateDimensions(a,fail){
@@ -32,6 +33,10 @@ function circulationIsConnected(plan,rooms){
 function validateFloorplan(a,fail){
   const mode=a.parameters?.mode??'layout';
   if(!['layout','doors'].includes(mode))fail(`Invalid mode ${mode}`);
+  const {scale,boundary,reveal_zone_hint:reveal}=a.parameters??{};
+  if(scale!==undefined&&!(Number.isFinite(scale)&&scale>0))fail('Invalid scale');
+  if(boundary!==undefined&&!['wall','lot'].includes(boundary))fail(`Invalid boundary ${boundary}`);
+  if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>(a.hints?.fr?.length??0)))fail('Invalid reveal_zone_hint');
   const plan=a.parameters?.plan;
   if(!plan||!isInt(plan.width)||!isInt(plan.depth)||plan.width<=0||plan.depth<=0)fail('Invalid plan size');
   const rooms=a.parameters?.rooms;
@@ -52,10 +57,23 @@ function validateFloorplan(a,fail){
     }
     if(i.x<0||i.y<0||i.x+i.width>plan.width||i.y+i.depth>plan.depth)fail(`Initial rect outside plan: room ${r.id}`);
   }
+  const overlap=(p,q)=>p.x<q.x+q.width&&q.x<p.x+p.width&&p.y<q.y+q.depth&&q.y<p.y+p.depth;
   rooms.forEach((a1,n)=>rooms.slice(n+1).forEach(b1=>{
-    const p=a1.initial,q=b1.initial;
-    if(p.x<q.x+q.width&&q.x<p.x+p.width&&p.y<q.y+q.depth&&q.y<p.y+p.depth)fail(`Initial rooms overlap: ${a1.id} / ${b1.id}`);
+    if(overlap(a1.initial,b1.initial))fail(`Initial rooms overlap: ${a1.id} / ${b1.id}`);
   }));
+  const context=a.parameters.context??[];
+  if(!Array.isArray(context))fail('Invalid context');
+  if(context.length&&mode!=='layout')fail('context requires mode: layout');
+  const contextIds=new Set();
+  for(const c of context){
+    if(!/^[a-z0-9-]+$/.test(c?.id||'')||roomIds.has(c.id)||contextIds.has(c.id))fail(`Invalid or duplicate context id ${c?.id}`);
+    contextIds.add(c.id);
+    if(!['street','building','tree'].includes(c.kind))fail(`Invalid context kind: ${c.id}`);
+    if(!localized(c.label))fail(`Missing translations: context ${c.id}`);
+    const r=c.rect;
+    if(!r||![r.x,r.y,r.width,r.depth].every(isInt)||r.width<1||r.depth<1)fail(`Invalid context rect: ${c.id}`);
+    for(const room of rooms)if(overlap(room.initial,r))fail(`Room ${room.id} starts on context element ${c.id}`);
+  }
   if(mode==='doors'){
     if(!localized(a.parameters.circulation))fail('Missing translations: circulation');
     if(!circulationIsConnected(plan,rooms))fail('Free space must form a single connected circulation');
@@ -83,6 +101,12 @@ function validateFloorplan(a,fail){
         if(!spaceIds.has(c.room)||!spaceIds.has(c.avoid)||c.room===c.avoid)fail('Invalid constraint reachable_avoiding');break;
       case 'max_doors':
         if(!isInt(c.value)||c.value<1)fail('Invalid constraint max_doors');break;
+      case 'min_setback':
+        if(!roomIds.has(c.room)||!Array.isArray(c.sides)||!c.sides.length||!c.sides.every(s=>floorplanSides.has(s))||!(Number.isFinite(c.value)&&c.value>=0))fail('Invalid constraint min_setback');break;
+      case 'min_distance':
+        if(!Array.isArray(c.rooms)||c.rooms.length!==2||c.rooms[0]===c.rooms[1]||!c.rooms.every(id=>roomIds.has(id)||contextIds.has(id))||!c.rooms.some(id=>roomIds.has(id))||!(Number.isFinite(c.value)&&c.value>0))fail('Invalid constraint min_distance');break;
+      case 'max_coverage':
+        if(!(Number.isFinite(c.value)&&c.value>0&&c.value<=100))fail('Invalid constraint max_coverage');break;
       default: fail(`Unknown constraint ${c.type}`);
     }
   }
@@ -100,6 +124,7 @@ for (const file of files){
   if(!/^[a-z0-9-]+$/.test(a.id||''))fail('Invalid id');
   if(ids.has(a.id))fail('Duplicate id'); ids.add(a.id);
   if(!validators[a.engine])fail('Unknown engine');
+  if(!categories.has(a.category))fail(`Unknown category ${a.category}`);
   for(const key of ['title','description','mission'])if(!a[key]?.fr||!a[key]?.en)fail(`Missing translations: ${key}`);
   if(!Array.isArray(a.hints?.fr)||!Array.isArray(a.hints?.en)||!a.feedback?.success?.fr||!a.feedback?.success?.en)fail('Missing hint/feedback translations');
   if(!Array.isArray(a.constraints)||!a.constraints.length)fail('Missing constraints');

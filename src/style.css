@@ -46,3 +46,25 @@
 }
 .fp-wall-hit:focus-visible{stroke:#ef9a73aa}
 .unreached-note{background:#eef1ea;color:#53676b}
+.fp-lot-ground{fill:#e8f0df}
+.fp-lot-line{fill:none;stroke:#4f7a52;stroke-width:2.5;stroke-dasharray:10 5}
+.fp-street rect{fill:#d7dbd6}
+.fp-neighbour rect{fill:#e2d9cb;stroke:#9b8b73;stroke-width:2}
+.fp-context-label{font-size:12px;font-weight:700;fill:#5d6b66;pointer-events:none}
+.fp-tree circle{fill:#9cc28466;stroke:#6f9a5c;stroke-width:1.5}
+.fp-trunk{fill:#806a50}
+.fp-buildable{fill:#ffffff55;stroke:#2f6e4f;stroke-width:2;stroke-dasharray:6 4}
+.fp-halo{fill:#e0745a1f;stroke:#c2553b;stroke-width:1.5;stroke-dasharray:4 4}
+.fp-zone{pointer-events:none}
+.fp-zone-label{font-size:11px;font-weight:800;fill:#2f6e4f}
+.fp-dimension{pointer-events:none}
+.fp-dimension line{stroke-width:1.6}
+.fp-dimension text{font-size:12px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.fp-dimension.ok line{stroke:#3f8a5a}
+.fp-dimension.ok text{fill:#2a6941}
+.fp-dimension.bad line{stroke:#c2553b}
+.fp-dimension.bad text{fill:#b0452d}
+@media(max-width:550px){.fp-dimension text{font-size:22px;stroke-width:6px}
+.fp-context-label,.floorplan-svg .fp-dim{font-size:18px}
+.fp-zone-label{font-size:16px}
+}
