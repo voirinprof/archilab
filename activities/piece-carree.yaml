@@ -1,0 +1,30 @@
+id: piece-carree
+engine: dimensions
+category: shapes
+difficulty: beginner
+duration_minutes: 4
+icon: grid
+color: mint
+title:
+  fr: "La pièce parfaite"
+  en: "The Perfect Room"
+description:
+  fr: "Crée une pièce carrée de 36 m²."
+  en: "Create a square room of 36 m²."
+mission:
+  fr: "Imagine une salle d'exposition carrée dont la surface est exactement 36 m²."
+  en: "Design a square exhibition room with an area of exactly 36 m²."
+concepts:
+  fr: ["Carré", "Surface"]
+  en: ["Square", "Area"]
+parameters:
+  width: {min: 3, max: 9, step: 1, initial: 4}
+  length: {min: 3, max: 9, step: 1, initial: 5}
+constraints:
+  - {type: area_equals, value: 36}
+  - {type: square}
+hints:
+  fr: ["Un carré possède quatre côtés de même longueur.", "Quel nombre multiplié par lui-même donne 36 ?"]
+  en: ["A square has four equal sides.", "Which number multiplied by itself equals 36?"]
+feedback:
+  success: {fr: "Magnifique ! Tu as conçu une salle carrée de 36 m².", en: "Excellent! You designed a 36 m² square room."}

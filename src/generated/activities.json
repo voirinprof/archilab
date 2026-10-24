@@ -1,0 +1,219 @@
+[
+  {
+    "id": "mission-25m2",
+    "engine": "dimensions",
+    "category": "spaces",
+    "difficulty": "beginner",
+    "duration_minutes": 5,
+    "icon": "house",
+    "color": "coral",
+    "title": {
+      "fr": "Mission 25 m²",
+      "en": "25 m² Mission"
+    },
+    "description": {
+      "fr": "Trouve les dimensions parfaites d'un mini-logement.",
+      "en": "Find the perfect dimensions for a tiny home."
+    },
+    "mission": {
+      "fr": "Ton client veut exactement 25 m² et une largeur d'au moins 4 m. Ajuste le plan !",
+      "en": "Your client wants exactly 25 m² and a width of at least 4 m. Adjust the plan!"
+    },
+    "concepts": {
+      "fr": [
+        "Surface",
+        "Dimensions"
+      ],
+      "en": [
+        "Area",
+        "Dimensions"
+      ]
+    },
+    "parameters": {
+      "width": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 4
+      },
+      "length": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 6
+      }
+    },
+    "constraints": [
+      {
+        "type": "area_equals",
+        "value": 25
+      },
+      {
+        "type": "min_width",
+        "value": 4
+      }
+    ],
+    "hints": {
+      "fr": [
+        "La surface est la largeur multipliée par la longueur.",
+        "Quels nombres multipliés donnent 25 ?"
+      ],
+      "en": [
+        "Area equals width times length.",
+        "Which two numbers multiply to 25?"
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Le plan répond aux besoins du client.",
+        "en": "Well done! Your plan meets the client's needs."
+      }
+    }
+  },
+  {
+    "id": "perimetre-24",
+    "engine": "dimensions",
+    "category": "spaces",
+    "difficulty": "intermediate",
+    "duration_minutes": 6,
+    "icon": "ruler",
+    "color": "yellow",
+    "title": {
+      "fr": "Le défi des murs",
+      "en": "The Wall Challenge"
+    },
+    "description": {
+      "fr": "Conçois une pièce avec exactement 24 m de murs.",
+      "en": "Design a room with exactly 24 m of walls."
+    },
+    "mission": {
+      "fr": "Tu disposes de 24 mètres de murs. Crée une pièce rectangulaire d'au moins 30 m², sans faire un carré.",
+      "en": "You have 24 metres of walls. Make a rectangular room of at least 30 m², but not a square."
+    },
+    "concepts": {
+      "fr": [
+        "Périmètre",
+        "Surface",
+        "Compromis"
+      ],
+      "en": [
+        "Perimeter",
+        "Area",
+        "Trade-offs"
+      ]
+    },
+    "parameters": {
+      "width": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 4
+      },
+      "length": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 5
+      }
+    },
+    "constraints": [
+      {
+        "type": "perimeter_equals",
+        "value": 24
+      },
+      {
+        "type": "min_area",
+        "value": 30
+      },
+      {
+        "type": "not_square"
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Le périmètre d'un rectangle vaut deux fois la somme de ses côtés.",
+        "Essaie une largeur de 5 mètres."
+      ],
+      "en": [
+        "A rectangle's perimeter is twice the sum of its sides.",
+        "Try a width of 5 metres."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bien joué ! Tu as optimisé l'espace en respectant la longueur des murs.",
+        "en": "Great job! You optimized the space within the wall limit."
+      }
+    }
+  },
+  {
+    "id": "piece-carree",
+    "engine": "dimensions",
+    "category": "shapes",
+    "difficulty": "beginner",
+    "duration_minutes": 4,
+    "icon": "grid",
+    "color": "mint",
+    "title": {
+      "fr": "La pièce parfaite",
+      "en": "The Perfect Room"
+    },
+    "description": {
+      "fr": "Crée une pièce carrée de 36 m².",
+      "en": "Create a square room of 36 m²."
+    },
+    "mission": {
+      "fr": "Imagine une salle d'exposition carrée dont la surface est exactement 36 m².",
+      "en": "Design a square exhibition room with an area of exactly 36 m²."
+    },
+    "concepts": {
+      "fr": [
+        "Carré",
+        "Surface"
+      ],
+      "en": [
+        "Square",
+        "Area"
+      ]
+    },
+    "parameters": {
+      "width": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 4
+      },
+      "length": {
+        "min": 3,
+        "max": 9,
+        "step": 1,
+        "initial": 5
+      }
+    },
+    "constraints": [
+      {
+        "type": "area_equals",
+        "value": 36
+      },
+      {
+        "type": "square"
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Un carré possède quatre côtés de même longueur.",
+        "Quel nombre multiplié par lui-même donne 36 ?"
+      ],
+      "en": [
+        "A square has four equal sides.",
+        "Which number multiplied by itself equals 36?"
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Magnifique ! Tu as conçu une salle carrée de 36 m².",
+        "en": "Excellent! You designed a 36 m² square room."
+      }
+    }
+  }
+]

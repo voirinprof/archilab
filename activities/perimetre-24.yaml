@@ -1,0 +1,31 @@
+id: perimetre-24
+engine: dimensions
+category: spaces
+difficulty: intermediate
+duration_minutes: 6
+icon: ruler
+color: yellow
+title:
+  fr: "Le défi des murs"
+  en: "The Wall Challenge"
+description:
+  fr: "Conçois une pièce avec exactement 24 m de murs."
+  en: "Design a room with exactly 24 m of walls."
+mission:
+  fr: "Tu disposes de 24 mètres de murs. Crée une pièce rectangulaire d'au moins 30 m², sans faire un carré."
+  en: "You have 24 metres of walls. Make a rectangular room of at least 30 m², but not a square."
+concepts:
+  fr: ["Périmètre", "Surface", "Compromis"]
+  en: ["Perimeter", "Area", "Trade-offs"]
+parameters:
+  width: {min: 3, max: 9, step: 1, initial: 4}
+  length: {min: 3, max: 9, step: 1, initial: 5}
+constraints:
+  - {type: perimeter_equals, value: 24}
+  - {type: min_area, value: 30}
+  - {type: not_square}
+hints:
+  fr: ["Le périmètre d'un rectangle vaut deux fois la somme de ses côtés.", "Essaie une largeur de 5 mètres."]
+  en: ["A rectangle's perimeter is twice the sum of its sides.", "Try a width of 5 metres."]
+feedback:
+  success: {fr: "Bien joué ! Tu as optimisé l'espace en respectant la longueur des murs.", en: "Great job! You optimized the space within the wall limit."}
