@@ -17,7 +17,7 @@ function DoorShape({ s, into }: { s: WallSegment; into: 'a' | 'b' }) {
   const arcEnd = vertical ? [s.x1, s.y1 + MARGIN + LEAF] : [s.x1 + MARGIN + LEAF, s.y1];
   const sweep = vertical ? (sign > 0 ? 1 : 0) : (sign > 0 ? 0 : 1);
   const r = LEAF * SCALE;
-  const [ax, ay] = hinge.map(px), [bx, by] = leafEnd.map(px), [cx, cy] = arcEnd.map(px);
+  const [ax, ay] = hinge.map(m => px(m)), [bx, by] = leafEnd.map(m => px(m)), [cx, cy] = arcEnd.map(m => px(m));
   const jamb = (from: number[], to: number[]) => <line x1={px(from[0])} y1={px(from[1])} x2={px(to[0])} y2={px(to[1])} className="fp-wall" />;
   return (
     <g className="fp-door">
@@ -39,7 +39,7 @@ export function DoorsGame({ game, lang }: { game: FloorplanActivity; lang: Lang 
   const [hint, setHint] = useState(-1);
 
   const segments = wallSegments(layout, plan);
-  const result = evaluate(game.constraints, layout, plan, doors);
+  const result = evaluate(game.constraints, layout, plan, { doors });
   const reached = reachableSpaces(doorLinks(layout, plan, doors));
   const spaces = spacesOf(layout, plan);
   const maxDoors = game.constraints.find(c => c.type === 'max_doors');

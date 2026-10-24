@@ -1,5 +1,225 @@
 [
   {
+    "id": "attention-aux-voisins",
+    "engine": "floorplan",
+    "category": "site",
+    "difficulty": "intermediate",
+    "duration_minutes": 6,
+    "icon": "site",
+    "color": "mint",
+    "title": {
+      "fr": "Attention aux voisins !",
+      "en": "Mind the Neighbours!"
+    },
+    "description": {
+      "fr": "Implante une maison sur son terrain en respectant les distances imposées.",
+      "en": "Place a house on its lot while respecting the required distances."
+    },
+    "mission": {
+      "fr": "Une famille a acheté ce terrain de 26 m × 20 m. Le règlement de la ville et le voisinage imposent des distances. Place et dimensionne la maison pour qu'elle respecte toutes les règles.",
+      "en": "A family has bought this 26 m × 20 m lot. The city's bylaw and the neighbours impose some distances. Place and size the house so it follows every rule."
+    },
+    "concepts": {
+      "fr": [
+        "Implantation",
+        "Marges de recul",
+        "Taux d'implantation",
+        "Voisinage"
+      ],
+      "en": [
+        "Siting",
+        "Setbacks",
+        "Site coverage",
+        "Neighbours"
+      ]
+    },
+    "parameters": {
+      "boundary": "lot",
+      "scale": 16,
+      "plan": {
+        "width": 26,
+        "depth": 20
+      },
+      "reveal_zone_hint": 4,
+      "rooms": [
+        {
+          "id": "house",
+          "label": {
+            "fr": "Maison",
+            "en": "House"
+          },
+          "color": "yellow",
+          "initial": {
+            "x": 14,
+            "y": 2,
+            "width": 10,
+            "depth": 8
+          },
+          "width": {
+            "min": 4,
+            "max": 20
+          },
+          "depth": {
+            "min": 4,
+            "max": 14
+          }
+        }
+      ],
+      "context": [
+        {
+          "id": "street",
+          "kind": "street",
+          "label": {
+            "fr": "Rue",
+            "en": "Street"
+          },
+          "rect": {
+            "x": -1,
+            "y": -4,
+            "width": 36,
+            "depth": 3
+          }
+        },
+        {
+          "id": "neighbour",
+          "kind": "building",
+          "label": {
+            "fr": "Maison voisine",
+            "en": "Neighbours' house"
+          },
+          "rect": {
+            "x": 27,
+            "y": 3,
+            "width": 7,
+            "depth": 10
+          }
+        },
+        {
+          "id": "oak",
+          "kind": "tree",
+          "label": {
+            "fr": "Vieux chêne",
+            "en": "Old oak"
+          },
+          "rect": {
+            "x": 4,
+            "y": 18,
+            "width": 1,
+            "depth": 1
+          }
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "min_setback",
+        "room": "house",
+        "sides": [
+          "north"
+        ],
+        "value": 6,
+        "label": {
+          "fr": "Marge avant : au moins 6 m entre la maison et la limite côté rue.",
+          "en": "Front setback: at least 6 m between the house and the street-side lot line."
+        }
+      },
+      {
+        "type": "min_setback",
+        "room": "house",
+        "sides": [
+          "west",
+          "east"
+        ],
+        "value": 3,
+        "label": {
+          "fr": "Marges latérales : au moins 3 m de chaque côté.",
+          "en": "Side setbacks: at least 3 m on each side."
+        }
+      },
+      {
+        "type": "min_setback",
+        "room": "house",
+        "sides": [
+          "south"
+        ],
+        "value": 5,
+        "label": {
+          "fr": "Marge arrière : au moins 5 m, pour garder un jardin.",
+          "en": "Rear setback: at least 5 m, to keep a garden."
+        }
+      },
+      {
+        "type": "min_distance",
+        "rooms": [
+          "house",
+          "oak"
+        ],
+        "value": 5,
+        "label": {
+          "fr": "Au moins 5 m entre la maison et le tronc du chêne, pour protéger ses racines.",
+          "en": "At least 5 m between the house and the oak's trunk, to protect its roots."
+        }
+      },
+      {
+        "type": "min_distance",
+        "rooms": [
+          "house",
+          "neighbour"
+        ],
+        "value": 8,
+        "label": {
+          "fr": "Au moins 8 m de la maison voisine, pour préserver sa lumière et son intimité.",
+          "en": "At least 8 m from the neighbours' house, to preserve their light and privacy."
+        }
+      },
+      {
+        "type": "min_area",
+        "room": "house",
+        "value": 90,
+        "label": {
+          "fr": "La maison mesure au moins 90 m² (demande du client).",
+          "en": "The house is at least 90 m² (the client's request)."
+        }
+      },
+      {
+        "type": "max_coverage",
+        "value": 20,
+        "label": {
+          "fr": "Taux d'implantation : la maison couvre au plus 20 % du terrain.",
+          "en": "Site coverage: the house covers at most 20% of the lot."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Lis les règles une par une. Commence par la marge avant : éloigne la maison de la rue d'au moins 6 m.",
+        "Les lignes de cote donnent les distances en direct : en rouge, c'est trop près ; en vert, c'est bon.",
+        "La maison voisine est à l'est : décale la tienne vers l'ouest. Et attention aux racines du chêne, au fond du jardin !",
+        "Regarde le plan : la zone en pointillés montre où tu as le droit de construire, et les zones rouges sont à éviter. 20 % du terrain, c'est 104 m²."
+      ],
+      "en": [
+        "Read the rules one by one. Start with the front setback: keep the house at least 6 m from the street.",
+        "Dimension lines show the distances live: red means too close, green means fine.",
+        "The neighbours' house is to the east: shift yours to the west. And watch out for the oak's roots at the back of the garden!",
+        "Look at the plan: the dashed area shows where you're allowed to build, and the red areas must be avoided. 20% of the lot is 104 m²."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ta maison respecte le règlement, ses voisins et le vieux chêne.",
+        "en": "Well done! Your house respects the bylaw, the neighbours and the old oak."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les cotes en rouge et les règles non cochées : elles te disent quoi corriger.",
+        "en": "Not yet. Look at the red dimension lines and the unticked rules: they tell you what to fix."
+      }
+    },
+    "explanation": {
+      "fr": "Avant de dessiner, l'architecte étudie le terrain et le règlement d'urbanisme de la ville. Les marges de recul gardent de l'espace entre la maison, la rue et les voisins : pour la lumière, l'intimité, la sécurité et la nature. Le taux d'implantation limite la surface construite pour garder de la place au sol pour la végétation et l'eau de pluie. Les distances de ce défi sont simplifiées pour le jeu : chaque ville a ses propres règles.",
+      "en": "Before drawing anything, the architect studies the site and the city's zoning bylaw. Setbacks keep space between the house, the street and the neighbours: for light, privacy, safety and nature. Site coverage limits the built area so there is ground left for plants and rainwater. The distances in this challenge are simplified for the game: every city has its own rules."
+    }
+  },
+  {
     "id": "mission-25m2",
     "engine": "dimensions",
     "category": "spaces",
