@@ -18,6 +18,7 @@ export const ui = {
     siteTitle: 'À toi d’implanter', siteHelp: 'Glisse la maison pour la déplacer et tire sa poignée ◢ pour l’agrandir. Les lignes de cote donnent les distances en direct. Au clavier : flèches pour déplacer, Maj + flèches pour redimensionner.',
     lot: 'Terrain', footprint: 'Emprise au sol', coverage: 'Taux d’implantation', onLot: 'Le bâtiment reste sur le terrain.', zone: 'Zone constructible',
     blockedSite: 'Pas ici : le bâtiment doit rester sur le terrain et ne peut pas recouvrir un élément existant.',
+    treesKept: 'Arbres conservés',
     // doors mode
     doorsTitle: 'À toi de percer les portes', doorsHelp: 'Touche un morceau de mur pour y percer une porte, touche-le encore pour la retirer. Au clavier : Tab pour choisir un mur, Entrée pour ajouter ou retirer la porte.',
     doors: 'Portes', reached: 'Pièces accessibles', outside: 'l’extérieur',
@@ -37,6 +38,7 @@ export const ui = {
     siteTitle: 'Time to site it', siteHelp: 'Drag the house to move it and pull its ◢ handle to resize it. Dimension lines show the distances live. With a keyboard: arrows to move, Shift + arrows to resize.',
     lot: 'Lot', footprint: 'Footprint', coverage: 'Site coverage', onLot: 'The building stays on the lot.', zone: 'Buildable zone',
     blockedSite: 'Not here: the building must stay on the lot and can’t cover an existing element.',
+    treesKept: 'Trees kept',
     doorsTitle: 'Time to add the doors', doorsHelp: 'Tap a piece of wall to put a door in it, tap it again to remove it. With a keyboard: Tab to pick a wall, Enter to add or remove the door.',
     doors: 'Doors', reached: 'Reachable rooms', outside: 'the outside',
     unreached: 'Greyed-out rooms can’t be reached from the entrance yet.',
@@ -58,6 +60,7 @@ const palette: Record<string, { fill: string; stroke: string }> = {
   coral: { fill: '#f2c9b4', stroke: '#b9765a' },
   blue: { fill: '#c9dcea', stroke: '#5b819d' },
   mint: { fill: '#cfe5da', stroke: '#5f9480' },
+  grey: { fill: '#dcd9d2', stroke: '#8d877b' },
 };
 export const colorsOf = (spec: RoomSpec) => palette[spec.color] ?? palette.blue;
 
@@ -138,10 +141,12 @@ type FeedbackProps = {
   hint: number;
   onHint: () => void;
   onReset: () => void;
+  /** Shown under the success message, e.g. when the best possible result is reached. */
+  extra?: string;
 };
 
 /** Check button, progressive hints, verdict, explanation, reset and concepts. */
-export function Feedback({ game, lang, solved, checked, onCheck, hint, onHint, onReset }: FeedbackProps) {
+export function Feedback({ game, lang, solved, checked, onCheck, hint, onHint, onReset, extra }: FeedbackProps) {
   const t = ui[lang];
   const hints = game.hints[lang];
   return (
@@ -152,7 +157,7 @@ export function Feedback({ game, lang, solved, checked, onCheck, hint, onHint, o
       {checked && (
         <div className={`result ${solved ? 'won' : 'try'}`} role="status">
           {solved ? <CheckCircle2 size={22} /> : <XCircle size={22} />}
-          <div><strong>{solved ? t.success : t.retry}</strong><p>{solved ? game.feedback.success[lang] : game.feedback.failure[lang]}</p></div>
+          <div><strong>{solved ? t.success : t.retry}</strong><p>{solved ? game.feedback.success[lang] : game.feedback.failure[lang]}</p>{solved && extra && <p className="result-extra">{extra}</p>}</div>
         </div>
       )}
       {checked && solved && <div className="note principle"><strong>{t.principle}</strong><p>{game.explanation[lang]}</p></div>}

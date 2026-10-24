@@ -25,6 +25,9 @@ export type FloorplanConstraint =
   | { type: 'min_setback'; room: string; sides: Side[]; value: number; label: Localized }
   | { type: 'min_distance'; rooms: [string, string]; value: number; label: Localized }
   | { type: 'max_coverage'; value: number; label: Localized }
+  // Tree constraints: a tree is lost when a room comes within its root zone.
+  | { type: 'keep_trees'; trees: string[]; label: Localized }
+  | { type: 'min_trees_kept'; value: number; label: Localized }
   // Door constraints (mode: doors). A space is a room id or 'circulation' (the free cells of the plan).
   | { type: 'entrance'; side?: Side; spaces?: string[]; label: Localized }
   | { type: 'all_reachable'; label: Localized }
@@ -33,7 +36,18 @@ export type FloorplanConstraint =
   | { type: 'max_doors'; value: number; label: Localized };
 
 /** A fixed element around or on the plan (street, neighbouring building, tree). It may lie outside the plan. */
-export type ContextSpec = { id: string; kind: 'street' | 'building' | 'tree'; label: Localized; rect: Rect };
+export type ContextSpec = {
+  id: string;
+  kind: 'street' | 'building' | 'tree';
+  label: Localized;
+  rect: Rect;
+  /** Trees: root protection zone around the trunk, in metres; building inside it kills the tree. Drawn as the crown. */
+  root_radius?: number;
+  /** false: rooms may be built over this element (default true). */
+  blocking?: boolean;
+  heritage?: boolean;
+  hide_label?: boolean;
+};
 
 /** A measured distance drawn on the plan, in metres. */
 export type DimensionLine = { kind: 'setback' | 'distance'; from: [number, number]; to: [number, number]; value: number; ok: boolean };
@@ -66,9 +80,11 @@ export type FloorplanActivity = {
     context?: ContextSpec[];
     /** Hint number (from 1) from which the buildable zone is drawn on the plan. */
     reveal_zone_hint?: number;
+    /** Highest number of trees that can be kept (checked by the tests); reaching it earns the feedback.best message. */
+    best_possible?: number;
   };
   constraints: FloorplanConstraint[];
   hints: LocalizedList;
-  feedback: { success: Localized; failure: Localized };
+  feedback: { success: Localized; failure: Localized; best?: Localized };
   explanation: Localized;
 };

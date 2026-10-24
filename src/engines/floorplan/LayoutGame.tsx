@@ -3,7 +3,7 @@ import type { KeyboardEvent, PointerEvent } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import type { Lang } from '../../types.ts';
 import type { ContextSpec, DimensionLine, FloorplanActivity, PlacedRoom, Rect, RoomSpec } from './types.ts';
-import { area, buildableZone, canPlace, clamp, clampPosition, contextRects, coverage, dimensionLines, evaluate, hasValidSize, initialLayout, sizeBounds } from './rules.ts';
+import { area, buildableZone, canPlace, clamp, clampPosition, contextRects, coverage, dimensionLines, evaluate, hasValidSize, initialLayout, keptTreeCount, lostTrees, obstaclesOf, sizeBounds } from './rules.ts';
 import { Feedback, NeedsList, PAD, PlanFrame, RoomLabel, SCALE, colorsOf, formatNumber, px, ui } from './shared.tsx';
 
 const HANDLE = 22;
@@ -12,24 +12,32 @@ const arrows: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRigh
 
 type Drag = { id: string; mode: 'move' | 'resize'; startX: number; startY: number; origin: Rect };
 
-/** Smallest rectangle holding the plan and every context element. */
-function extentOf(plan: { width: number; depth: number }, context: Rect[]): Rect {
-  const rects = [{ x: 0, y: 0, width: plan.width, depth: plan.depth }, ...context];
+/** Smallest rectangle holding the plan and every context element, tree crowns included. */
+function extentOf(plan: { width: number; depth: number }, context: ContextSpec[]): Rect {
+  const grow = (c: ContextSpec): Rect => {
+    if (c.kind !== 'tree') return c.rect;
+    const r = (c.root_radius ?? TREE_CROWN) - 0.5;
+    return { x: c.rect.x - r, y: c.rect.y - r, width: c.rect.width + 2 * r, depth: c.rect.depth + 2 * r };
+  };
+  const rects = [{ x: 0, y: 0, width: plan.width, depth: plan.depth }, ...context.map(grow)];
   const x0 = Math.min(...rects.map(r => r.x)), y0 = Math.min(...rects.map(r => r.y));
   const x1 = Math.max(...rects.map(r => r.x + r.width)), y1 = Math.max(...rects.map(r => r.y + r.depth));
   return { x: x0, y: y0, width: x1 - x0, depth: y1 - y0 };
 }
 
-function ContextShape({ item, lang, scale }: { item: ContextSpec; lang: Lang; scale: number }) {
+function ContextShape({ item, lang, scale, lost }: { item: ContextSpec; lang: Lang; scale: number; lost: boolean }) {
   const p = (m: number) => px(m, scale);
   const r = item.rect;
   if (item.kind === 'tree') {
     const cx = p(r.x + r.width / 2), cy = p(r.y + r.depth / 2);
+    // The crown is drawn as wide as the root zone: roots spread roughly to the edge of the foliage.
+    const crown = (item.root_radius ?? TREE_CROWN) * scale;
     return (
-      <g className="fp-tree">
-        <circle cx={cx} cy={cy} r={TREE_CROWN * scale} />
+      <g className={`fp-tree${item.heritage ? ' heritage' : ''}${lost ? ' lost' : ''}`}>
+        <title>{item.label[lang]}</title>
+        <circle cx={cx} cy={cy} r={crown} />
         <rect x={p(r.x)} y={p(r.y)} width={r.width * scale} height={r.depth * scale} rx="3" className="fp-trunk" />
-        <text x={cx + TREE_CROWN * scale + 4} y={cy + 4} className="fp-context-label">{item.label[lang]}</text>
+        {!item.hide_label && <text x={cx} y={cy + (r.depth * scale) / 2 + 14} textAnchor="middle" className="fp-context-label fp-tree-label">{item.label[lang]}</text>}
       </g>
     );
   }
@@ -65,6 +73,8 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
   const site = game.parameters.boundary === 'lot';
   const contextItems = game.parameters.context ?? [];
   const context = contextRects(contextItems);
+  const obstacles = obstaclesOf(contextItems);
+  const treeCount = contextItems.filter(c => c.kind === 'tree' && c.root_radius).length;
   const p = (m: number) => px(m, scale);
 
   const [layout, setLayout] = useState<PlacedRoom[]>(() => initialLayout(rooms));
@@ -78,14 +88,17 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
 
   const specOf = (id: string): RoomSpec => rooms.find(r => r.id === id)!;
   const rectOf = (id: string): PlacedRoom => layout.find(r => r.id === id)!;
-  const result = evaluate(game.constraints, layout, plan, { context });
+  const result = evaluate(game.constraints, layout, plan, { context: contextItems });
+  const lost = lostTrees(layout, contextItems);
+  const kept = keptTreeCount(layout, contextItems);
+  const best = game.parameters.best_possible;
   const roomsArea = layout.reduce((sum, r) => sum + area(r), 0);
   const dimensions = dimensionLines(game.constraints, layout, plan, context);
   const revealAt = game.parameters.reveal_zone_hint;
   const zone = revealAt !== undefined && hint + 1 >= revealAt ? buildableZone(game.constraints, selected, plan, context) : null;
 
   function place(id: string, rect: Rect): boolean {
-    if (!hasValidSize(rect, specOf(id)) || !canPlace(layout, id, rect, plan, context)) return false;
+    if (!hasValidSize(rect, specOf(id)) || !canPlace(layout, id, rect, plan, obstacles)) return false;
     setLayout(current => current.map(r => (r.id === id ? { ...r, ...rect } : r)));
     setChecked(false);
     return true;
@@ -167,7 +180,9 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
     ? [
         { label: t.lot, value: `${plan.width * plan.depth} m²` },
         { label: t.footprint, value: `${roomsArea} m²` },
-        { label: t.coverage, value: `${formatNumber(coverage(layout, plan) * 100, lang)} %` },
+        treeCount
+          ? { label: t.treesKept, value: `${kept} / ${treeCount}` }
+          : { label: t.coverage, value: `${formatNumber(coverage(layout, plan) * 100, lang)} %` },
       ]
     : [
         { label: t.home, value: `${plan.width * plan.depth} m²` },
@@ -190,14 +205,14 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
             lang={lang}
             svgRef={svgRef}
             scale={scale}
-            extent={extentOf(plan, context)}
+            extent={extentOf(plan, contextItems)}
             boundary={site ? 'lot' : 'wall'}
             className="draggable"
             onPointerMove={moveDrag}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
           >
-            {contextItems.map(item => <ContextShape key={item.id} item={item} lang={lang} scale={scale} />)}
+            {contextItems.map(item => <ContextShape key={item.id} item={item} lang={lang} scale={scale} lost={lost.has(item.id)} />)}
             {site
               ? <rect x={p(0)} y={p(0)} width={plan.width * scale} height={plan.depth * scale} className="fp-lot-line" />
               : <rect x={p(0)} y={p(0)} width={plan.width * scale} height={plan.depth * scale} fill="none" stroke="#37545b" strokeWidth="6" />}
@@ -238,6 +253,10 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
                   )}
                 </g>
               );
+            })}
+            {contextItems.filter(item => lost.has(item.id)).map(item => {
+              const cx = p(item.rect.x + item.rect.width / 2), cy = p(item.rect.y + item.rect.depth / 2), s = 7;
+              return <path key={`lost-${item.id}`} className="fp-tree-lost" d={`M${cx - s} ${cy - s}L${cx + s} ${cy + s}M${cx + s} ${cy - s}L${cx - s} ${cy + s}`} />;
             })}
             {dimensions.map((line, i) => <DimensionMark key={i} line={line} lang={lang} scale={scale} />)}
             {ghost && <rect x={p(ghost.x) + 2} y={p(ghost.y) + 2} width={ghost.width * scale - 4} height={ghost.depth * scale - 4} rx="4" className="fp-ghost" />}
@@ -283,6 +302,7 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
           hint={hint}
           onHint={() => setHint(h => Math.min(h + 1, game.hints[lang].length - 1))}
           onReset={reset}
+          extra={best !== undefined && kept >= best ? game.feedback.best?.[lang] : undefined}
         />
       </aside>
     </div>

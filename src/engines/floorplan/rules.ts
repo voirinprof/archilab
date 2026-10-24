@@ -101,6 +101,22 @@ export function contextRects(context: ContextSpec[] = []): PlacedRoom[] {
   return context.map(c => ({ id: c.id, ...c.rect }));
 }
 
+/** Context elements that rooms may not be built over. */
+export function obstaclesOf(context: ContextSpec[] = []): PlacedRoom[] {
+  return contextRects(context.filter(c => c.blocking !== false));
+}
+
+/** Trees whose trunk or root zone is touched by a room. */
+export function lostTrees(layout: PlacedRoom[], context: ContextSpec[] = []): Set<string> {
+  const lost = context.filter(c =>
+    c.kind === 'tree' && layout.some(r => overlaps(r, c.rect) || gap(r, c.rect) < (c.root_radius ?? 0) - EPSILON));
+  return new Set(lost.map(c => c.id));
+}
+
+export function keptTreeCount(layout: PlacedRoom[], context: ContextSpec[] = []): number {
+  return context.filter(c => c.kind === 'tree').length - lostTrees(layout, context).size;
+}
+
 export function initialLayout(rooms: RoomSpec[]): PlacedRoom[] {
   return rooms.map(room => ({ id: room.id, ...room.initial }));
 }
@@ -173,13 +189,13 @@ export function reachableSpaces(doorSegments: WallSegment[], avoid?: string): Se
 }
 
 /** What a constraint may look at besides the rooms: placed doors and fixed context elements. */
-export type Extras = { doors?: string[]; context?: PlacedRoom[] };
+export type Extras = { doors?: string[]; context?: ContextSpec[] };
 
 const EPSILON = 1e-9;
 
 export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], plan: Plan, { doors = [], context = [] }: Extras = {}): boolean {
   const find = (id: string) => layout.find(r => r.id === id);
-  const findAny = (id: string) => find(id) ?? context.find(r => r.id === id);
+  const findAny = (id: string) => find(id) ?? contextRects(context).find(r => r.id === id);
   const placedDoors = () => doorLinks(layout, plan, doors);
   switch (c.type) {
     case 'min_area':
@@ -227,6 +243,12 @@ export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], pl
     }
     case 'max_coverage':
       return coverage(layout, plan) * 100 <= c.value + EPSILON;
+    case 'keep_trees': {
+      const lost = lostTrees(layout, context);
+      return c.trees.every(id => !lost.has(id));
+    }
+    case 'min_trees_kept':
+      return keptTreeCount(layout, context) >= c.value;
   }
 }
 

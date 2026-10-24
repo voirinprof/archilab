@@ -72,7 +72,15 @@ function validateFloorplan(a,fail){
     if(!localized(c.label))fail(`Missing translations: context ${c.id}`);
     const r=c.rect;
     if(!r||![r.x,r.y,r.width,r.depth].every(isInt)||r.width<1||r.depth<1)fail(`Invalid context rect: ${c.id}`);
-    for(const room of rooms)if(overlap(room.initial,r))fail(`Room ${room.id} starts on context element ${c.id}`);
+    if(c.root_radius!==undefined&&(c.kind!=='tree'||!(Number.isFinite(c.root_radius)&&c.root_radius>0)))fail(`Invalid root_radius: ${c.id}`);
+    for(const flag of ['blocking','heritage','hide_label'])if(c[flag]!==undefined&&typeof c[flag]!=='boolean')fail(`Invalid ${flag}: ${c.id}`);
+    if(c.blocking!==false)for(const room of rooms)if(overlap(room.initial,r))fail(`Room ${room.id} starts on context element ${c.id}`);
+  }
+  const treeIds=new Set(context.filter(c=>c.kind==='tree').map(c=>c.id));
+  const best=a.parameters.best_possible;
+  if(best!==undefined){
+    if(!isInt(best)||best<1||best>treeIds.size)fail('Invalid best_possible');
+    if(!localized(a.feedback?.best))fail('Missing translations: feedback.best');
   }
   if(mode==='doors'){
     if(!localized(a.parameters.circulation))fail('Missing translations: circulation');
@@ -107,6 +115,10 @@ function validateFloorplan(a,fail){
         if(!Array.isArray(c.rooms)||c.rooms.length!==2||c.rooms[0]===c.rooms[1]||!c.rooms.every(id=>roomIds.has(id)||contextIds.has(id))||!c.rooms.some(id=>roomIds.has(id))||!(Number.isFinite(c.value)&&c.value>0))fail('Invalid constraint min_distance');break;
       case 'max_coverage':
         if(!(Number.isFinite(c.value)&&c.value>0&&c.value<=100))fail('Invalid constraint max_coverage');break;
+      case 'keep_trees':
+        if(!Array.isArray(c.trees)||!c.trees.length||!c.trees.every(id=>treeIds.has(id)))fail('Invalid constraint keep_trees');break;
+      case 'min_trees_kept':
+        if(!isInt(c.value)||c.value<1||c.value>treeIds.size)fail('Invalid constraint min_trees_kept');break;
       default: fail(`Unknown constraint ${c.type}`);
     }
   }
