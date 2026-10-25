@@ -1,5 +1,5 @@
 import type { FurnishConstraint, FurnitureSpec, OpeningSpec, PlacedFurniture, Plan, Rect, Rotation, Side } from './types.ts';
-import { gap, isInside, overlaps } from './rules.ts';
+import { gap, isInside, overlaps, walkableArea } from './rules.ts';
 
 const EPSILON = 1e-9;
 const CLOCKWISE: Side[] = ['north', 'east', 'south', 'west'];
@@ -114,39 +114,8 @@ function targetRects(scene: Scene, id: string): Rect[] {
  * Returns the reachable cells and the ids among `to` that the walkable area touches.
  */
 export function passage(scene: Scene, from: string, to: string[], width: number) {
-  const { plan, step } = scene;
-  const nx = Math.round(plan.width / step), ny = Math.round(plan.depth / step);
-  const k = Math.max(1, Math.ceil(width / step - EPSILON));
-  const cellRect = (i: number, j: number, size = 1): Rect => ({ x: i * step, y: j * step, width: size * step, depth: size * step });
-  const blocked = footprints(scene).map(f => f.rect);
-  const free: boolean[] = [];
-  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) free[j * nx + i] = blocked.every(b => !overlaps(cellRect(i, j), b));
-  const blockFree = (i: number, j: number) => {
-    for (let dj = 0; dj < k; dj++) for (let di = 0; di < k; di++) if (!free[(j + dj) * nx + i + di]) return false;
-    return true;
-  };
-  const touches = (i: number, j: number, rects: Rect[]) => rects.some(r => gap(cellRect(i, j, k), r) < EPSILON);
-
-  const seen = new Set<number>();
-  const queue: [number, number][] = [];
-  const starts = targetRects(scene, from);
-  for (let j = 0; j + k <= ny; j++) for (let i = 0; i + k <= nx; i++) {
-    if (blockFree(i, j) && touches(i, j, starts)) { seen.add(j * nx + i); queue.push([i, j]); }
-  }
-  while (queue.length) {
-    const [i, j] = queue.shift()!;
-    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const a = i + di, b = j + dj;
-      if (a < 0 || b < 0 || a + k > nx || b + k > ny || seen.has(b * nx + a) || !blockFree(a, b)) continue;
-      seen.add(b * nx + a);
-      queue.push([a, b]);
-    }
-  }
-  const blocks = [...seen].map(n => [n % nx, Math.floor(n / nx)] as [number, number]);
-  const cells = new Set<number>();
-  for (const [i, j] of blocks) for (let dj = 0; dj < k; dj++) for (let di = 0; di < k; di++) cells.add((j + dj) * nx + i + di);
-  const reached = to.filter(id => blocks.some(([i, j]) => touches(i, j, targetRects(scene, id))));
-  return { cells: [...cells].map(n => cellRect(n % nx, Math.floor(n / nx))), reached: new Set(reached) };
+  const area = walkableArea(scene.plan, scene.step, footprints(scene).map(f => f.rect), targetRects(scene, from), width, { corners: true });
+  return { cells: area.cells, reached: new Set(to.filter(id => area.reaches(targetRects(scene, id)))) };
 }
 
 function rectOfAny(scene: Scene, id: string): Rect {

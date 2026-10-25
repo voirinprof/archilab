@@ -1,0 +1,141 @@
+id: chantier-en-desordre
+engine: sequence
+category: plans
+difficulty: beginner
+duration_minutes: 6
+icon: hardhat
+color: coral
+title:
+  fr: "Chantier en désordre"
+  en: "Building Site Mix-up"
+description:
+  fr: "Remets les grandes étapes de la construction d'une maison dans un ordre logique."
+  en: "Put the main stages of building a house back into a logical order."
+mission:
+  fr: "Le planning du chantier s'est mélangé ! Remets les étapes dans un ordre logique, puis lance le chantier : il s'arrêtera à la première étape impossible et te dira pourquoi."
+  en: "The building site schedule got mixed up! Put the stages into a logical order, then start the site: it will stop at the first impossible stage and tell you why."
+concepts:
+  fr: ["Chantier", "Planning", "Gros œuvre et second œuvre", "Hors d'eau, hors d'air"]
+  en: ["Building site", "Scheduling", "Structural work and fit-out", "Weathertight, airtight"]
+parameters:
+  illustration: house
+  steps:
+    - id: permis
+      icon: "📝"
+      layer: sign
+      label: {fr: "Permis de construire", en: "Building permit"}
+      detail: {fr: "La ville autorise le projet.", en: "The city approves the project."}
+    - id: terrassement
+      icon: "🚜"
+      layer: excavation
+      label: {fr: "Terrassement", en: "Earthworks"}
+      detail: {fr: "On creuse et on nivelle le terrain.", en: "The ground is dug and levelled."}
+    - id: fondations
+      icon: "🧱"
+      layer: foundations
+      label: {fr: "Fondations", en: "Foundations"}
+      detail: {fr: "Du béton coulé dans le sol pour porter la maison.", en: "Concrete poured into the ground to carry the house."}
+    - id: dalle
+      icon: "⬛"
+      layer: slab
+      label: {fr: "Dalle", en: "Ground slab"}
+      detail: {fr: "Le plancher du rez-de-chaussée.", en: "The ground floor."}
+    - id: murs
+      icon: "🏗️"
+      layer: walls
+      label: {fr: "Murs", en: "Walls"}
+      detail: {fr: "On monte les murs porteurs.", en: "The load-bearing walls go up."}
+    - id: toiture
+      icon: "🏠"
+      layer: roof
+      label: {fr: "Charpente et toiture", en: "Roof frame and roofing"}
+      detail: {fr: "Le bâtiment est « hors d'eau ».", en: "The building is weathertight."}
+    - id: menuiseries
+      icon: "🪟"
+      layer: windows
+      label: {fr: "Fenêtres et portes", en: "Windows and doors"}
+      detail: {fr: "Le bâtiment est « hors d'air ».", en: "The building is airtight."}
+    - id: plomberie
+      icon: "🚰"
+      layer: pipes
+      label: {fr: "Plomberie", en: "Plumbing"}
+      detail: {fr: "Les tuyaux d'eau passent dans les murs.", en: "Water pipes run through the walls."}
+    - id: electricite
+      icon: "⚡"
+      layer: wires
+      label: {fr: "Électricité", en: "Electrics"}
+      detail: {fr: "Les câbles passent dans les murs.", en: "Cables run through the walls."}
+    - id: isolation
+      icon: "🧶"
+      layer: insulation
+      label: {fr: "Isolation et cloisons", en: "Insulation and partitions"}
+      detail: {fr: "On isole et on ferme les murs intérieurs.", en: "Walls are insulated and closed."}
+    - id: finitions
+      icon: "🎨"
+      layer: finishes
+      label: {fr: "Finitions", en: "Finishes"}
+      detail: {fr: "Peinture, sols, cuisine, salle de bain.", en: "Paint, floors, kitchen, bathroom."}
+  dependencies:
+    - before: permis
+      after: terrassement
+      reason: {fr: "Sans permis de construire, on n'a pas le droit de commencer les travaux.", en: "Without a building permit, works aren't allowed to start."}
+    - before: terrassement
+      after: fondations
+      reason: {fr: "Il faut d'abord creuser le sol pour y couler les fondations.", en: "The ground must be dug first to pour the foundations into it."}
+    - before: fondations
+      after: dalle
+      reason: {fr: "La dalle repose sur les fondations.", en: "The slab rests on the foundations."}
+    - before: dalle
+      after: murs
+      reason: {fr: "Les murs se montent sur la dalle.", en: "The walls are built on the slab."}
+    - before: murs
+      after: toiture
+      reason: {fr: "La charpente et le toit s'appuient sur les murs : sans eux, rien ne les porte.", en: "The roof frame rests on the walls: without them, nothing holds it up."}
+    - before: toiture
+      after: menuiseries
+      reason: {fr: "On met d'abord le bâtiment « hors d'eau » avec le toit, puis on pose les fenêtres.", en: "The roof makes the building weathertight first; the windows come next."}
+    - before: toiture
+      after: plomberie
+      reason: {fr: "Les tuyaux s'installent à l'abri de la pluie, une fois le toit posé.", en: "Pipes are installed out of the rain, once the roof is on."}
+    - before: toiture
+      after: electricite
+      reason: {fr: "Les câbles électriques craignent l'eau : on attend que le toit soit posé.", en: "Electric cables fear water: they wait until the roof is on."}
+    - before: plomberie
+      after: isolation
+      reason: {fr: "Les tuyaux passent dans les murs avant qu'on les isole et qu'on les referme.", en: "Pipes go into the walls before they are insulated and closed."}
+    - before: electricite
+      after: isolation
+      reason: {fr: "Les câbles passent dans les murs avant l'isolation et les cloisons qui les cachent.", en: "Cables go into the walls before the insulation and partitions that hide them."}
+    - before: menuiseries
+      after: isolation
+      reason: {fr: "On isole un bâtiment fermé : les fenêtres doivent être posées (« hors d'air »).", en: "Insulation goes into a closed building: the windows must be in (airtight)."}
+    - before: isolation
+      after: finitions
+      reason: {fr: "On peint et on pose les sols sur des murs et des cloisons terminés.", en: "Paint and floors go onto finished walls and partitions."}
+  initial_order: [finitions, murs, permis, electricite, toiture, fondations, isolation, terrassement, menuiseries, dalle, plomberie]
+constraints:
+  - type: respects_dependencies
+    label:
+      fr: "Chaque étape vient après tout ce dont elle a besoin : le chantier va jusqu'au bout."
+      en: "Every stage comes after everything it needs: the site runs to the end."
+hints:
+  fr:
+    - "Lance le chantier : il s'arrête à la première étape impossible et t'explique pourquoi. Corrige, puis relance !"
+    - "On construit de bas en haut : d'abord les autorisations, puis le sol, les fondations, la dalle, les murs et enfin le toit."
+    - "Les tuyaux et les câbles passent dans les murs : ils doivent être posés avant l'isolation et les cloisons qui les cachent."
+    - "Une fois le toit posé, l'ordre des fenêtres, de la plomberie et de l'électricité est libre : plusieurs plannings sont justes !"
+  en:
+    - "Start the site: it stops at the first impossible stage and explains why. Fix it, then start again!"
+    - "Buildings go up from the bottom: first the permit, then the ground, foundations, slab, walls and finally the roof."
+    - "Pipes and cables run inside the walls: they must go in before the insulation and partitions that hide them."
+    - "Once the roof is on, windows, plumbing and electrics can come in any order: several schedules are right!"
+feedback:
+  success:
+    fr: "Bravo ! Ton planning est logique : la maison se construit sans accroc."
+    en: "Well done! Your schedule is logical: the house goes up without a hitch."
+  failure:
+    fr: "Pas encore. Lance le chantier pour voir où il bloque et pourquoi."
+    en: "Not yet. Start the site to see where it gets stuck and why."
+explanation:
+  fr: "Un chantier suit un ordre logique, parce que chaque étape a besoin des précédentes. On commence par les autorisations, puis le « gros œuvre » (terrassement, fondations, dalle, murs, toit) qui met le bâtiment « hors d'eau », puis les fenêtres qui le mettent « hors d'air ». Vient ensuite le « second œuvre » : réseaux, isolation, cloisons et finitions. Certaines étapes peuvent se faire en même temps, par des corps de métier différents. L'architecte prépare ce planning avec les entreprises et suit le chantier. Ce jeu simplifie : un vrai chantier compte des dizaines d'étapes."
+  en: "A building site follows a logical order, because each stage needs the previous ones. It starts with permits, then the structural work (earthworks, foundations, slab, walls, roof) that makes the building weathertight, then the windows that make it airtight. Next comes the fit-out: services, insulation, partitions and finishes. Some stages can happen at the same time, by different trades. The architect prepares this schedule with the builders and follows the site. This game simplifies: a real site has dozens of stages."
