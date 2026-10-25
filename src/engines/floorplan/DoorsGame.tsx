@@ -9,16 +9,17 @@ const LEAF = 0.8; // door leaf width in metres, centred in its 1 m wall segment
 const MARGIN = (1 - LEAF) / 2;
 
 /** Door leaf and swing arc, opening into side a (west/north) or b (east/south) of the segment. */
-function DoorShape({ s, into }: { s: WallSegment; into: 'a' | 'b' }) {
+export function DoorShape({ s, into, scale = SCALE }: { s: Pick<WallSegment, 'x1' | 'y1' | 'x2' | 'y2'>; into: 'a' | 'b'; scale?: number }) {
+  const p = (m: number) => px(m, scale);
   const sign = into === 'b' ? 1 : -1;
   const vertical = s.x1 === s.x2;
   const hinge = vertical ? [s.x1, s.y1 + MARGIN] : [s.x1 + MARGIN, s.y1];
   const leafEnd = vertical ? [s.x1 + sign * LEAF, s.y1 + MARGIN] : [s.x1 + MARGIN, s.y1 + sign * LEAF];
   const arcEnd = vertical ? [s.x1, s.y1 + MARGIN + LEAF] : [s.x1 + MARGIN + LEAF, s.y1];
   const sweep = vertical ? (sign > 0 ? 1 : 0) : (sign > 0 ? 0 : 1);
-  const r = LEAF * SCALE;
-  const [ax, ay] = hinge.map(m => px(m)), [bx, by] = leafEnd.map(m => px(m)), [cx, cy] = arcEnd.map(m => px(m));
-  const jamb = (from: number[], to: number[]) => <line x1={px(from[0])} y1={px(from[1])} x2={px(to[0])} y2={px(to[1])} className="fp-wall" />;
+  const r = LEAF * scale;
+  const [ax, ay] = hinge.map(p), [bx, by] = leafEnd.map(p), [cx, cy] = arcEnd.map(p);
+  const jamb = (from: number[], to: number[]) => <line x1={p(from[0])} y1={p(from[1])} x2={p(to[0])} y2={p(to[1])} className="fp-wall" />;
   return (
     <g className="fp-door">
       {vertical

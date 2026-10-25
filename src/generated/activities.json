@@ -740,6 +740,510 @@
     }
   },
   {
+    "id": "le-batiment-transformable",
+    "engine": "floorplan",
+    "category": "client",
+    "difficulty": "advanced",
+    "duration_minutes": 10,
+    "icon": "renovate",
+    "color": "mint",
+    "title": {
+      "fr": "Le bâtiment transformable",
+      "en": "The Transformable Building"
+    },
+    "description": {
+      "fr": "Transforme d'anciens bureaux en logement familial, avec le moins de travaux possible.",
+      "en": "Turn old offices into a family home with as little building work as possible."
+    },
+    "mission": {
+      "fr": "Ces anciens bureaux de 70 m² vont devenir le logement d'une famille de quatre. Démolis ou construis des cloisons, ouvre ou ferme des portes, puis donne une fonction à chaque pièce. Les murs porteurs et le mur des tuyaux ne bougent pas, et le budget de travaux est limité.",
+      "en": "These old 70 m² offices will become a home for a family of four. Demolish or build partitions, open or close doors, then give each room a function. The load-bearing walls and the pipe wall can't move, and the works budget is limited."
+    },
+    "concepts": {
+      "fr": [
+        "Adaptabilité",
+        "Reconversion",
+        "Murs porteurs",
+        "Économie de moyens"
+      ],
+      "en": [
+        "Adaptability",
+        "Conversion",
+        "Load-bearing walls",
+        "Doing more with less"
+      ]
+    },
+    "parameters": {
+      "mode": "renovate",
+      "plan": {
+        "width": 10,
+        "depth": 7
+      },
+      "scale": 50,
+      "load_bearing": [
+        [
+          [
+            0,
+            3
+          ],
+          [
+            10,
+            3
+          ]
+        ]
+      ],
+      "water": [
+        [
+          [
+            8,
+            4
+          ],
+          [
+            8,
+            7
+          ]
+        ]
+      ],
+      "partitions": [
+        [
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        [
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            10,
+            4
+          ]
+        ],
+        [
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            7
+          ]
+        ]
+      ],
+      "doors": [
+        [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        [
+          [
+            8,
+            3
+          ],
+          [
+            9,
+            3
+          ]
+        ],
+        [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        [
+          [
+            7,
+            4
+          ],
+          [
+            8,
+            4
+          ]
+        ],
+        [
+          [
+            8,
+            4
+          ],
+          [
+            9,
+            4
+          ]
+        ]
+      ],
+      "windows": [
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        [
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ]
+        ],
+        [
+          [
+            7,
+            0
+          ],
+          [
+            9,
+            0
+          ]
+        ],
+        [
+          [
+            1,
+            7
+          ],
+          [
+            5,
+            7
+          ]
+        ],
+        [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            6
+          ]
+        ],
+        [
+          [
+            10,
+            5
+          ],
+          [
+            10,
+            6
+          ]
+        ]
+      ],
+      "former": [
+        {
+          "label": {
+            "fr": "ex-bureau",
+            "en": "ex-office"
+          },
+          "at": [
+            1,
+            1
+          ]
+        },
+        {
+          "label": {
+            "fr": "ex-bureau",
+            "en": "ex-office"
+          },
+          "at": [
+            4,
+            1
+          ]
+        },
+        {
+          "label": {
+            "fr": "ex-salle de réunion",
+            "en": "ex-meeting room"
+          },
+          "at": [
+            8,
+            1
+          ]
+        },
+        {
+          "label": {
+            "fr": "ex-open space",
+            "en": "ex-open-plan office"
+          },
+          "at": [
+            3,
+            5
+          ]
+        },
+        {
+          "label": {
+            "fr": "ex-WC",
+            "en": "ex-toilets"
+          },
+          "at": [
+            7,
+            5
+          ]
+        },
+        {
+          "label": {
+            "fr": "ex-kitchenette",
+            "en": "ex-kitchenette"
+          },
+          "at": [
+            9,
+            5
+          ]
+        }
+      ],
+      "uses": [
+        {
+          "id": "bedroom",
+          "label": {
+            "fr": "Chambre",
+            "en": "Bedroom"
+          },
+          "color": "blue"
+        },
+        {
+          "id": "living",
+          "label": {
+            "fr": "Séjour",
+            "en": "Living room"
+          },
+          "color": "yellow"
+        },
+        {
+          "id": "kitchen",
+          "label": {
+            "fr": "Cuisine",
+            "en": "Kitchen"
+          },
+          "color": "coral"
+        },
+        {
+          "id": "bathroom",
+          "label": {
+            "fr": "Salle de bain",
+            "en": "Bathroom"
+          },
+          "color": "mint"
+        },
+        {
+          "id": "hall",
+          "label": {
+            "fr": "Entrée / couloir",
+            "en": "Hall / corridor"
+          },
+          "color": "grey"
+        },
+        {
+          "id": "storage",
+          "label": {
+            "fr": "Rangement",
+            "en": "Storage"
+          },
+          "color": "grey"
+        }
+      ],
+      "costs": {
+        "demolish": 1,
+        "build": 2,
+        "door": 1
+      },
+      "good_cost": 6
+    },
+    "constraints": [
+      {
+        "type": "use_count",
+        "use": "bedroom",
+        "min": 3,
+        "min_area": 9,
+        "label": {
+          "fr": "Au moins 3 chambres de 9 m² ou plus : une pour les parents, une pour chaque enfant.",
+          "en": "At least 3 bedrooms of 9 m² or more: one for the parents, one for each child."
+        }
+      },
+      {
+        "type": "use_min_area",
+        "areas": {
+          "living": 20
+        },
+        "label": {
+          "fr": "Un séjour d'au moins 20 m².",
+          "en": "A living room of at least 20 m²."
+        }
+      },
+      {
+        "type": "use_min_area",
+        "areas": {
+          "kitchen": 4,
+          "bathroom": 3
+        },
+        "label": {
+          "fr": "La cuisine fait au moins 4 m² et la salle de bain au moins 3 m².",
+          "en": "The kitchen is at least 4 m² and the bathroom at least 3 m²."
+        }
+      },
+      {
+        "type": "use_has_window",
+        "uses": [
+          "bedroom",
+          "living"
+        ],
+        "label": {
+          "fr": "Chaque chambre et le séjour ont une fenêtre.",
+          "en": "Every bedroom and the living room have a window."
+        }
+      },
+      {
+        "type": "use_touches_water",
+        "uses": [
+          "kitchen",
+          "bathroom"
+        ],
+        "label": {
+          "fr": "La cuisine et la salle de bain touchent le mur des tuyaux (en bleu).",
+          "en": "The kitchen and the bathroom touch the pipe wall (in blue)."
+        }
+      },
+      {
+        "type": "no_door_between_uses",
+        "uses": [
+          "bedroom",
+          "living"
+        ],
+        "label": {
+          "fr": "Les chambres ne s'ouvrent pas directement sur le séjour (intimité).",
+          "en": "Bedrooms don't open straight onto the living room (privacy)."
+        }
+      },
+      {
+        "type": "reachable_avoiding_use",
+        "uses": [
+          "bathroom",
+          "kitchen",
+          "living"
+        ],
+        "avoid": "bedroom",
+        "label": {
+          "fr": "On va au séjour, à la cuisine et à la salle de bain sans traverser de chambre.",
+          "en": "You can reach the living room, kitchen and bathroom without walking through a bedroom."
+        }
+      },
+      {
+        "type": "all_reachable",
+        "label": {
+          "fr": "Toutes les pièces sont accessibles depuis l'entrée.",
+          "en": "Every room can be reached from the entrance."
+        }
+      },
+      {
+        "type": "all_assigned",
+        "label": {
+          "fr": "Chaque pièce a une fonction.",
+          "en": "Every room has a function."
+        }
+      },
+      {
+        "type": "max_cost",
+        "value": 12,
+        "label": {
+          "fr": "Le coût des travaux ne dépasse pas le budget de 12.",
+          "en": "The works cost stays within the budget of 12."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Commence par donner une fonction aux pièces telles qu'elles sont : beaucoup d'anciens bureaux font déjà de bonnes chambres !",
+        "La cuisine et la salle de bain doivent toucher le mur bleu des tuyaux : regarde quelles pièces le bordent.",
+        "Le séjour doit faire 20 m², mais l'ancien open space n'en fait que 18. Comment lui gagner 2 m² sans que les chambres s'ouvrent dessus ?",
+        "Démolir coûte 1 par mètre, construire 2, et percer ou fermer une porte 1. Une piste : prends un petit morceau du couloir pour agrandir le séjour, et garde un passage vers le reste du logement."
+      ],
+      "en": [
+        "Start by giving each room a function as it is: many old offices already make good bedrooms!",
+        "The kitchen and bathroom must touch the blue pipe wall: look at which rooms border it.",
+        "The living room needs 20 m², but the old open-plan office only has 18. How can it gain 2 m² without bedrooms opening onto it?",
+        "Demolishing costs 1 per metre, building 2, and opening or closing a door 1. One idea: take a small piece of the corridor to enlarge the living room, and keep a way through to the rest of the home."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Les anciens bureaux sont devenus un vrai logement familial.",
+        "en": "Well done! The old offices have become a real family home."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les besoins non cochés : la fonction des pièces, leur surface, leurs portes ou le budget.",
+        "en": "Not yet. Look at the unticked needs: room functions, sizes, doors or the budget."
+      },
+      "best": {
+        "fr": "Transformation très économe : tu as gardé presque tout ce qui existait !",
+        "en": "A very economical transformation: you kept almost everything that was already there!"
+      }
+    },
+    "explanation": {
+      "fr": "Transformer un bâtiment plutôt que le démolir économise beaucoup de matériaux, d'énergie et d'argent : c'est souvent le choix le plus écologique. Pour cela, l'architecte lit le bâtiment existant : les murs porteurs, qui tiennent la structure, restent en place ; les cloisons se déplacent ; les pièces d'eau se regroupent près des tuyaux. Un bâtiment bien conçu dès le départ, avec peu de murs porteurs et des réseaux bien placés, est plus facile à adapter. Les coûts de ce défi sont simplifiés pour le jeu.",
+      "en": "Transforming a building instead of demolishing it saves a lot of materials, energy and money: it is often the greenest choice. To do it, the architect reads the existing building: load-bearing walls, which hold the structure up, stay in place; partitions can move; wet rooms gather near the pipes. A building designed well from the start, with few load-bearing walls and well-placed services, is easier to adapt. The costs in this challenge are simplified for the game."
+    }
+  },
+  {
     "id": "mission-25m2",
     "engine": "dimensions",
     "category": "spaces",

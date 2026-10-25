@@ -84,9 +84,55 @@ function validateFurnish(a,fail){
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_passage_hint');
   validateCommonContent(a,fail);
 }
+/** Renovate mode: walls given as runs on grid lines, uses given to rooms, works priced. */
+function validateRenovate(a,fail){
+  const {plan,load_bearing,water,partitions,doors,windows,uses,costs,good_cost,former}=a.parameters;
+  if(!plan||!isInt(plan.width)||!isInt(plan.depth)||plan.width<1||plan.depth<1)fail('Invalid plan size');
+  const onLine=r=>Array.isArray(r)&&r.length===2&&r.every(p=>Array.isArray(p)&&p.length===2&&p.every(isInt))
+    &&(r[0][0]===r[1][0]||r[0][1]===r[1][1])&&!(r[0][0]===r[1][0]&&r[0][1]===r[1][1])
+    &&r.every(([x,y])=>x>=0&&y>=0&&x<=plan.width&&y<=plan.depth);
+  const keys=r=>{const [[x1,y1],[x2,y2]]=r;const out=[];if(x1===x2)for(let y=Math.min(y1,y2);y<Math.max(y1,y2);y++)out.push(`v:${x1}:${y}`);else for(let x=Math.min(x1,x2);x<Math.max(x1,x2);x++)out.push(`h:${x}:${y1}`);return out;};
+  const perimeter=k=>{const [d,x,y]=k.split(':');return d==='v'?(+x===0||+x===plan.width):(+y===0||+y===plan.depth);};
+  for(const [name,list] of Object.entries({load_bearing,water,partitions,doors,windows})){
+    if(!Array.isArray(list))fail(`Missing ${name}`);
+    for(const r of list)if(!onLine(r))fail(`Invalid run in ${name}: ${JSON.stringify(r)}`);
+  }
+  const walls=new Set([...load_bearing,...water,...partitions].flatMap(keys));
+  for(const k of walls)if(perimeter(k))fail(`Interior wall on the outer wall: ${k}`);
+  for(const r of windows)for(const k of keys(r))if(!perimeter(k))fail(`Window not on the outer wall: ${k}`);
+  const doorKeys=doors.flatMap(keys);
+  for(const k of doorKeys)if(!perimeter(k)&&!walls.has(k))fail(`Door without a wall: ${k}`);
+  if(!doorKeys.some(perimeter))fail('Missing entrance: no door on the outer wall');
+  if(!Array.isArray(uses)||!uses.length)fail('Missing uses');
+  const useIds=new Set();
+  for(const u of uses){
+    if(!/^[a-z0-9-]+$/.test(u?.id||'')||useIds.has(u.id))fail(`Invalid or duplicate use ${u?.id}`);
+    useIds.add(u.id);
+    if(!localized(u.label)||typeof u.color!=='string')fail(`Invalid use ${u.id}`);
+  }
+  if(!costs||!['demolish','build','door'].every(k=>Number.isFinite(costs[k])&&costs[k]>=0))fail('Invalid costs');
+  if(good_cost!==undefined&&(!Number.isFinite(good_cost)||!localized(a.feedback?.best)))fail('good_cost needs a number and feedback.best');
+  for(const f of former??[])if(!localized(f?.label)||!Array.isArray(f.at)||f.at.length!==2)fail('Invalid former use');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    const known=u=>useIds.has(u);
+    switch(c.type){
+      case 'use_count': if(!known(c.use)||!isInt(c.min)||c.min<1)fail('Invalid constraint use_count');break;
+      case 'use_min_area': if(!c.areas||!Object.entries(c.areas).every(([u,v])=>known(u)&&Number.isFinite(v)&&v>0))fail('Invalid constraint use_min_area');break;
+      case 'use_has_window': case 'use_touches_water': if(!Array.isArray(c.uses)||!c.uses.length||!c.uses.every(known))fail(`Invalid constraint ${c.type}`);break;
+      case 'all_assigned': case 'all_reachable': break;
+      case 'reachable_avoiding_use': if(!Array.isArray(c.uses)||!c.uses.every(known)||!known(c.avoid))fail('Invalid constraint reachable_avoiding_use');break;
+      case 'no_door_between_uses': if(!Array.isArray(c.uses)||c.uses.length!==2||!c.uses.every(known))fail('Invalid constraint no_door_between_uses');break;
+      case 'max_cost': if(!Number.isFinite(c.value)||c.value<0)fail('Invalid constraint max_cost');break;
+      default: fail(`Unknown constraint ${c.type} for mode renovate`);
+    }
+  }
+  validateCommonContent(a,fail);
+}
 function validateFloorplan(a,fail){
   const mode=a.parameters?.mode??'layout';
   if(mode==='furnish')return validateFurnish(a,fail);
+  if(mode==='renovate')return validateRenovate(a,fail);
   if(!['layout','doors'].includes(mode))fail(`Invalid mode ${mode}`);
   const {scale,boundary,reveal_zone_hint:reveal}=a.parameters??{};
   if(scale!==undefined&&!(Number.isFinite(scale)&&scale>0))fail('Invalid scale');

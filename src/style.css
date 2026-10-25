@@ -139,3 +139,34 @@
 @media(max-width:550px){.blocks-stage{grid-template-columns:1fr}
 }
 .editor-cell{-webkit-tap-highlight-color:transparent}
+.tool-switch{display:flex;gap:6px;background:#f0f4ef;border-radius:12px;padding:4px;width:max-content;max-width:100%;margin:10px 0 0}
+.tool-switch button{display:flex;align-items:center;gap:6px;border:0;background:none;border-radius:9px;padding:8px 12px;font-weight:700;font-size:13px;color:#53676b}
+.tool-switch button.active{background:#203d45;color:#fff}
+.rn-cell{stroke:#ffffff;stroke-width:.6;cursor:pointer}
+.rn-cell.selected{stroke:#142e37;stroke-width:1.5;filter:brightness(.93)}
+.rn-former{font-size:9px;font-style:italic;fill:#8a9894;pointer-events:none}
+.rn-label{pointer-events:none}
+.rn-unknown{fill:#8a9894}
+.rn-wall{fill:none;stroke-linecap:square}
+.rn-wall.exterior{stroke:#37545b;stroke-width:7}
+.rn-wall.bearing{stroke:#37545b;stroke-width:8}
+.rn-wall.bearing-core{stroke:#f3f5f1;stroke-width:2.5;stroke-dasharray:4 4;stroke-linecap:butt}
+.rn-wall.water{stroke:#3c8dbc;stroke-width:7}
+.rn-wall.partition{stroke:#6b7f84;stroke-width:3.5}
+.rn-wall.new{stroke:#d9822b;stroke-width:4}
+.rn-wall.removed{stroke:#c2553b;stroke-width:2;stroke-dasharray:3 4;stroke-linecap:butt;opacity:.8}
+.rn-focus{fill:none;outline:none;pointer-events:all}
+.rn-focus:focus-visible{stroke:#ef9a73;stroke-width:3}
+.renovate.tool-rooms .fp-wall-hit{display:none}
+.rn-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#66767b;margin:-6px 0 14px}
+.rn-legend span{display:flex;align-items:center;gap:6px}
+.rn-swatch{display:inline-block;width:22px;height:0;border-top:4px solid}
+.rn-swatch.bearing{border-top:7px solid #37545b}
+.rn-swatch.water{border-color:#3c8dbc}
+.rn-swatch.partition{border-color:#6b7f84}
+.rn-swatch.new{border-color:#d9822b}
+.rn-swatch.removed{border-top:2px dashed #c2553b}
+.rn-facts{display:flex;gap:14px;font-size:12px;color:#53676b;margin:-2px 0 10px}
+.rn-none{font-size:13px;color:#6b807b;margin:0}
+.metrics strong.over{color:#b0452d}
+.room-chips button svg{flex-shrink:0}
