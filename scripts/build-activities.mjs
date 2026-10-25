@@ -374,7 +374,39 @@ function validateDistrict(a,fail){
   }
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict};
+/** Sequence engine: steps to put in order, dependencies between them (with their reasons), a scrambled start. */
+function validateSequence(a,fail){
+  const P=a.parameters??{};
+  if(P.illustration!=='house')fail('Invalid illustration');
+  if(!Array.isArray(P.steps)||P.steps.length<3||P.steps.length>16)fail('steps must list 3 to 16 steps');
+  const ids=new Set();
+  for(const s of P.steps){
+    if(!/^[a-z0-9-]+$/.test(s?.id||'')||ids.has(s.id))fail(`Invalid or duplicate step id ${s?.id}`);
+    ids.add(s.id);
+    if(!localized(s.label)||!localized(s.detail)||typeof s.icon!=='string'||typeof s.layer!=='string')fail(`Invalid step ${s.id}`);
+  }
+  if(!Array.isArray(P.dependencies)||!P.dependencies.length)fail('Missing dependencies');
+  for(const d of P.dependencies){
+    if(!ids.has(d.before)||!ids.has(d.after)||d.before===d.after)fail(`Invalid dependency ${d.before} → ${d.after}`);
+    if(!localized(d.reason))fail(`Missing translations: reason ${d.before} → ${d.after}`);
+  }
+  // at least one order must respect every dependency (no cycle)
+  const remaining=new Set(ids);
+  while(remaining.size){
+    const ready=[...remaining].find(s=>P.dependencies.every(d=>d.after!==s||!remaining.has(d.before)));
+    if(!ready)fail('Dependencies form a cycle: no order is possible');
+    remaining.delete(ready);
+  }
+  const start=P.initial_order;
+  if(!Array.isArray(start)||start.length!==ids.size||new Set(start).size!==ids.size||!start.every(s=>ids.has(s)))fail('initial_order must list every step once');
+  if(P.dependencies.every(d=>start.indexOf(d.before)<start.indexOf(d.after)))fail('initial_order is already solved');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(c.type!=='respects_dependencies')fail(`Unknown constraint ${c.type}`);
+  }
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict,sequence:validateSequence};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
