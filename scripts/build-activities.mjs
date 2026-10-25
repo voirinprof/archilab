@@ -30,8 +30,63 @@ function circulationIsConnected(plan,rooms){
   }
   return seen.size===free.length;
 }
+function validateCommonFloorplan(a,fail){
+  if(!localized(a.feedback?.failure))fail('Missing translations: feedback.failure');
+  if(!localized(a.explanation))fail('Missing translations: explanation');
+  if(!Array.isArray(a.concepts?.fr)||!Array.isArray(a.concepts?.en))fail('Missing translations: concepts');
+  if(a.hints.fr.length!==a.hints.en.length)fail('Hints must have the same count in fr and en');
+}
+/** Furnish mode: fixed-size items on a grid, with rotation and usage zones. */
+function validateFurnish(a,fail){
+  const {plan,step,items,openings,reveal_passage_hint:reveal}=a.parameters;
+  if(!(Number.isFinite(step)&&step>0))fail('Invalid step');
+  const onGrid=v=>Number.isFinite(v)&&Math.abs(v/step-Math.round(v/step))<1e-9;
+  if(!plan||!onGrid(plan.width)||!onGrid(plan.depth)||plan.width<=0||plan.depth<=0)fail('Invalid plan size');
+  if(!Array.isArray(items)||!items.length)fail('Missing items');
+  if(!Array.isArray(openings)||!openings.some(o=>o.kind==='door'))fail('Missing door');
+  const ids=new Set();
+  const rects=[];
+  for(const o of openings){
+    if(!/^[a-z0-9-]+$/.test(o?.id||'')||ids.has(o.id))fail(`Invalid or duplicate opening id ${o?.id}`);
+    ids.add(o.id);
+    if(!['door','window'].includes(o.kind)||!localized(o.label)||!floorplanSides.has(o.side))fail(`Invalid opening ${o.id}`);
+    const wall=['north','south'].includes(o.side)?plan.width:plan.depth;
+    if(!onGrid(o.at)||!onGrid(o.width)||o.width<=0||o.at<0||o.at+o.width>wall)fail(`Opening outside its wall: ${o.id}`);
+    if(o.swing!==undefined&&(o.kind!=='door'||!onGrid(o.swing)||o.swing<=0))fail(`Invalid swing: ${o.id}`);
+  }
+  for(const i of items){
+    if(!/^[a-z0-9-]+$/.test(i?.id||'')||ids.has(i.id))fail(`Invalid or duplicate item id ${i?.id}`);
+    ids.add(i.id);
+    if(!localized(i.label)||typeof i.color!=='string')fail(`Invalid item ${i.id}`);
+    if(!i.size||!onGrid(i.size.width)||!onGrid(i.size.depth)||i.size.width<=0||i.size.depth<=0)fail(`Invalid size: ${i.id}`);
+    const p=i.initial;
+    if(!p||!onGrid(p.x)||!onGrid(p.y)||![0,90,180,270].includes(p.rotation))fail(`Invalid initial placement: ${i.id}`);
+    for(const [k,v] of Object.entries(i.usage??{}))if(!['front','back','left','right'].includes(k)||!onGrid(v)||v<=0)fail(`Invalid usage ${k}: ${i.id}`);
+    const turned=p.rotation%180!==0;
+    const r={x:p.x,y:p.y,width:turned?i.size.depth:i.size.width,depth:turned?i.size.width:i.size.depth};
+    if(r.x<0||r.y<0||r.x+r.width>plan.width+1e-9||r.y+r.depth>plan.depth+1e-9)fail(`Item starts outside the room: ${i.id}`);
+    for(const o of rects)if(r.x<o.r.x+o.r.width&&o.r.x<r.x+r.width&&r.y<o.r.y+o.r.depth&&o.r.y<r.y+r.depth)fail(`Items overlap at start: ${i.id} / ${o.id}`);
+    rects.push({id:i.id,r});
+  }
+  if(!items.some(i=>!i.fixed))fail('No movable item');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    switch(c.type){
+      case 'usage_clear':
+        if(!Array.isArray(c.items)||!c.items.length||!c.items.every(id=>ids.has(id)))fail('Invalid constraint usage_clear');break;
+      case 'min_passage':
+        if(!ids.has(c.from)||!Array.isArray(c.to)||!c.to.every(id=>ids.has(id))||!(Number.isFinite(c.width)&&c.width>0))fail('Invalid constraint min_passage');break;
+      case 'min_distance': case 'max_distance':
+        if(!Array.isArray(c.rooms)||c.rooms.length!==2||c.rooms[0]===c.rooms[1]||!c.rooms.every(id=>ids.has(id))||!(Number.isFinite(c.value)&&c.value>=0))fail(`Invalid constraint ${c.type}`);break;
+      default: fail(`Unknown constraint ${c.type} for mode furnish`);
+    }
+  }
+  if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_passage_hint');
+  validateCommonFloorplan(a,fail);
+}
 function validateFloorplan(a,fail){
   const mode=a.parameters?.mode??'layout';
+  if(mode==='furnish')return validateFurnish(a,fail);
   if(!['layout','doors'].includes(mode))fail(`Invalid mode ${mode}`);
   const {scale,boundary,reveal_zone_hint:reveal}=a.parameters??{};
   if(scale!==undefined&&!(Number.isFinite(scale)&&scale>0))fail('Invalid scale');
@@ -122,10 +177,7 @@ function validateFloorplan(a,fail){
       default: fail(`Unknown constraint ${c.type}`);
     }
   }
-  if(!localized(a.feedback?.failure))fail('Missing translations: feedback.failure');
-  if(!localized(a.explanation))fail('Missing translations: explanation');
-  if(!Array.isArray(a.concepts?.fr)||!Array.isArray(a.concepts?.en))fail('Missing translations: concepts');
-  if(a.hints.fr.length!==a.hints.en.length)fail('Hints must have the same count in fr and en');
+  validateCommonFloorplan(a,fail);
 }
 const validators={dimensions:validateDimensions,floorplan:validateFloorplan};
 const activities=[];

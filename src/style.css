@@ -74,3 +74,18 @@
 .fp-tree-lost{stroke:#c2553b;stroke-width:3;stroke-linecap:round;pointer-events:none}
 .result-extra{font-weight:800}
 .fp-tree-label{paint-order:stroke;stroke:#ffffffcc;stroke-width:4px;stroke-linejoin:round}
+.fp-usage.ok{fill:url(#fp-hatch-ok)}
+.fp-usage.bad{fill:url(#fp-hatch-bad);stroke:#c2553b;stroke-width:1.5}
+.fp-hatch-line{stroke-width:3}
+.fp-hatch-line.ok{stroke:#3f8a5a55}
+.fp-hatch-line.bad{stroke:#c2553b99}
+.fp-walk{fill:#7fb5d340}
+.fp-wall-gap{stroke:#fbfaf6;stroke-width:8}
+.fp-entrance path{fill:none;stroke:#bd8e6a;stroke-width:2;stroke-dasharray:4 3}
+.fp-window-frame{stroke:#37545b;stroke-width:8}
+.fp-window-glass{stroke:#a9d6ea;stroke-width:4}
+.fp-fixture{pointer-events:none}
+.fp-warn{font-size:16px;font-weight:800;fill:#c2553b;pointer-events:none}
+.rotate-button{margin:10px 0 0}
+.floorplan-svg.furnish{max-height:min(560px,70vh)}
+.fp-door-label{font-size:11px;font-weight:700;fill:#5d6b66;pointer-events:none;paint-order:stroke;stroke:#ffffffcc;stroke-width:4px;stroke-linejoin:round}

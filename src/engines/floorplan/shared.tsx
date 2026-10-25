@@ -1,7 +1,7 @@
 import type { ReactNode, Ref, SVGProps } from 'react';
 import { CheckCircle2, Circle, Lightbulb, RotateCcw, XCircle } from 'lucide-react';
 import type { Lang } from '../../types.ts';
-import type { FloorplanActivity, Plan, Rect, RoomSpec } from './types.ts';
+import type { FloorplanActivity, Plan, Rect } from './types.ts';
 
 export const ui = {
   fr: {
@@ -19,6 +19,11 @@ export const ui = {
     lot: 'Terrain', footprint: 'Emprise au sol', coverage: 'Taux d’implantation', onLot: 'Le bâtiment reste sur le terrain.', zone: 'Zone constructible',
     blockedSite: 'Pas ici : le bâtiment doit rester sur le terrain et ne peut pas recouvrir un élément existant.',
     treesKept: 'Arbres conservés',
+    // furnish mode
+    furnishTitle: 'À toi de meubler', furnishHelp: 'Glisse un meuble pour le déplacer et tourne-le avec « Pivoter ». Au clavier : flèches pour déplacer, R pour pivoter.',
+    rotate: 'Pivoter', studio: 'Studio', furniture: 'Meubles', freeFloor: 'Sol libre',
+    blockedFurniture: 'Pas de place ici : un meuble ne peut ni sortir du studio ni en chevaucher un autre.',
+    unreachable: 'inaccessible',
     // doors mode
     doorsTitle: 'À toi de percer les portes', doorsHelp: 'Touche un morceau de mur pour y percer une porte, touche-le encore pour la retirer. Au clavier : Tab pour choisir un mur, Entrée pour ajouter ou retirer la porte.',
     doors: 'Portes', reached: 'Pièces accessibles', outside: 'l’extérieur',
@@ -39,6 +44,10 @@ export const ui = {
     lot: 'Lot', footprint: 'Footprint', coverage: 'Site coverage', onLot: 'The building stays on the lot.', zone: 'Buildable zone',
     blockedSite: 'Not here: the building must stay on the lot and can’t cover an existing element.',
     treesKept: 'Trees kept',
+    furnishTitle: 'Time to furnish', furnishHelp: 'Drag a piece of furniture to move it and turn it with Rotate. With a keyboard: arrows to move, R to rotate.',
+    rotate: 'Rotate', studio: 'Studio', furniture: 'Furniture', freeFloor: 'Free floor',
+    blockedFurniture: 'No room here: furniture can’t leave the studio or overlap another piece.',
+    unreachable: 'unreachable',
     doorsTitle: 'Time to add the doors', doorsHelp: 'Tap a piece of wall to put a door in it, tap it again to remove it. With a keyboard: Tab to pick a wall, Enter to add or remove the door.',
     doors: 'Doors', reached: 'Reachable rooms', outside: 'the outside',
     unreached: 'Greyed-out rooms can’t be reached from the entrance yet.',
@@ -62,13 +71,15 @@ const palette: Record<string, { fill: string; stroke: string }> = {
   mint: { fill: '#cfe5da', stroke: '#5f9480' },
   grey: { fill: '#dcd9d2', stroke: '#8d877b' },
 };
-export const colorsOf = (spec: RoomSpec) => palette[spec.color] ?? palette.blue;
+export const colorsOf = (spec: { color: string }) => palette[spec.color] ?? palette.blue;
 
 type PlanFrameProps = {
   plan: Plan;
   lang: Lang;
   svgRef?: Ref<SVGSVGElement>;
   scale?: number;
+  /** Grid spacing in metres (default 1). */
+  gridStep?: number;
   /** Area to show, in metres; defaults to the plan. Use it when context elements lie outside the plan. */
   extent?: Rect;
   boundary?: 'wall' | 'lot';
@@ -76,7 +87,7 @@ type PlanFrameProps = {
 } & Omit<SVGProps<SVGSVGElement>, 'ref'>;
 
 /** The plan background shared by every floorplan mode: grid, dimensions and orientation. */
-export function PlanFrame({ plan, lang, svgRef, scale = SCALE, extent, boundary = 'wall', children, className, ...rest }: PlanFrameProps) {
+export function PlanFrame({ plan, lang, svgRef, scale = SCALE, gridStep = 1, extent, boundary = 'wall', children, className, ...rest }: PlanFrameProps) {
   const t = ui[lang];
   const p = (m: number) => px(m, scale);
   const area = extent ?? { x: 0, y: 0, width: plan.width, depth: plan.depth };
@@ -89,8 +100,8 @@ export function PlanFrame({ plan, lang, svgRef, scale = SCALE, extent, boundary 
   return (
     <svg ref={svgRef} viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`} className={`floorplan-svg ${className ?? ''}`} role="group" aria-label={`${t.plan} ${plan.width} m × ${plan.depth} m`} {...rest}>
       <defs>
-        <pattern id="fp-grid" x={PAD} y={PAD} width={scale} height={scale} patternUnits="userSpaceOnUse">
-          <path d={`M${scale} 0H0V${scale}`} fill="none" stroke="#8caaa6" strokeWidth=".8" opacity={lot ? '.25' : '.35'} />
+        <pattern id="fp-grid" x={PAD} y={PAD} width={scale * gridStep} height={scale * gridStep} patternUnits="userSpaceOnUse">
+          <path d={`M${scale * gridStep} 0H0V${scale * gridStep}`} fill="none" stroke="#8caaa6" strokeWidth=".8" opacity={lot ? '.25' : '.35'} />
         </pattern>
       </defs>
       <rect x={p(0)} y={p(0)} width={w} height={h} className={lot ? 'fp-lot-ground' : ''} fill={lot ? undefined : '#fbfaf6'} />
@@ -133,7 +144,7 @@ export function NeedsList({ lang, items }: { lang: Lang; items: { label: string;
 }
 
 type FeedbackProps = {
-  game: FloorplanActivity;
+  game: Pick<FloorplanActivity, 'hints' | 'feedback' | 'explanation' | 'concepts'>;
   lang: Lang;
   solved: boolean;
   checked: boolean;

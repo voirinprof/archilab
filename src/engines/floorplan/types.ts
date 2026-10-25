@@ -88,3 +88,47 @@ export type FloorplanActivity = {
   feedback: { success: Localized; failure: Localized; best?: Localized };
   explanation: Localized;
 };
+
+// ---------- furnish mode: fixed-size furniture that can be rotated, each with its usage zones ----------
+
+export type Rotation = 0 | 90 | 180 | 270;
+/** Usage zone depths in metres, relative to the item: in rotation 0, front is south, back north, left west, right east. */
+export type UsageSides = { front?: number; back?: number; left?: number; right?: number };
+
+export type FurnitureSpec = {
+  id: string;
+  label: Localized;
+  color: string;
+  /** Size in rotation 0. */
+  size: { width: number; depth: number };
+  /** Top-left corner of the rotated footprint. */
+  initial: { x: number; y: number; rotation: Rotation };
+  usage?: UsageSides;
+  /** Built-in elements (bathroom, kitchenette) cannot be moved. */
+  fixed?: boolean;
+};
+
+/** A door or window in an outer wall, `at` metres from the west (or north) end of that wall. */
+export type OpeningSpec = { id: string; kind: 'door' | 'window'; label: Localized; side: Side; at: number; width: number; swing?: number };
+
+export type PlacedFurniture = { id: string; x: number; y: number; rotation: Rotation };
+
+export type FurnishConstraint =
+  | { type: 'usage_clear'; items: string[]; label: Localized }
+  | { type: 'min_passage'; from: string; to: string[]; width: number; label: Localized }
+  | { type: 'min_distance' | 'max_distance'; rooms: [string, string]; value: number; label: Localized };
+
+export type FurnishActivity = Omit<FloorplanActivity, 'parameters' | 'constraints'> & {
+  parameters: {
+    mode: 'furnish';
+    plan: Plan;
+    scale?: number;
+    /** Snapping step in metres. */
+    step: number;
+    items: FurnitureSpec[];
+    openings: OpeningSpec[];
+    /** Hint number (from 1) from which the walkable area is drawn. */
+    reveal_passage_hint?: number;
+  };
+  constraints: FurnishConstraint[];
+};
