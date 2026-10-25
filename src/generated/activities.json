@@ -3923,5 +3923,304 @@
       "fr": "Les architectes organisent un logement en zones. Les pièces de jour (salon, cuisine) sont proches l'une de l'autre et tournées vers la lumière. Les pièces de nuit (chambre, salle de bain) sont regroupées au calme. L'espace qui reste n'est pas perdu : il sert à circuler d'une pièce à l'autre.",
       "en": "Architects organize a home into zones. Daytime rooms (living room, kitchen) sit close together and face the light. Night-time rooms (bedroom, bathroom) are grouped somewhere quiet. Leftover space is not wasted: it is used to move from one room to another."
     }
+  },
+  {
+    "id": "une-ecole-pour-tous",
+    "engine": "floorplan",
+    "category": "comfort",
+    "difficulty": "intermediate",
+    "duration_minutes": 10,
+    "icon": "school",
+    "color": "yellow",
+    "title": {
+      "fr": "Une école pour tous",
+      "en": "A School for Everyone"
+    },
+    "description": {
+      "fr": "Organise une petite école de plain-pied où chacun peut circuler, même en fauteuil roulant.",
+      "en": "Lay out a small single-storey school where everyone can get around, even in a wheelchair."
+    },
+    "mission": {
+      "fr": "La ville construit une petite école de quartier de 18 m × 14 m, de plain-pied. Place et dimensionne les deux classes, la bibliothèque, la salle polyvalente, l'accueil et les toilettes pour que chaque élève puisse y circuler, y apprendre et s'y sentir bien. L'entrée donne sur la rue, au nord.",
+      "en": "The city is building a small 18 m × 14 m single-storey neighbourhood school. Place and size the two classrooms, the library, the multipurpose hall, the reception and the toilets so every pupil can get around, learn and feel good there. The entrance opens onto the street, to the north."
+    },
+    "concepts": {
+      "fr": [
+        "Conception universelle",
+        "Bâtiment public",
+        "Circulation",
+        "Lumière naturelle"
+      ],
+      "en": [
+        "Universal design",
+        "Public building",
+        "Circulation",
+        "Daylight"
+      ]
+    },
+    "parameters": {
+      "plan": {
+        "width": 18,
+        "depth": 14
+      },
+      "building": {
+        "fr": "École",
+        "en": "School"
+      },
+      "scale": 32,
+      "rooms": [
+        {
+          "id": "classe-1",
+          "label": {
+            "fr": "Classe 1",
+            "en": "Classroom 1"
+          },
+          "color": "blue",
+          "initial": {
+            "x": 0,
+            "y": 0,
+            "width": 5,
+            "depth": 5
+          },
+          "width": {
+            "min": 4,
+            "max": 10
+          },
+          "depth": {
+            "min": 4,
+            "max": 9
+          }
+        },
+        {
+          "id": "classe-2",
+          "label": {
+            "fr": "Classe 2",
+            "en": "Classroom 2"
+          },
+          "color": "blue",
+          "initial": {
+            "x": 5,
+            "y": 0,
+            "width": 5,
+            "depth": 5
+          },
+          "width": {
+            "min": 4,
+            "max": 10
+          },
+          "depth": {
+            "min": 4,
+            "max": 9
+          }
+        },
+        {
+          "id": "bibliotheque",
+          "label": {
+            "fr": "Bibliothèque",
+            "en": "Library"
+          },
+          "color": "mint",
+          "initial": {
+            "x": 0,
+            "y": 9,
+            "width": 5,
+            "depth": 4
+          },
+          "width": {
+            "min": 5,
+            "max": 8
+          },
+          "depth": {
+            "min": 4,
+            "max": 7
+          }
+        },
+        {
+          "id": "salle-polyvalente",
+          "label": {
+            "fr": "Salle polyvalente",
+            "en": "Multipurpose hall"
+          },
+          "color": "coral",
+          "initial": {
+            "x": 5,
+            "y": 8,
+            "width": 7,
+            "depth": 6
+          },
+          "width": {
+            "min": 7,
+            "max": 10
+          },
+          "depth": {
+            "min": 6,
+            "max": 9
+          }
+        },
+        {
+          "id": "accueil",
+          "label": {
+            "fr": "Accueil",
+            "en": "Reception"
+          },
+          "color": "yellow",
+          "initial": {
+            "x": 14,
+            "y": 10,
+            "width": 3,
+            "depth": 3
+          },
+          "width": {
+            "min": 3,
+            "max": 5
+          },
+          "depth": {
+            "min": 3,
+            "max": 4
+          }
+        },
+        {
+          "id": "toilettes",
+          "label": {
+            "fr": "Toilettes",
+            "en": "Toilets"
+          },
+          "color": "grey",
+          "initial": {
+            "x": 14,
+            "y": 0,
+            "width": 2,
+            "depth": 3
+          },
+          "width": {
+            "min": 2,
+            "max": 4
+          },
+          "depth": {
+            "min": 3,
+            "max": 4
+          }
+        }
+      ],
+      "context": [
+        {
+          "id": "entree",
+          "kind": "entrance",
+          "label": {
+            "fr": "Entrée",
+            "en": "Entrance"
+          },
+          "rect": {
+            "x": 8,
+            "y": -1,
+            "width": 2,
+            "depth": 1
+          },
+          "blocking": false
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "min_area",
+        "rooms": [
+          "classe-1",
+          "classe-2"
+        ],
+        "value": 48,
+        "label": {
+          "fr": "Chaque classe mesure au moins 48 m², pour 25 élèves.",
+          "en": "Each classroom is at least 48 m², for 25 pupils."
+        }
+      },
+      {
+        "type": "touches_any_side",
+        "rooms": [
+          "classe-1",
+          "classe-2"
+        ],
+        "sides": [
+          "south",
+          "east"
+        ],
+        "label": {
+          "fr": "Les classes ont une façade au sud ou à l'est : lumière naturelle et soleil du matin.",
+          "en": "The classrooms have a south or east façade: daylight and morning sun."
+        }
+      },
+      {
+        "type": "not_adjacent",
+        "rooms": [
+          "bibliotheque",
+          "salle-polyvalente"
+        ],
+        "label": {
+          "fr": "La bibliothèque n'est pas collée à la salle polyvalente (bruit).",
+          "en": "The library doesn't share a wall with the multipurpose hall (noise)."
+        }
+      },
+      {
+        "type": "max_distance",
+        "from": "accueil",
+        "to": [
+          "entree"
+        ],
+        "value": 0,
+        "label": {
+          "fr": "L'accueil touche l'entrée, pour accueillir et surveiller.",
+          "en": "The reception touches the entrance, to welcome people and keep watch."
+        }
+      },
+      {
+        "type": "max_distance",
+        "from": "toilettes",
+        "to": [
+          "classe-1",
+          "classe-2"
+        ],
+        "value": 6,
+        "label": {
+          "fr": "Les toilettes sont à 6 m au plus de chaque classe.",
+          "en": "The toilets are at most 6 m from each classroom."
+        }
+      },
+      {
+        "type": "accessible_width",
+        "from": "entree",
+        "width": 2,
+        "label": {
+          "fr": "Chaque salle est accessible depuis l'entrée par un couloir d'au moins 2 m de large (fauteuil roulant, croisement).",
+          "en": "Every room can be reached from the entrance by a corridor at least 2 m wide (wheelchair, passing)."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Commence par l'entrée, en haut : un couloir d'au moins 2 m doit partir de là. Ne bouche pas l'entrée avec une salle !",
+        "Regarde la zone bleue : c'est là qu'un fauteuil roulant peut circuler. Chaque salle doit la toucher, sinon elle affiche ♿✕.",
+        "Les classes ont besoin de lumière : colle-les à la façade sud (en bas) ou est (à droite). La salle polyvalente, bruyante, se place loin de la bibliothèque.",
+        "Une piste : un couloir en T qui descend de l'entrée jusqu'au milieu, puis traverse le bâtiment de gauche à droite. Les classes au sud ; la salle polyvalente, l'accueil, les toilettes et la bibliothèque au nord."
+      ],
+      "en": [
+        "Start with the entrance, at the top: a corridor at least 2 m wide must start there. Don't block the entrance with a room!",
+        "Look at the blue area: that's where a wheelchair can go. Every room must touch it, otherwise it shows ♿✕.",
+        "Classrooms need light: put them against the south façade (bottom) or east façade (right). The noisy multipurpose hall goes far from the library.",
+        "One idea: a T-shaped corridor going down from the entrance to the middle, then across the building from left to right. Classrooms to the south; the hall, reception, toilets and library to the north."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ton école est lumineuse, calme et accessible à tous.",
+        "en": "Well done! Your school is bright, calm and accessible to everyone."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les salles marquées ♿✕, les cotes en rouge et les besoins non cochés.",
+        "en": "Not yet. Look at the rooms marked ♿✕, the red dimension lines and the unticked needs."
+      }
+    },
+    "explanation": {
+      "fr": "Une école est un bâtiment public : elle doit accueillir tout le monde, quelle que soit sa façon de se déplacer. C'est la conception universelle : des couloirs assez larges pour un fauteuil roulant ou deux personnes qui se croisent, pas de marche, des toilettes proches. L'architecte organise aussi les espaces pour apprendre (des classes lumineuses et calmes), pour accueillir et surveiller (l'accueil près de l'entrée) et pour limiter les nuisances (le bruit loin de la bibliothèque). Les règles de ce jeu sont simplifiées : les normes réelles d'accessibilité sont plus détaillées.",
+      "en": "A school is a public building: it must welcome everyone, however they get around. This is universal design: corridors wide enough for a wheelchair or two people passing, no steps, toilets nearby. The architect also organises spaces for learning (bright, calm classrooms), for welcoming and supervising (reception near the entrance) and for limiting nuisances (noise far from the library). This game's rules are simplified: real accessibility standards are more detailed."
+    }
   }
 ]

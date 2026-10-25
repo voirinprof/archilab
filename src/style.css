@@ -372,3 +372,5 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 .district-warn{color:#b0452d;font-style:normal;font-weight:700}
 @media(max-width:550px){.district-metrics{grid-template-columns:1fr 1fr}.district-icon{font-size:28px}}
 .district-palette button.inspect{padding-left:11px}
+.fp-entrance-mark rect{fill:#fff6de;stroke:#d9a43a;stroke-width:2}
+.fp-entrance-mark text{fill:#875b37}

@@ -188,6 +188,61 @@ export function reachableSpaces(doorSegments: WallSegment[], avoid?: string): Se
   return seen;
 }
 
+/**
+ * Floor a person needing `width` metres can reach from `starts`, cut into grid cells of `step` metres:
+ * a block of k×k free cells (k = width rounded up to the grid) moves cell by cell between the obstacles.
+ * `reaches` tells whether that area touches a rectangle (a room, a usage zone…) along an edge;
+ * with `corners`, touching at a single corner is enough (the furnish mode's original rule).
+ */
+export function walkableArea(plan: Plan, step: number, obstacles: Rect[], starts: Rect[], width: number, { corners = false } = {}) {
+  const nx = Math.round(plan.width / step), ny = Math.round(plan.depth / step);
+  const k = Math.max(1, Math.ceil(width / step - EPSILON));
+  const cellRect = (i: number, j: number, size = 1): Rect => ({ x: i * step, y: j * step, width: size * step, depth: size * step });
+  const free: boolean[] = [];
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) free[j * nx + i] = obstacles.every(b => !overlaps(cellRect(i, j), b));
+  const blockFree = (i: number, j: number) => {
+    for (let dj = 0; dj < k; dj++) for (let di = 0; di < k; di++) if (!free[(j + dj) * nx + i + di]) return false;
+    return true;
+  };
+  // touching means sharing a stretch of edge (or overlapping): a corner alone lets nobody through
+  const touches = (i: number, j: number, rects: Rect[]) => rects.some(r => {
+    const b = cellRect(i, j, k);
+    if (corners) return gap(b, r) < EPSILON;
+    const ox = Math.min(b.x + b.width, r.x + r.width) - Math.max(b.x, r.x);
+    const oy = Math.min(b.y + b.depth, r.y + r.depth) - Math.max(b.y, r.y);
+    return (ox > EPSILON && oy > -EPSILON) || (oy > EPSILON && ox > -EPSILON);
+  });
+  const seen = new Set<number>();
+  const queue: [number, number][] = [];
+  for (let j = 0; j + k <= ny; j++) for (let i = 0; i + k <= nx; i++) {
+    if (blockFree(i, j) && touches(i, j, starts)) { seen.add(j * nx + i); queue.push([i, j]); }
+  }
+  while (queue.length) {
+    const [i, j] = queue.shift()!;
+    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const a = i + di, b = j + dj;
+      if (a < 0 || b < 0 || a + k > nx || b + k > ny || seen.has(b * nx + a) || !blockFree(a, b)) continue;
+      seen.add(b * nx + a);
+      queue.push([a, b]);
+    }
+  }
+  const blocks = [...seen].map(n => [n % nx, Math.floor(n / nx)] as [number, number]);
+  const cells = new Set<number>();
+  for (const [i, j] of blocks) for (let dj = 0; dj < k; dj++) for (let di = 0; di < k; di++) cells.add((j + dj) * nx + i + di);
+  return {
+    cells: [...cells].map(n => cellRect(n % nx, Math.floor(n / nx))),
+    reaches: (rects: Rect[]) => blocks.some(([i, j]) => touches(i, j, rects)),
+  };
+}
+
+/** For an accessible_width rule: the floor a wheelchair can use, and the rooms it doesn't reach. Rooms are the obstacles. */
+export function accessibility(c: Extract<FloorplanConstraint, { type: 'accessible_width' }>, layout: PlacedRoom[], plan: Plan, context: ContextSpec[] = []) {
+  const start = contextRects(context).find(r => r.id === c.from);
+  const area = walkableArea(plan, 1, layout, start ? [start] : [], c.width);
+  const targets = c.rooms ? layout.filter(r => c.rooms!.includes(r.id)) : layout;
+  return { cells: area.cells, unreached: targets.filter(r => !area.reaches([r])).map(r => r.id) };
+}
+
 /** What a constraint may look at besides the rooms: placed doors and fixed context elements. */
 export type Extras = { doors?: string[]; context?: ContextSpec[] };
 
@@ -200,10 +255,17 @@ export function checkConstraint(c: FloorplanConstraint, layout: PlacedRoom[], pl
   switch (c.type) {
     case 'min_area':
     case 'max_area': {
-      const room = find(c.room);
-      if (!room) return false;
-      return c.type === 'min_area' ? area(room) >= c.value : area(room) <= c.value;
+      const rooms = [...(c.room ? [c.room] : []), ...(c.rooms ?? [])].map(find);
+      return rooms.length > 0 && rooms.every(room => !!room && (c.type === 'min_area' ? area(room) >= c.value : area(room) <= c.value));
     }
+    case 'touches_any_side':
+      return c.rooms.every(id => { const room = find(id); return !!room && c.sides.some(side => touchesSide(room, plan, side)); });
+    case 'max_distance': {
+      const a = findAny(c.from);
+      return !!a && c.to.every(id => { const b = findAny(id); return !!b && gap(a, b) <= c.value + EPSILON; });
+    }
+    case 'accessible_width':
+      return accessibility(c, layout, plan, context).unreached.length === 0;
     case 'adjacent':
     case 'not_adjacent': {
       const [a, b] = c.rooms.map(find);
@@ -277,6 +339,15 @@ export function dimensionLines(constraints: FloorplanConstraint[], layout: Place
       const [from, to] = closestPoints(a, b);
       const value = gap(a, b);
       lines.push({ kind: 'distance', from, to, value, ok: value >= c.value - EPSILON });
+    } else if (c.type === 'max_distance' && c.value > 0) {
+      const a = findAny(c.from);
+      for (const id of c.to) {
+        const b = findAny(id);
+        if (!a || !b) continue;
+        const [from, to] = closestPoints(a, b);
+        const value = gap(a, b);
+        lines.push({ kind: 'distance', from, to, value, ok: value <= c.value + EPSILON });
+      }
     }
   }
   return lines;

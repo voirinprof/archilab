@@ -18,7 +18,14 @@ export type RoomSpec = {
 };
 
 export type FloorplanConstraint =
-  | { type: 'min_area' | 'max_area'; room: string; value: number; label: Localized }
+  /** One room (`room`) or several (`rooms`), each with at least / at most this area. */
+  | { type: 'min_area' | 'max_area'; room?: string; rooms?: string[]; value: number; label: Localized }
+  /** Each room touches at least one of these sides of the plan. */
+  | { type: 'touches_any_side'; rooms: string[]; sides: Side[]; label: Localized }
+  /** The room `from` is at most `value` metres from each of `to` (rooms or context elements). */
+  | { type: 'max_distance'; from: string; to: string[]; value: number; label: Localized }
+  /** Every room (or the listed ones) can be reached from a context element through free floor at least `width` metres wide. */
+  | { type: 'accessible_width'; from: string; width: number; rooms?: string[]; label: Localized }
   | { type: 'adjacent' | 'not_adjacent'; rooms: [string, string]; min_shared?: number; label: Localized }
   | { type: 'touches_side'; room: string; side: Side; label: Localized }
   // Site constraints. Distances are in metres; min_distance may refer to a context element.
@@ -38,7 +45,7 @@ export type FloorplanConstraint =
 /** A fixed element around or on the plan (street, neighbouring building, tree). It may lie outside the plan. */
 export type ContextSpec = {
   id: string;
-  kind: 'street' | 'building' | 'tree';
+  kind: 'street' | 'building' | 'tree' | 'entrance';
   label: Localized;
   rect: Rect;
   /** Trees: root protection zone around the trunk, in metres; building inside it kills the tree. Drawn as the crown. */
@@ -70,6 +77,8 @@ export type FloorplanActivity = {
   parameters: {
     plan: Plan;
     rooms: RoomSpec[];
+    /** Name of the building in the metrics (default « Logement » / « Home »). */
+    building?: Localized;
     /** layout (default): move and resize rooms. doors: rooms are fixed, the player places doors. */
     mode?: 'layout' | 'doors';
     circulation?: Localized;

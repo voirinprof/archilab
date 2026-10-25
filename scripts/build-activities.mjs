@@ -138,6 +138,7 @@ function validateFloorplan(a,fail){
   const {scale,boundary,reveal_zone_hint:reveal}=a.parameters??{};
   if(scale!==undefined&&!(Number.isFinite(scale)&&scale>0))fail('Invalid scale');
   if(boundary!==undefined&&!['wall','lot'].includes(boundary))fail(`Invalid boundary ${boundary}`);
+  if(a.parameters.building!==undefined&&!localized(a.parameters.building))fail('Missing translations: building');
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>(a.hints?.fr?.length??0)))fail('Invalid reveal_zone_hint');
   const plan=a.parameters?.plan;
   if(!plan||!isInt(plan.width)||!isInt(plan.depth)||plan.width<=0||plan.depth<=0)fail('Invalid plan size');
@@ -170,7 +171,7 @@ function validateFloorplan(a,fail){
   for(const c of context){
     if(!/^[a-z0-9-]+$/.test(c?.id||'')||roomIds.has(c.id)||contextIds.has(c.id))fail(`Invalid or duplicate context id ${c?.id}`);
     contextIds.add(c.id);
-    if(!['street','building','tree'].includes(c.kind))fail(`Invalid context kind: ${c.id}`);
+    if(!['street','building','tree','entrance'].includes(c.kind))fail(`Invalid context kind: ${c.id}`);
     if(!localized(c.label))fail(`Missing translations: context ${c.id}`);
     const r=c.rect;
     if(!r||![r.x,r.y,r.width,r.depth].every(isInt)||r.width<1||r.depth<1)fail(`Invalid context rect: ${c.id}`);
@@ -194,8 +195,16 @@ function validateFloorplan(a,fail){
     if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
     if(doorTypes.has(c.type)&&mode!=='doors')fail(`Constraint ${c.type} requires mode: doors`);
     switch(c.type){
-      case 'min_area': case 'max_area':
-        if(!roomIds.has(c.room)||!Number.isFinite(c.value))fail(`Invalid constraint ${c.type}`);break;
+      case 'min_area': case 'max_area': {
+        const listed=[...(c.room!==undefined?[c.room]:[]),...(c.rooms??[])];
+        if(!listed.length||!listed.every(id=>roomIds.has(id))||!Number.isFinite(c.value))fail(`Invalid constraint ${c.type}`);break;
+      }
+      case 'touches_any_side':
+        if(!Array.isArray(c.rooms)||!c.rooms.length||!c.rooms.every(id=>roomIds.has(id))||!Array.isArray(c.sides)||!c.sides.length||!c.sides.every(s=>floorplanSides.has(s)))fail('Invalid constraint touches_any_side');break;
+      case 'max_distance':
+        if(!(roomIds.has(c.from)||contextIds.has(c.from))||!Array.isArray(c.to)||!c.to.length||!c.to.every(id=>roomIds.has(id)||contextIds.has(id))||!(Number.isFinite(c.value)&&c.value>=0))fail('Invalid constraint max_distance');break;
+      case 'accessible_width':
+        if(!contextIds.has(c.from)||!(Number.isFinite(c.width)&&c.width>0)||(c.rooms!==undefined&&(!Array.isArray(c.rooms)||!c.rooms.every(id=>roomIds.has(id)))))fail('Invalid constraint accessible_width');break;
       case 'adjacent': case 'not_adjacent':
         if(!Array.isArray(c.rooms)||c.rooms.length!==2||c.rooms[0]===c.rooms[1]||!c.rooms.every(id=>roomIds.has(id)))fail(`Invalid constraint ${c.type}`);
         if(c.min_shared!==undefined&&!(Number.isFinite(c.min_shared)&&c.min_shared>0))fail(`Invalid min_shared`);break;

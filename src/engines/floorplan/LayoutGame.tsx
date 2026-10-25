@@ -3,7 +3,7 @@ import type { KeyboardEvent, PointerEvent } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import type { Lang } from '../../types.ts';
 import type { ContextSpec, DimensionLine, FloorplanActivity, PlacedRoom, Rect, RoomSpec } from './types.ts';
-import { area, buildableZone, canPlace, clamp, clampPosition, contextRects, coverage, dimensionLines, evaluate, hasValidSize, initialLayout, keptTreeCount, lostTrees, obstaclesOf, sizeBounds } from './rules.ts';
+import { accessibility, area, buildableZone, canPlace, clamp, clampPosition, contextRects, coverage, dimensionLines, evaluate, hasValidSize, initialLayout, keptTreeCount, lostTrees, obstaclesOf, sizeBounds } from './rules.ts';
 import { Feedback, NeedsList, PAD, PlanFrame, RoomLabel, SCALE, colorsOf, formatNumber, px, ui } from './shared.tsx';
 
 const HANDLE = 22;
@@ -38,6 +38,14 @@ function ContextShape({ item, lang, scale, lost }: { item: ContextSpec; lang: La
         <circle cx={cx} cy={cy} r={crown} />
         <rect x={p(r.x)} y={p(r.y)} width={r.width * scale} height={r.depth * scale} rx="3" className="fp-trunk" />
         {!item.hide_label && <text x={cx} y={cy + (r.depth * scale) / 2 + 14} textAnchor="middle" className="fp-context-label fp-tree-label">{item.label[lang]}</text>}
+      </g>
+    );
+  }
+  if (item.kind === 'entrance') {
+    return (
+      <g className="fp-entrance-mark">
+        <rect x={p(r.x)} y={p(r.y)} width={r.width * scale} height={r.depth * scale} rx="4" />
+        <text x={p(r.x + r.width / 2)} y={p(r.y + r.depth / 2) + 4} textAnchor="middle" className="fp-context-label">↓ {item.label[lang]}</text>
       </g>
     );
   }
@@ -90,6 +98,9 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
   const rectOf = (id: string): PlacedRoom => layout.find(r => r.id === id)!;
   const result = evaluate(game.constraints, layout, plan, { context: contextItems });
   const lost = lostTrees(layout, contextItems);
+  const accessRule = game.constraints.find(c => c.type === 'accessible_width');
+  const access = accessRule?.type === 'accessible_width' ? accessibility(accessRule, layout, plan, contextItems) : null;
+  const [showAccess, setShowAccess] = useState(true);
   const kept = keptTreeCount(layout, contextItems);
   const best = game.parameters.best_possible;
   const roomsArea = layout.reduce((sum, r) => sum + area(r), 0);
@@ -185,7 +196,7 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
           : { label: t.coverage, value: `${formatNumber(coverage(layout, plan) * 100, lang)} %` },
       ]
     : [
-        { label: t.home, value: `${plan.width * plan.depth} m²` },
+        { label: game.parameters.building?.[lang] ?? t.home, value: `${plan.width * plan.depth} m²` },
         { label: t.rooms, value: `${roomsArea} m²` },
         { label: t.free, value: `${plan.width * plan.depth - roomsArea} m²` },
       ];
@@ -213,6 +224,7 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
             onPointerCancel={endDrag}
           >
             {contextItems.map(item => <ContextShape key={item.id} item={item} lang={lang} scale={scale} lost={lost.has(item.id)} />)}
+            {access && showAccess && access.cells.map(c => <rect key={`walk-${c.x}-${c.y}`} x={p(c.x)} y={p(c.y)} width={c.width * scale} height={c.depth * scale} className="fp-walk" />)}
             {site
               ? <rect x={p(0)} y={p(0)} width={plan.width * scale} height={plan.depth * scale} className="fp-lot-line" />
               : <rect x={p(0)} y={p(0)} width={plan.width * scale} height={plan.depth * scale} fill="none" stroke="#37545b" strokeWidth="6" />}
@@ -243,7 +255,8 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
                   onKeyDown={e => onKey(e, r.id)}
                 >
                   <rect x={x + 2} y={y + 2} width={w - 4} height={h - 4} rx="4" fill={colors.fill} stroke={isSel ? '#142e37' : colors.stroke} strokeWidth={isSel ? 3.5 : 2} />
-                  <RoomLabel rect={r} label={spec.label[lang]} detail={`${area(r)} m²`} scale={scale} />
+                  <RoomLabel rect={r} label={spec.label[lang]} detail={`${area(r)} m²${access?.unreached.includes(r.id) ? ' · ♿✕' : ''}`} scale={scale} />
+                  {access?.unreached.includes(r.id) && <title>{t.unreachableRoom}</title>}
                   {isSel && (
                     <path
                       className="fp-handle"
@@ -268,6 +281,9 @@ export function LayoutGame({ game, lang }: { game: FloorplanActivity; lang: Lang
       </section>
       <aside className="controls">
         <h2>{site ? t.siteTitle : t.design}</h2>
+        {accessRule?.type === 'accessible_width' && (
+          <label className="truss-toggle"><input type="checkbox" checked={showAccess} onChange={e => setShowAccess(e.target.checked)} /> ♿ {t.wheelchair(accessRule.width)}</label>
+        )}
         {rooms.length > 1 && (
           <div className="room-chips" role="group" aria-label={t.selected}>
             {rooms.map(room => (
