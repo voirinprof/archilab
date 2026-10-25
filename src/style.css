@@ -340,3 +340,35 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 .carbon-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:#5f6f73;margin-top:6px}
 .carbon-legend span{display:flex;align-items:center;gap:5px}
 .carbon-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;position:static}
+.district-palette{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.district-palette button{display:flex;align-items:center;gap:6px;border:1px solid #dce3dd;background:#fff;border-radius:99px;padding:5px 11px 5px 5px;font-size:12px;font-weight:700;color:#53676b}
+.district-palette button.active{background:#203d45;border-color:#203d45;color:#fff}
+.district-palette .swatch{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;font-size:13px}
+.district-palette button:last-child{padding-left:11px}
+.district-drawing{padding:6px}
+.district-svg{display:block;width:100%;max-height:min(520px,65vh);touch-action:none;user-select:none;-webkit-user-select:none}
+.district-cell{cursor:pointer}
+.district-cell.fixed{cursor:not-allowed}
+.district-cell.path rect:first-child{stroke:#c9b98f;stroke-width:2;stroke-dasharray:4 4}
+.district-lane{stroke:#fff;stroke-width:3;stroke-dasharray:10 8}
+.district-icon{font-size:24px;pointer-events:none}
+.district-heat{fill:#c2410c;pointer-events:none}
+.district-noise{fill:#c2553b55;stroke:#c2553b;stroke-width:2;stroke-dasharray:4 3;pointer-events:none}
+.district-badge{pointer-events:none}
+.district-badge rect{fill:#2f6e4f}
+.district-badge.far rect{fill:#b0452d}
+.district-badge text{font-size:11px;font-weight:800;fill:#fff}
+.district-cursor{fill:none;outline:none;pointer-events:none}
+.district-cursor:focus-visible{stroke:#ef9a73;stroke-width:4}
+.district-layers{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#53676b;margin:-6px 0 14px}
+.district-layers button{border:1px solid #dce3dd;background:#fff;border-radius:99px;padding:6px 11px;font-size:12px;font-weight:700;color:#53676b}
+.district-layers button.active{background:#203d45;border-color:#203d45;color:#fff}
+.district-layers small{flex-basis:100%;font-weight:600;color:#5f6f73}
+.district-metrics{grid-template-columns:repeat(4,1fr)}
+.district-detail p{font-size:13px;margin:6px 0}
+.district-detail ul{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:13px}
+.district-detail li.ok{color:#2a6941}
+.district-detail li.far{color:#b0452d;font-weight:700}
+.district-warn{color:#b0452d;font-style:normal;font-weight:700}
+@media(max-width:550px){.district-metrics{grid-template-columns:1fr 1fr}.district-icon{font-size:28px}}
+.district-palette button.inspect{padding-left:11px}

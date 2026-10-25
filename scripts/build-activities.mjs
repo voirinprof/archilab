@@ -333,7 +333,39 @@ function validateCarbon(a,fail){
   }
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon};
+/** District engine: a grid of plots, plot types described by their effects, fixed areas, noise and walking rules. */
+function validateDistrict(a,fail){
+  const P=a.parameters??{};
+  if(!P.grid||!isInt(P.grid.width)||!isInt(P.grid.height)||P.grid.width<2||P.grid.height<2||P.grid.width>20||P.grid.height>20)fail('Invalid grid');
+  for(const k of ['plot_metres','minutes_per_plot'])if(!(Number.isFinite(P[k])&&P[k]>0))fail(`Invalid ${k}`);
+  if(!(Number.isFinite(P.cooling)&&P.cooling>=0))fail('Invalid cooling');
+  if(!Array.isArray(P.tiles)||!P.tiles.length)fail('Missing tiles');
+  const ids=new Set();
+  for(const t of P.tiles){
+    if(!/^[a-z0-9-]+$/.test(t?.id||'')||t.id==='empty'||ids.has(t.id))fail(`Invalid or duplicate tile id ${t?.id}`);
+    ids.add(t.id);
+    if(!localized(t.label)||typeof t.color!=='string'||typeof t.icon!=='string'||typeof t.walkable!=='boolean'||!(t.permeable>=0&&t.permeable<=1)||!(Number.isFinite(t.heat)&&t.heat>=0))fail(`Invalid tile ${t.id}`);
+    if(t.residents!==undefined&&!(isInt(t.residents)&&t.residents>0))fail(`Invalid residents: ${t.id}`);
+  }
+  for(const t of P.tiles)if(t.next_to!==undefined&&!ids.has(t.next_to))fail(`Unknown next_to in ${t.id}`);
+  const inGrid=c=>Array.isArray(c)&&c.length===2&&c.every(isInt)&&c[0]>=0&&c[1]>=0&&c[0]<P.grid.width&&c[1]<P.grid.height;
+  if(!Array.isArray(P.fixed))fail('Missing fixed');
+  for(const f of P.fixed)if(!ids.has(f.type)||!P.tiles.find(t=>t.id===f.type).fixed||!inGrid(f.from)||!inGrid(f.to))fail(`Invalid fixed area ${f.type}`);
+  if(!P.tiles.some(t=>!t.fixed))fail('No tile to place');
+  if(!P.noise||!ids.has(P.noise.source)||!isInt(P.noise.reach)||P.noise.reach<1)fail('Invalid noise');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    switch(c.type){
+      case 'min_population': if(!isInt(c.value)||c.value<1)fail('Invalid min_population');break;
+      case 'services_within': if(!Array.isArray(c.services)||!c.services.length||!c.services.every(s=>P.tiles.find(t=>t.id===s)?.service)||!isInt(c.value)||c.value<1)fail('Invalid services_within');break;
+      case 'min_green_share': case 'max_impermeable_share': if(!(c.value>=0&&c.value<=100))fail(`Invalid ${c.type}`);break;
+      case 'no_noisy_homes': break;
+      default: fail(`Unknown constraint ${c.type}`);
+    }
+  }
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
