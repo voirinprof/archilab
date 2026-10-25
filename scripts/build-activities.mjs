@@ -406,7 +406,79 @@ function validateSequence(a,fail){
   }
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict,sequence:validateSequence};
+/** Isocity engine: a plan drawn with symbols, elements to place in an isometric view, steps with their own checks. */
+const city=await import('../src/engines/isocity/rules.ts');
+function validateIsocity(a,fail){
+  const P=a.parameters??{};
+  const {grid}=P;
+  if(!grid||!isInt(grid.width)||!isInt(grid.depth)||grid.width<4||grid.depth<4||grid.width>20||grid.depth>20)fail('Invalid grid');
+  if(!localized(P.empty_label))fail('Missing translations: empty_label');
+  const kinds=new Set(['road','building','green','tree','signal']),shapes=new Set(['road','crosswalk','house','apartment','school','shop','park','green','tree','signal']),dirs=new Set(['n','e','s','w']);
+  if(!Array.isArray(P.elements)||!P.elements.length)fail('Missing elements');
+  const els=new Map();
+  for(const e of P.elements){
+    if(!/^[a-z0-9-]+$/.test(e?.id||'')||els.has(e.id))fail(`Invalid or duplicate element id ${e?.id}`);
+    els.set(e.id,e);
+    if(!kinds.has(e.kind)||!shapes.has(e.shape))fail(`Invalid kind or shape: ${e.id}`);
+    if(!localized(e.label)||!/^#[0-9a-f]{6}$/i.test(e.color||'')||typeof e.icon!=='string')fail(`Invalid label, color or icon: ${e.id}`);
+    if(e.size!==undefined&&!(Array.isArray(e.size)&&e.size.length===2&&e.size.every(n=>isInt(n)&&n>=1&&n<=4)))fail(`Invalid size: ${e.id}`);
+    if(e.height!==undefined&&!(Number.isFinite(e.height)&&e.height>=0&&e.height<=4))fail(`Invalid height: ${e.id}`);
+    const road=e.kind==='road';
+    if(road!==Array.isArray(e.connections)||(road&&(e.connections.length<2||!e.connections.every(d=>dirs.has(d))||new Set(e.connections).size!==e.connections.length)))fail(`Road pieces (only) need connections: ${e.id}`);
+    if(['tree','signal'].includes(e.kind)&&e.size&&e.size.join()!=='1,1')fail(`Trees and traffic lights take one cell: ${e.id}`);
+  }
+  if(!Array.isArray(P.symbols)||!P.symbols.length)fail('Missing symbols');
+  const symbols=new Map();
+  for(const s of P.symbols){
+    if(typeof s?.symbol!=='string'||s.symbol.length!==1||s.symbol==='.'||symbols.has(s.symbol))fail(`Invalid or duplicate symbol ${s?.symbol}`);
+    symbols.set(s.symbol,s);
+    if(!localized(s.label))fail(`Missing translations: symbol ${s.symbol}`);
+    if(!s.road&&!s.element&&!s.overlay)fail(`Symbol ${s.symbol} means nothing`);
+    if(s.element&&(!els.has(s.element)||['tree','signal'].includes(els.get(s.element).kind)||(els.get(s.element).kind==='road')!==!!s.road))fail(`Invalid element in symbol ${s.symbol}`);
+    if(s.overlay&&!['tree','signal'].includes(els.get(s.overlay)?.kind))fail(`Invalid overlay in symbol ${s.symbol}`);
+  }
+  if(!Array.isArray(P.plan)||P.plan.length!==grid.depth||!P.plan.every(row=>typeof row==='string'&&[...row].length===grid.width))fail(`plan must be ${grid.depth} rows of ${grid.width} characters`);
+  P.plan.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.'&&!symbols.has(ch))fail(`Unknown symbol "${ch}" in plan row ${y+1}`)}));
+  // every road cell must be drawable with a piece, and every element must be exactly placeable from the plan
+  const expected=city.expectedPlan(P);
+  expected.forEach((row,y)=>row.forEach((c,x)=>{
+    if(!c.road)return;
+    const pieces=c.element?[els.get(c.element)]:P.elements.filter(e=>e.kind==='road'&&e.shape==='road');
+    if(c.dirs.length<2||!city.roadPieceFor(P,c.dirs,pieces))fail(`No road piece fits the plan at column ${x+1}, row ${y+1}`);
+    if(c.overlay&&els.get(c.overlay).kind==='signal'&&c.dirs.length<3)fail(`Traffic lights need a junction (column ${x+1}, row ${y+1})`);
+  }));
+  const solution=city.solutionOf(P);
+  const occ=city.occupancy(P,solution);
+  expected.forEach((row,y)=>row.forEach((c,x)=>{
+    if(!c.road&&c.element&&occ.get(`${x},${y}`)?.base?.element!==c.element)fail(`The ${c.element} area around column ${x+1}, row ${y+1} doesn't match the element's size`);
+  }));
+  for(const p of solution)if(!city.canPlace(P,solution.filter(q=>q.uid!==p.uid),p).ok)fail(`The plan breaks a placement rule at column ${p.x+1}, row ${p.y+1} (${p.element})`);
+  // constraints and steps
+  const cids=new Set();
+  for(const c of a.constraints){
+    if(!/^[a-z0-9-]+$/.test(c?.id||'')||cids.has(c.id))fail(`Invalid or duplicate constraint id ${c?.id}`);
+    cids.add(c.id);
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.id}`);
+    if(!['match_roads','no_dead_ends','match_elements','touch_road'].includes(c.type))fail(`Unknown constraint ${c.type}`);
+    if(['match_elements','touch_road'].includes(c.type)&&!(Array.isArray(c.elements)&&c.elements.length&&c.elements.every(id=>els.has(id))))fail(`Invalid elements in constraint ${c.id}`);
+  }
+  const {solved}=city.evaluateCity(P,solution,a.constraints);
+  if(!solved)fail('The plan itself does not meet every constraint');
+  if(!Array.isArray(P.steps)||P.steps.length<2)fail('Missing steps');
+  const sids=new Set();
+  P.steps.forEach((s,i)=>{
+    if(!/^[a-z0-9-]+$/.test(s?.id||'')||sids.has(s.id))fail(`Invalid or duplicate step id ${s?.id}`);
+    sids.add(s.id);
+    for(const k of ['label','intro','explanation','success'])if(!localized(s[k]))fail(`Missing translations: step ${s.id} ${k}`);
+    if(!Array.isArray(s.hints?.fr)||!s.hints.fr.length||s.hints.fr.length!==s.hints?.en?.length)fail(`Hints of step ${s.id} must have the same count in fr and en`);
+    if(!!s.final!==(i===P.steps.length-1))fail('Only the last step is final, and it must be');
+    if(!s.final&&!(Array.isArray(s.elements)&&s.elements.length&&s.elements.every(id=>els.has(id))))fail(`Invalid elements in step ${s.id}`);
+    if(!s.final&&!(Array.isArray(s.constraints)&&s.constraints.length&&s.constraints.every(id=>cids.has(id))))fail(`Invalid constraints in step ${s.id}`);
+  });
+  if(city.evaluateCity(P,[],a.constraints).solved)fail('An empty neighbourhood already meets every constraint');
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict,sequence:validateSequence,isocity:validateIsocity};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});

@@ -4017,6 +4017,668 @@
     }
   },
   {
+    "id": "quartier-des-tilleuls",
+    "engine": "isocity",
+    "category": "city",
+    "difficulty": "beginner",
+    "duration_minutes": 12,
+    "icon": "isocity",
+    "color": "mint",
+    "title": {
+      "fr": "Le quartier des Tilleuls",
+      "en": "Linden Neighbourhood"
+    },
+    "description": {
+      "fr": "Lis le plan d'un quartier et construis-le en 3D : rues, bâtiments, espaces verts et sécurité.",
+      "en": "Read a neighbourhood plan and build it in 3D: streets, buildings, green spaces and safety."
+    },
+    "mission": {
+      "fr": "La ville a dessiné le plan du nouveau quartier des Tilleuls. À toi de le construire ! Lis le plan, puis pose chaque élément sur la même case de la vue 3D, étape par étape : les rues, les bâtiments, les espaces verts, puis la sécurité.",
+      "en": "The city has drawn the plan of the new Linden neighbourhood. Now build it! Read the plan, then place each element on the same cell of the 3D view, step by step: streets, buildings, green spaces, then safety."
+    },
+    "concepts": {
+      "fr": [
+        "Plan et vue isométrique",
+        "Usages du sol",
+        "Réseau de rues",
+        "Espaces verts",
+        "Sécurité des piétons"
+      ],
+      "en": [
+        "Plan and isometric view",
+        "Land use",
+        "Street network",
+        "Green spaces",
+        "Pedestrian safety"
+      ]
+    },
+    "parameters": {
+      "grid": {
+        "width": 12,
+        "depth": 12
+      },
+      "empty_label": {
+        "fr": "Terrain libre (herbe)",
+        "en": "Open ground (grass)"
+      },
+      "elements": [
+        {
+          "id": "road-straight",
+          "kind": "road",
+          "shape": "road",
+          "connections": [
+            "n",
+            "s"
+          ],
+          "rotatable": true,
+          "color": "#6b7378",
+          "icon": "🛣️",
+          "label": {
+            "fr": "Route droite",
+            "en": "Straight road"
+          }
+        },
+        {
+          "id": "road-curve",
+          "kind": "road",
+          "shape": "road",
+          "connections": [
+            "n",
+            "e"
+          ],
+          "rotatable": true,
+          "color": "#6b7378",
+          "icon": "↪️",
+          "label": {
+            "fr": "Virage",
+            "en": "Bend"
+          }
+        },
+        {
+          "id": "road-t",
+          "kind": "road",
+          "shape": "road",
+          "connections": [
+            "e",
+            "s",
+            "w"
+          ],
+          "rotatable": true,
+          "color": "#6b7378",
+          "icon": "⊤",
+          "label": {
+            "fr": "Intersection en T",
+            "en": "T junction"
+          }
+        },
+        {
+          "id": "road-cross",
+          "kind": "road",
+          "shape": "road",
+          "connections": [
+            "n",
+            "e",
+            "s",
+            "w"
+          ],
+          "color": "#6b7378",
+          "icon": "✚",
+          "label": {
+            "fr": "Carrefour (4 branches)",
+            "en": "Crossroads (4 ways)"
+          }
+        },
+        {
+          "id": "house",
+          "kind": "building",
+          "shape": "house",
+          "height": 0.75,
+          "color": "#e07a5f",
+          "icon": "🏠",
+          "label": {
+            "fr": "Maison",
+            "en": "House"
+          }
+        },
+        {
+          "id": "apartment",
+          "kind": "building",
+          "shape": "apartment",
+          "size": [
+            2,
+            1
+          ],
+          "height": 2.2,
+          "rotatable": true,
+          "color": "#8fa9c4",
+          "icon": "🏢",
+          "label": {
+            "fr": "Immeuble",
+            "en": "Apartment block"
+          }
+        },
+        {
+          "id": "school",
+          "kind": "building",
+          "shape": "school",
+          "size": [
+            3,
+            2
+          ],
+          "height": 1.1,
+          "rotatable": true,
+          "color": "#f2c14e",
+          "icon": "🏫",
+          "label": {
+            "fr": "École",
+            "en": "School"
+          }
+        },
+        {
+          "id": "shop",
+          "kind": "building",
+          "shape": "shop",
+          "height": 0.9,
+          "color": "#d1495b",
+          "icon": "🏪",
+          "label": {
+            "fr": "Commerce",
+            "en": "Shop"
+          }
+        },
+        {
+          "id": "tree",
+          "kind": "tree",
+          "shape": "tree",
+          "height": 0.85,
+          "color": "#4f9d69",
+          "icon": "🌳",
+          "label": {
+            "fr": "Arbre",
+            "en": "Tree"
+          }
+        },
+        {
+          "id": "park",
+          "kind": "green",
+          "shape": "park",
+          "size": [
+            2,
+            2
+          ],
+          "height": 0.6,
+          "color": "#8cc084",
+          "icon": "⛲",
+          "label": {
+            "fr": "Petit parc",
+            "en": "Small park"
+          }
+        },
+        {
+          "id": "green",
+          "kind": "green",
+          "shape": "green",
+          "color": "#b5d99c",
+          "icon": "🌿",
+          "label": {
+            "fr": "Espace vert",
+            "en": "Green space"
+          }
+        },
+        {
+          "id": "crosswalk",
+          "kind": "road",
+          "shape": "crosswalk",
+          "connections": [
+            "n",
+            "s"
+          ],
+          "rotatable": true,
+          "color": "#6b7378",
+          "icon": "🚸",
+          "label": {
+            "fr": "Passage piéton",
+            "en": "Pedestrian crossing"
+          }
+        },
+        {
+          "id": "traffic-light",
+          "kind": "signal",
+          "shape": "signal",
+          "height": 1.1,
+          "color": "#2d3436",
+          "icon": "🚦",
+          "label": {
+            "fr": "Feux de circulation",
+            "en": "Traffic lights"
+          }
+        }
+      ],
+      "symbols": [
+        {
+          "symbol": "#",
+          "road": true,
+          "label": {
+            "fr": "Rue (les traits blancs montrent où elle va)",
+            "en": "Street (white lines show where it goes)"
+          }
+        },
+        {
+          "symbol": "=",
+          "road": true,
+          "element": "crosswalk",
+          "label": {
+            "fr": "Passage piéton",
+            "en": "Pedestrian crossing"
+          }
+        },
+        {
+          "symbol": "L",
+          "road": true,
+          "overlay": "traffic-light",
+          "label": {
+            "fr": "Intersection avec feux",
+            "en": "Junction with traffic lights"
+          }
+        },
+        {
+          "symbol": "h",
+          "element": "house",
+          "label": {
+            "fr": "Maison",
+            "en": "House"
+          }
+        },
+        {
+          "symbol": "A",
+          "element": "apartment",
+          "label": {
+            "fr": "Immeuble (2 cases)",
+            "en": "Apartment block (2 cells)"
+          }
+        },
+        {
+          "symbol": "S",
+          "element": "school",
+          "label": {
+            "fr": "École (3 × 2 cases)",
+            "en": "School (3 × 2 cells)"
+          }
+        },
+        {
+          "symbol": "c",
+          "element": "shop",
+          "label": {
+            "fr": "Commerce",
+            "en": "Shop"
+          }
+        },
+        {
+          "symbol": "P",
+          "element": "park",
+          "label": {
+            "fr": "Petit parc (2 × 2 cases)",
+            "en": "Small park (2 × 2 cells)"
+          }
+        },
+        {
+          "symbol": "g",
+          "element": "green",
+          "label": {
+            "fr": "Espace vert",
+            "en": "Green space"
+          }
+        },
+        {
+          "symbol": "T",
+          "overlay": "tree",
+          "label": {
+            "fr": "Arbre",
+            "en": "Tree"
+          }
+        }
+      ],
+      "plan": [
+        "...h#.PPT.#.",
+        ".T.h#.PP..#.",
+        "....#######.",
+        "...h#.A.A..T",
+        "...h#.A.A...",
+        "....=cc...T.",
+        "####L=###L##",
+        "..gg#gg..#..",
+        ".SSS=....#..",
+        ".SSS#..T.#..",
+        "...h#....#T.",
+        "...h#....#.."
+      ],
+      "steps": [
+        {
+          "id": "roads",
+          "label": {
+            "fr": "Les rues",
+            "en": "Streets"
+          },
+          "intro": {
+            "fr": "Commence par les rues. Sur le plan, les traits blancs montrent où va chaque route : choisis la bonne pièce (droite, virage, T ou carrefour), pivote-la si besoin, puis pose-la sur la même case de la vue 3D. Repère-toi avec les lettres et les chiffres.",
+            "en": "Start with the streets. On the plan, white lines show where each road goes: pick the right piece (straight, bend, T or crossroads), rotate it if needed, then place it on the same cell of the 3D view. Use the letters and numbers to find your way."
+          },
+          "explanation": {
+            "fr": "Une intersection permet de connecter plusieurs rues et d'organiser les déplacements. Un réseau sans impasse permet d'aller partout dans le quartier, et d'en sortir.",
+            "en": "A junction connects several streets and organises how people move around. A network with no dead ends lets you go anywhere in the neighbourhood, and out of it."
+          },
+          "elements": [
+            "road-straight",
+            "road-curve",
+            "road-t",
+            "road-cross"
+          ],
+          "constraints": [
+            "roads-match",
+            "roads-connected"
+          ],
+          "hints": {
+            "fr": [
+              "Les deux grandes rues traversent tout le quartier : la colonne E du nord au sud, et la ligne 7 d'ouest en est. Pose une route droite, pivote-la, puis glisse pour en poser plusieurs.",
+              "Là où deux rues se croisent, il faut un carrefour (E7) ou une intersection en T (E3, J7). Compte les branches sur le plan !",
+              "La petite rue du nord tourne en K3 : c'est un virage. Pivote-le jusqu'à ce qu'il relie l'ouest et le nord."
+            ],
+            "en": [
+              "The two main streets cross the whole neighbourhood: column E from north to south, and row 7 from west to east. Place a straight road, rotate it, then drag to lay several.",
+              "Where two streets meet, you need a crossroads (E7) or a T junction (E3, J7). Count the branches on the plan!",
+              "The small northern street turns at K3: that's a bend. Rotate it until it links west and north."
+            ]
+          },
+          "success": {
+            "fr": "Le réseau de rues est en place et bien connecté !",
+            "en": "The street network is in place and well connected!"
+          }
+        },
+        {
+          "id": "buildings",
+          "label": {
+            "fr": "Les bâtiments",
+            "en": "Buildings"
+          },
+          "intro": {
+            "fr": "Place maintenant les bâtiments sur leurs parcelles : 6 maisons, 2 immeubles, l'école et 2 commerces. Un immeuble occupe 2 cases et l'école 3 × 2 : pivote-les pour qu'ils tiennent exactement dans leur parcelle.",
+            "en": "Now place the buildings on their plots: 6 houses, 2 apartment blocks, the school and 2 shops. An apartment block takes 2 cells and the school 3 × 2: rotate them so they fit their plot exactly."
+          },
+          "explanation": {
+            "fr": "La représentation isométrique permet de voir le volume des bâtiments à partir d'un plan : sur le plan, une maison et un immeuble ne sont que des rectangles, mais en 3D on voit tout de suite que l'immeuble loge beaucoup plus de monde.",
+            "en": "The isometric view shows the volume of buildings drawn on a plan: on the plan, a house and an apartment block are just rectangles, but in 3D you see at once that the block houses far more people."
+          },
+          "elements": [
+            "house",
+            "apartment",
+            "school",
+            "shop"
+          ],
+          "constraints": [
+            "buildings-match",
+            "buildings-access"
+          ],
+          "hints": {
+            "fr": [
+              "Un bâtiment se pose à partir de son coin nord-ouest : touche la case en haut à gauche de sa parcelle sur le plan.",
+              "Les immeubles sont en G4-G5 et I4-I5 : ils sont plus longs du nord au sud, pivote-les une fois.",
+              "L'école occupe B9 à D10, juste à côté de la grande rue."
+            ],
+            "en": [
+              "A building is placed from its north-west corner: tap the top-left cell of its plot on the plan.",
+              "The apartment blocks are at G4-G5 and I4-I5: they are longer from north to south, so rotate them once.",
+              "The school takes B9 to D10, right next to the main street."
+            ]
+          },
+          "success": {
+            "fr": "Tous les bâtiments sont sur leurs parcelles et donnent sur une rue.",
+            "en": "Every building is on its plot and faces a street."
+          }
+        },
+        {
+          "id": "green",
+          "label": {
+            "fr": "Les espaces verts",
+            "en": "Green spaces"
+          },
+          "intro": {
+            "fr": "Aménage les espaces verts : le petit parc, les pelouses et 6 arbres. Un arbre pousse sur l'herbe ou sur un espace vert, jamais sur une route ni sur un bâtiment.",
+            "en": "Lay out the green spaces: the small park, the lawns and 6 trees. A tree grows on grass or on a green space, never on a road or a building."
+          },
+          "explanation": {
+            "fr": "Les espaces verts améliorent le cadre de vie : ils rafraîchissent le quartier en été, réduisent les îlots de chaleur, laissent l'eau de pluie s'infiltrer et donnent des lieux de rencontre. Pour être utiles, ils doivent être faciles à rejoindre.",
+            "en": "Green spaces make a neighbourhood nicer to live in: they cool it in summer, reduce heat islands, let rainwater soak in and give people places to meet. To be useful, they must be easy to reach."
+          },
+          "elements": [
+            "tree",
+            "park",
+            "green"
+          ],
+          "constraints": [
+            "green-match",
+            "trees-match",
+            "green-access"
+          ],
+          "hints": {
+            "fr": [
+              "Le parc occupe G1 à H2 : pose-le depuis G1.",
+              "Les pelouses sont de part et d'autre de la grande rue, juste sous la ligne 7 : C8, D8, F8 et G8.",
+              "Cherche les ronds verts du plan : ce sont les 6 arbres (I1, B2, L4, K6, H10, K11)."
+            ],
+            "en": [
+              "The park takes G1 to H2: place it from G1.",
+              "The lawns are on both sides of the main street, just below row 7: C8, D8, F8 and G8.",
+              "Look for the green dots on the plan: they are the 6 trees (I1, B2, L4, K6, H10, K11)."
+            ]
+          },
+          "success": {
+            "fr": "Le quartier est plus vert, et chaque espace vert donne sur une rue.",
+            "en": "The neighbourhood is greener, and every green space opens onto a street."
+          }
+        },
+        {
+          "id": "safety",
+          "label": {
+            "fr": "La sécurité",
+            "en": "Safety"
+          },
+          "intro": {
+            "fr": "Sécurise les déplacements : remplace les tronçons de rue indiqués par des passages piétons (dans le sens de la rue), puis équipe les deux intersections indiquées de feux de circulation.",
+            "en": "Make getting around safe: replace the marked pieces of street with pedestrian crossings (in the direction of the street), then fit traffic lights to the two marked junctions."
+          },
+          "explanation": {
+            "fr": "Un passage piéton facilite la traversée de la chaussée. Son emplacement est choisi avec soin : près des carrefours, et devant les lieux très fréquentés comme l'école ou les commerces. Les feux organisent le passage des voitures et des piétons aux intersections les plus chargées.",
+            "en": "A pedestrian crossing makes it easier to cross the road. Its place is chosen with care: near junctions, and in front of busy places such as the school or the shops. Traffic lights organise cars and pedestrians at the busiest junctions."
+          },
+          "elements": [
+            "crosswalk",
+            "traffic-light"
+          ],
+          "constraints": [
+            "crossings-match",
+            "lights-match"
+          ],
+          "hints": {
+            "fr": [
+              "Les passages piétons sont en E6, F7 et E9 (devant l'école). Pose-les par-dessus la route : ils la remplacent.",
+              "Les bandes blanches suivent le sens de la rue : en F7, la rue va d'ouest en est, pivote le passage.",
+              "Les feux vont sur les intersections E7 et J7."
+            ],
+            "en": [
+              "The crossings are at E6, F7 and E9 (in front of the school). Place them on top of the road: they replace it.",
+              "The white stripes follow the street: at F7 the street runs west to east, so rotate the crossing.",
+              "The traffic lights go on the junctions E7 and J7."
+            ]
+          },
+          "success": {
+            "fr": "Les piétons traversent en sécurité !",
+            "en": "Pedestrians can cross safely!"
+          }
+        },
+        {
+          "id": "final",
+          "final": true,
+          "label": {
+            "fr": "Vérification finale",
+            "en": "Final check"
+          },
+          "intro": {
+            "fr": "Compare ton quartier au plan. Vérifie le quartier : les cases à revoir s'affichent en rouge (à corriger) ou en orange (il manque quelque chose). Ici, tous les éléments sont disponibles pour corriger.",
+            "en": "Compare your neighbourhood with the plan. Check it: cells to review show in red (to fix) or orange (something is missing). Every element is available here to fix things."
+          },
+          "explanation": {
+            "fr": "Le quartier est terminé.",
+            "en": "The neighbourhood is finished."
+          },
+          "elements": [],
+          "constraints": [],
+          "hints": {
+            "fr": [
+              "Vérifie le quartier : les cases rouges ou orange montrent les écarts avec le plan."
+            ],
+            "en": [
+              "Check the neighbourhood: red or orange cells show the differences with the plan."
+            ]
+          },
+          "success": {
+            "fr": "Le quartier est conforme au plan.",
+            "en": "The neighbourhood matches the plan."
+          }
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "id": "roads-match",
+        "type": "match_roads",
+        "label": {
+          "fr": "Chaque rue du plan est construite, avec des pièces bien orientées.",
+          "en": "Every street of the plan is built, with correctly oriented pieces."
+        }
+      },
+      {
+        "id": "roads-connected",
+        "type": "no_dead_ends",
+        "label": {
+          "fr": "Aucune route ne s'arrête dans le vide : chaque bout rejoint une autre route ou sort du quartier.",
+          "en": "No road ends in the middle of nowhere: each end joins another road or leaves the neighbourhood."
+        }
+      },
+      {
+        "id": "buildings-match",
+        "type": "match_elements",
+        "elements": [
+          "house",
+          "apartment",
+          "school",
+          "shop"
+        ],
+        "label": {
+          "fr": "Chaque bâtiment est sur sa parcelle : 6 maisons, 2 immeubles, l'école et 2 commerces.",
+          "en": "Every building is on its plot: 6 houses, 2 apartment blocks, the school and 2 shops."
+        }
+      },
+      {
+        "id": "buildings-access",
+        "type": "touch_road",
+        "elements": [
+          "house",
+          "apartment",
+          "school",
+          "shop"
+        ],
+        "label": {
+          "fr": "Chaque bâtiment donne sur une rue.",
+          "en": "Every building faces a street."
+        }
+      },
+      {
+        "id": "green-match",
+        "type": "match_elements",
+        "elements": [
+          "park",
+          "green"
+        ],
+        "label": {
+          "fr": "Le parc et les espaces verts sont à leur place.",
+          "en": "The park and the green spaces are in place."
+        }
+      },
+      {
+        "id": "trees-match",
+        "type": "match_elements",
+        "elements": [
+          "tree"
+        ],
+        "label": {
+          "fr": "Les 6 arbres sont plantés aux bons endroits.",
+          "en": "The 6 trees are planted in the right places."
+        }
+      },
+      {
+        "id": "green-access",
+        "type": "touch_road",
+        "grouped": true,
+        "elements": [
+          "park",
+          "green"
+        ],
+        "label": {
+          "fr": "On peut rejoindre chaque espace vert depuis une rue.",
+          "en": "Every green space can be reached from a street."
+        }
+      },
+      {
+        "id": "crossings-match",
+        "type": "match_elements",
+        "elements": [
+          "crosswalk"
+        ],
+        "label": {
+          "fr": "Les 3 passages piétons sont aux endroits indiqués, dans le sens de la rue.",
+          "en": "The 3 pedestrian crossings are where the plan shows them, in the direction of the street."
+        }
+      },
+      {
+        "id": "lights-match",
+        "type": "match_elements",
+        "elements": [
+          "traffic-light"
+        ],
+        "label": {
+          "fr": "Les feux équipent les 2 intersections indiquées.",
+          "en": "Traffic lights equip the 2 marked junctions."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Vérifie le quartier : les cases rouges ou orange montrent les écarts avec le plan.",
+        "Survole une case du plan : la même case s'éclaire dans la vue 3D, et inversement. Les lettres et les chiffres sont les mêmes dans les deux vues.",
+        "Tu peux revenir à une étape précédente avec les boutons d'étapes, ou tout corriger ici : tous les éléments sont disponibles."
+      ],
+      "en": [
+        "Check the neighbourhood: red or orange cells show the differences with the plan.",
+        "Hover over a cell of the plan: the same cell lights up in the 3D view, and the other way round. Letters and numbers are the same in both views.",
+        "You can go back to an earlier step with the step buttons, or fix everything here: every element is available."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Le quartier des Tilleuls est construit exactement comme sur le plan.",
+        "en": "Well done! Linden Neighbourhood is built exactly as on the plan."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les cases en rouge ou en orange et les points non cochés.",
+        "en": "Not yet. Look at the red or orange cells and the unticked points."
+      }
+    },
+    "explanation": {
+      "fr": "Un plan d'urbanisme organise les usages du sol : où l'on habite, où l'on apprend, où l'on achète, où l'on se promène, et comment on circule entre ces lieux. Urbanistes et architectes passent sans cesse du plan (vue de dessus, précise et mesurable) au volume (vue en 3D, plus parlante) pour vérifier que le quartier sera agréable, accessible et sûr. Ce jeu simplifie beaucoup : un vrai quartier prévoit aussi des trottoirs, des pistes cyclables, des arrêts de bus, des réseaux souterrains…",
+      "en": "An urban plan organises land use: where people live, learn, shop and stroll, and how they move between these places. Urban planners and architects keep switching between the plan (top view, precise and measurable) and the volume (3D view, easier to grasp) to check that the neighbourhood will be pleasant, accessible and safe. This game simplifies a lot: a real neighbourhood also has pavements, cycle lanes, bus stops, underground networks…"
+    }
+  },
+  {
     "id": "tetris-architectural",
     "engine": "floorplan",
     "category": "spaces",
