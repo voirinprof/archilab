@@ -114,7 +114,7 @@ function targetRects(scene: Scene, id: string): Rect[] {
  * Returns the reachable cells and the ids among `to` that the walkable area touches.
  */
 export function passage(scene: Scene, from: string, to: string[], width: number) {
-  const area = walkableArea(scene.plan, scene.step, footprints(scene).map(f => f.rect), targetRects(scene, from), width, { corners: true });
+  const area = walkableArea(scene.plan, scene.step, footprints(scene).map(f => f.rect), targetRects(scene, from), width);
   return { cells: area.cells, reached: new Set(to.filter(id => area.reaches(targetRects(scene, id)))) };
 }
 

@@ -53,7 +53,7 @@ const sceneOf = (placed: PlacedFurniture[]): Scene => ({ plan, step, items, open
 const layout = (...spots: [string, number, number, 0 | 90 | 180 | 270][]) => spots.map(([id, x, y, rotation]) => ({ id, x, y, rotation }));
 const solutions = [
   layout(['bed', 0, 3, 180], ['desk', 2, 4.5, 180], ['wardrobe', 4.5, 2.5, 90], ['sofa', 3, 4, 180], ['table', 2.5, 2, 0]),
-  layout(['bed', 0.5, 3, 0], ['sofa', 2, 3.5, 0], ['desk', 4, 4.5, 180], ['wardrobe', 3, 0, 90], ['table', 2, 1, 0]),
+  layout(['bed', 0.5, 3, 0], ['sofa', 2, 3, 270], ['desk', 4, 4.5, 180], ['wardrobe', 3, 1, 270], ['table', 2, 1, 0]),
   layout(['bed', 1.5, 3, 0], ['sofa', 0, 3, 270], ['desk', 3, 4.5, 180], ['wardrobe', 4, 3.5, 0], ['table', 2.5, 1, 0]),
 ];
 const results = (placed: PlacedFurniture[]) => evaluateFurnish(game.constraints, sceneOf(placed)).constraints;
@@ -87,4 +87,14 @@ test('Aménage ton studio : each rule can be broken', () => {
   assert.ok(canPlaceFurniture(sceneOf(trapped), { id: 'sofa', x: 2, y: 1, rotation: 0 }));
   assert.equal(results(trapped)[index('usage_clear', 0)], true);
   assert.equal(results(trapped)[index('min_passage')], false);
+});
+
+test('Aménage ton studio : nobody squeezes between two pieces of furniture that only touch at a corner', () => {
+  // the table under the door swing and the wardrobe beside it meet at one point: the entrance is shut in
+  const cornered = layout(['bed', 0.5, 3, 0], ['sofa', 2, 3.5, 0], ['desk', 4, 4.5, 180], ['wardrobe', 3, 0, 90], ['table', 2, 1, 0]);
+  const scene = sceneOf(cornered);
+  assert.ok(cornered.every(p => canPlaceFurniture(scene, p)));
+  const c = game.constraints.find(c => c.type === 'min_passage')!;
+  assert.equal(checkFurnish(c, scene), false);
+  assert.equal(passage(scene, 'entrance', ['bed'], 0.8).cells.length, 4);
 });
