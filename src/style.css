@@ -301,3 +301,42 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 }
 .truss-ground{fill:#c9d8b6}
 .truss-frame{stroke:#6f7a7e;stroke-width:8;stroke-linecap:round}
+.carbon-house{display:block;width:100%;max-height:300px}
+.carbon-sky{fill:#eaf3f6}
+.carbon-ground{fill:#c9d8b6}
+.carbon-walls{stroke-linejoin:round}
+.carbon-roof{fill:#8d6f5a}
+.carbon-roof.wing{fill:#a2826b}
+.carbon-window rect{fill:#a9d6ea;stroke:#fff;stroke-width:3}
+.carbon-window line{stroke:#fff;stroke-width:2}
+.carbon-chimney{fill:#8d6f5a}
+.carbon-smoke{fill:#7d8486;transition:opacity .3s}
+.carbon-unit rect{fill:#e6ecef;stroke:#7e888c;stroke-width:2}
+.carbon-unit circle{fill:none;stroke:#7e888c;stroke-width:2}
+.carbon-plug{font-size:22px}
+.carbon-subtitle{font:700 18px Arial,Helvetica,sans-serif;margin:6px 0 12px}
+.carbon-controls{display:grid;gap:14px}
+.carbon-controls .control{margin:0}
+.carbon-choice{border:0;padding:0;margin:0;min-width:0}
+.carbon-choice legend{font-size:14px;font-weight:700;margin-bottom:8px;padding:0}
+.carbon-choice [role=radiogroup]{display:flex;flex-wrap:wrap;gap:6px}
+.carbon-choice button{border:1px solid #dce3dd;background:#fff;border-radius:99px;padding:8px 12px;font-size:13px;font-weight:700;color:#53676b}
+.carbon-choice button.active{background:#203d45;border-color:#203d45;color:#fff}
+.carbon-chart{display:grid;gap:16px;margin-bottom:16px}
+.carbon-row-head{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:800;margin-bottom:6px}
+.carbon-row-head strong{font-size:18px}
+.carbon-row small{display:block;font-size:11px;color:#5f6f73;margin-top:6px}
+.carbon-row small.down{color:#2a6941;font-weight:700}
+.carbon-bar{position:relative;height:18px;background:#eef2ee;border-radius:6px;overflow:hidden}
+.carbon-bar .seg{position:absolute;top:0;bottom:0;transition:left .25s,width .25s}
+.carbon-bar .target{position:absolute;top:-3px;bottom:-3px;width:3px;margin-left:-1px;background:#142e37}
+.seg.built{background:#d9a43a}
+.seg.use{background:#c2553b}
+.seg.structure{background:#8d6f5a}
+.seg.insulation{background:#e6c46e}
+.seg.windows{background:#7fb5d3}
+.seg.heating{background:#9aa6a9}
+.seg.need{background:#e58f78}
+.carbon-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:#5f6f73;margin-top:6px}
+.carbon-legend span{display:flex;align-items:center;gap:5px}
+.carbon-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;position:static}

@@ -2323,6 +2323,302 @@
     }
   },
   {
+    "id": "mission-carbone",
+    "engine": "carbon",
+    "category": "city",
+    "difficulty": "intermediate",
+    "duration_minutes": 7,
+    "icon": "leaf",
+    "color": "mint",
+    "title": {
+      "fr": "Mission carbone",
+      "en": "Carbon Mission"
+    },
+    "description": {
+      "fr": "Réduis l'empreinte carbone d'une maison, de sa construction à 50 ans de chauffage.",
+      "en": "Cut a house's carbon footprint, from building it to 50 years of heating."
+    },
+    "mission": {
+      "fr": "Cette maison familiale de 120 m² a été dessinée sans penser au climat : sur 50 ans, elle émettrait près de 380 tonnes de CO₂. Change sa forme, ses matériaux, son isolation, ses fenêtres et son chauffage pour passer sous 60 tonnes, sans sacrifier la lumière.",
+      "en": "This 120 m² family house was designed without thinking about the climate: over 50 years it would emit nearly 380 tonnes of CO₂. Change its shape, materials, insulation, windows and heating to get under 60 tonnes, without giving up daylight."
+    },
+    "concepts": {
+      "fr": [
+        "Empreinte carbone",
+        "Carbone de construction",
+        "Isolation",
+        "Énergie"
+      ],
+      "en": [
+        "Carbon footprint",
+        "Embodied carbon",
+        "Insulation",
+        "Energy"
+      ]
+    },
+    "parameters": {
+      "floor_area": 120,
+      "lifetime": 50,
+      "physics": {
+        "lambda": 0.04,
+        "surface_resistance": 0.5,
+        "ventilation_w_per_k": 30,
+        "degree_kilohours": 108,
+        "solar_gain_per_m2": 100,
+        "max_gain_share": 0.6
+      },
+      "shapes": [
+        {
+          "id": "long",
+          "kind": "long",
+          "storeys": 1,
+          "envelope": 383,
+          "label": {
+            "fr": "Allongée, de plain-pied",
+            "en": "Long, single storey"
+          }
+        },
+        {
+          "id": "ell",
+          "kind": "ell",
+          "storeys": 1,
+          "envelope": 400,
+          "label": {
+            "fr": "En L, de plain-pied",
+            "en": "L-shaped, single storey"
+          }
+        },
+        {
+          "id": "compact",
+          "kind": "compact",
+          "storeys": 2,
+          "envelope": 290,
+          "label": {
+            "fr": "Compacte, sur 2 étages",
+            "en": "Compact, two storeys"
+          }
+        }
+      ],
+      "structures": [
+        {
+          "id": "concrete",
+          "kg_per_m2": 300,
+          "color": "#b8bcbc",
+          "label": {
+            "fr": "Béton",
+            "en": "Concrete"
+          }
+        },
+        {
+          "id": "steel",
+          "kg_per_m2": 250,
+          "color": "#9fb1bd",
+          "label": {
+            "fr": "Acier",
+            "en": "Steel"
+          }
+        },
+        {
+          "id": "wood",
+          "kg_per_m2": 120,
+          "color": "#d9b27c",
+          "label": {
+            "fr": "Bois",
+            "en": "Timber"
+          }
+        },
+        {
+          "id": "straw",
+          "kg_per_m2": 80,
+          "color": "#e6cf8e",
+          "label": {
+            "fr": "Bois et paille",
+            "en": "Timber and straw"
+          }
+        }
+      ],
+      "insulations": [
+        {
+          "id": "polystyrene",
+          "kg_per_m2_cm": 0.9,
+          "label": {
+            "fr": "Polystyrène",
+            "en": "Polystyrene"
+          }
+        },
+        {
+          "id": "mineral",
+          "kg_per_m2_cm": 0.5,
+          "label": {
+            "fr": "Laine minérale",
+            "en": "Mineral wool"
+          }
+        },
+        {
+          "id": "biobased",
+          "kg_per_m2_cm": 0.15,
+          "label": {
+            "fr": "Fibre de bois",
+            "en": "Wood fibre"
+          }
+        }
+      ],
+      "thickness": {
+        "min": 5,
+        "max": 40,
+        "step": 5,
+        "initial": 5
+      },
+      "glazing": {
+        "min": 10,
+        "max": 40,
+        "step": 5,
+        "initial": 40
+      },
+      "windows": [
+        {
+          "id": "double",
+          "u": 1.4,
+          "kg_per_m2": 50,
+          "panes": 2,
+          "label": {
+            "fr": "Double vitrage",
+            "en": "Double glazing"
+          }
+        },
+        {
+          "id": "triple",
+          "u": 0.8,
+          "kg_per_m2": 70,
+          "panes": 3,
+          "label": {
+            "fr": "Triple vitrage",
+            "en": "Triple glazing"
+          }
+        }
+      ],
+      "heatings": [
+        {
+          "id": "gas",
+          "kind": "gas",
+          "efficiency": 0.9,
+          "kg_per_kwh": 0.23,
+          "embodied_kg": 500,
+          "label": {
+            "fr": "Chaudière au gaz",
+            "en": "Gas boiler"
+          }
+        },
+        {
+          "id": "electric",
+          "kind": "electric",
+          "efficiency": 1,
+          "kg_per_kwh": 0.06,
+          "embodied_kg": 300,
+          "label": {
+            "fr": "Radiateurs électriques",
+            "en": "Electric heaters"
+          }
+        },
+        {
+          "id": "heat-pump",
+          "kind": "heat-pump",
+          "efficiency": 3,
+          "kg_per_kwh": 0.06,
+          "embodied_kg": 1500,
+          "label": {
+            "fr": "Pompe à chaleur",
+            "en": "Heat pump"
+          }
+        },
+        {
+          "id": "pellets",
+          "kind": "wood",
+          "efficiency": 0.85,
+          "kg_per_kwh": 0.03,
+          "embodied_kg": 800,
+          "label": {
+            "fr": "Poêle à granulés",
+            "en": "Pellet stove"
+          }
+        }
+      ],
+      "initial": {
+        "shape": "long",
+        "structure": "concrete",
+        "insulation": "polystyrene",
+        "windows": "double",
+        "heating": "gas"
+      }
+    },
+    "constraints": [
+      {
+        "type": "max",
+        "metric": "total",
+        "value": 60,
+        "label": {
+          "fr": "Moins de 60 t de CO₂ en tout, sur 50 ans.",
+          "en": "Less than 60 t of CO₂ in total, over 50 years."
+        }
+      },
+      {
+        "type": "max",
+        "metric": "embodied",
+        "value": 25,
+        "label": {
+          "fr": "Moins de 25 t de CO₂ pour la construction (matériaux et équipements).",
+          "en": "Less than 25 t of CO₂ for building it (materials and equipment)."
+        }
+      },
+      {
+        "type": "max",
+        "metric": "heating_need",
+        "value": 60,
+        "label": {
+          "fr": "Un besoin de chauffage de 60 kWh par m² et par an au plus : une maison sobre et confortable.",
+          "en": "A heating need of at most 60 kWh per m² per year: a frugal, comfortable house."
+        }
+      },
+      {
+        "type": "min",
+        "metric": "glazing",
+        "value": 15,
+        "label": {
+          "fr": "Au moins 15 % de vitrage, pour la lumière naturelle.",
+          "en": "At least 15% glazing, for daylight."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Regarde le graphique : au départ, presque tout vient du chauffage au gaz pendant 50 ans. Commence par garder la chaleur dans la maison.",
+        "Une maison compacte a moins de murs et de toit par où la chaleur s'échappe. Plus d'isolant et un vitrage plus raisonnable réduisent aussi les pertes.",
+        "Une fois la maison bien isolée, le chauffage pèse peu : ce sont alors les matériaux qui comptent. Le béton émet beaucoup plus que le bois.",
+        "Une piste : forme compacte, structure en bois, 30 cm de fibre de bois, 20 % de triple vitrage et une pompe à chaleur. Plusieurs autres combinaisons marchent aussi !"
+      ],
+      "en": [
+        "Look at the chart: at first, almost everything comes from 50 years of gas heating. Start by keeping the heat inside the house.",
+        "A compact house has fewer walls and less roof for heat to escape through. More insulation and a more reasonable amount of glass cut losses too.",
+        "Once the house is well insulated, heating weighs little: then materials are what count. Concrete emits much more than timber.",
+        "One idea: compact shape, timber structure, 30 cm of wood fibre, 20% triple glazing and a heat pump. Several other combinations work too!"
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ta maison émet des dizaines de fois moins de CO₂, tout en restant lumineuse et confortable.",
+        "en": "Well done! Your house emits dozens of times less CO₂ while staying bright and comfortable."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde quelle barre dépasse l'objectif : la construction ou le chauffage ?",
+        "en": "Not yet. Look at which bar goes over the target: building it, or heating it?"
+      }
+    },
+    "explanation": {
+      "fr": "L'empreinte carbone d'un bâtiment se mesure sur toute sa vie. Il y a le carbone de la construction (extraire et fabriquer les matériaux, les équipements) et celui de l'utilisation (surtout le chauffage pendant des dizaines d'années). Une forme compacte, une bonne isolation et un vitrage bien dosé réduisent les besoins ; un chauffage peu émetteur fait le reste. Quand l'utilisation devient sobre, les matériaux pèsent le plus lourd : le bois, la paille ou la fibre de bois émettent bien moins que le béton, l'acier ou le polystyrène. Les chiffres de ce jeu sont des ordres de grandeur simplifiés : une vraie analyse du cycle de vie est beaucoup plus détaillée, et l'électricité émet plus ou moins selon la façon dont elle est produite.",
+      "en": "A building's carbon footprint is measured over its whole life. There is the carbon of building it (extracting and making materials and equipment) and the carbon of using it (mostly heating for decades). A compact shape, good insulation and well-measured glazing cut the needs; low-carbon heating does the rest. Once use becomes frugal, materials weigh the most: timber, straw or wood fibre emit far less than concrete, steel or polystyrene. The figures in this game are simplified orders of magnitude: a real life-cycle assessment is much more detailed, and electricity emits more or less depending on how it is produced."
+    }
+  },
+  {
     "id": "ou-mettre-la-porte",
     "engine": "floorplan",
     "category": "spaces",

@@ -309,7 +309,31 @@ function validateTruss(a,fail){
   }
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss};
+/** Carbon engine: design options with their (simplified) carbon and thermal factors. */
+function validateCarbon(a,fail){
+  const P=a.parameters??{};
+  const pos=v=>Number.isFinite(v)&&v>0, nonNeg=v=>Number.isFinite(v)&&v>=0;
+  if(!pos(P.floor_area)||!isInt(P.lifetime)||P.lifetime<1)fail('Invalid floor_area or lifetime');
+  const ph=P.physics??{};
+  if(!['lambda','surface_resistance','degree_kilohours'].every(k=>pos(ph[k]))||!['ventilation_w_per_k','solar_gain_per_m2'].every(k=>nonNeg(ph[k]))||!(ph.max_gain_share>=0&&ph.max_gain_share<1))fail('Invalid physics');
+  const lists={shapes:o=>['compact','long','ell'].includes(o.kind)&&pos(o.envelope)&&isInt(o.storeys)&&o.storeys>0,structures:o=>nonNeg(o.kg_per_m2)&&typeof o.color==='string',insulations:o=>nonNeg(o.kg_per_m2_cm),windows:o=>pos(o.u)&&nonNeg(o.kg_per_m2)&&isInt(o.panes)&&o.panes>0,heatings:o=>['gas','electric','heat-pump','wood'].includes(o.kind)&&pos(o.efficiency)&&nonNeg(o.kg_per_kwh)&&nonNeg(o.embodied_kg)};
+  for(const [k,ok] of Object.entries(lists)){
+    if(!Array.isArray(P[k])||!P[k].length)fail(`Missing ${k}`);
+    const ids=new Set();
+    for(const o of P[k]){if(!/^[a-z0-9-]+$/.test(o?.id||'')||ids.has(o.id)||!localized(o.label)||!ok(o))fail(`Invalid option in ${k}: ${o?.id}`);ids.add(o.id);}
+  }
+  for(const k of ['thickness','glazing']){const s=P[k];if(!s||![s.min,s.max,s.step,s.initial].every(Number.isFinite)||s.min>s.max||s.step<=0||s.initial<s.min||s.initial>s.max)fail(`Invalid ${k}`);}
+  const largestWindows=P.glazing.max/100*P.floor_area;
+  for(const s of P.shapes)if(s.envelope<=largestWindows)fail(`Shape ${s.id}: envelope smaller than the largest glazing`);
+  const init=P.initial??{};
+  for(const [k,list] of [['shape','shapes'],['structure','structures'],['insulation','insulations'],['windows','windows'],['heating','heatings']])if(!P[list].some(o=>o.id===init[k]))fail(`Invalid initial ${k}`);
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['max','min'].includes(c.type)||!['total','embodied','operational','heating_need','glazing'].includes(c.metric)||!Number.isFinite(c.value))fail(`Invalid constraint ${c.type} ${c.metric}`);
+  }
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
