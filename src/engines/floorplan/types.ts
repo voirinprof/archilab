@@ -132,3 +132,48 @@ export type FurnishActivity = Omit<FloorplanActivity, 'parameters' | 'constraint
   };
   constraints: FurnishConstraint[];
 };
+
+// ---------- renovate mode: an existing building whose partitions are moved to fit a new programme ----------
+
+/** A straight wall run along grid lines, from one point to another, in metres. */
+export type Run = [[number, number], [number, number]];
+
+/** exterior, bearing and water walls are fixed; partitions can be demolished; new walls are built by the player. */
+export type WallKind = 'exterior' | 'bearing' | 'water' | 'partition' | 'new';
+
+/** The player's works: demolished partitions, new walls and doors opened or closed (segment keys). */
+export type Works = { removed: string[]; added: string[]; doorFlips: string[] };
+
+export type UseSpec = { id: string; label: Localized; color: string };
+
+export type RenovateConstraint =
+  | { type: 'use_count'; use: string; min: number; min_area?: number; label: Localized }
+  /** Every room with one of these uses exists and has at least the given area. */
+  | { type: 'use_min_area'; areas: Record<string, number>; label: Localized }
+  | { type: 'use_has_window' | 'use_touches_water'; uses: string[]; label: Localized }
+  | { type: 'all_assigned' | 'all_reachable'; label: Localized }
+  | { type: 'reachable_avoiding_use'; uses: string[]; avoid: string; label: Localized }
+  | { type: 'no_door_between_uses'; uses: [string, string]; label: Localized }
+  | { type: 'max_cost'; value: number; label: Localized };
+
+export type RenovateActivity = Omit<FloorplanActivity, 'parameters' | 'constraints'> & {
+  parameters: {
+    mode: 'renovate';
+    plan: Plan;
+    scale?: number;
+    load_bearing: Run[];
+    /** Walls holding the water pipes: rooms on either side can become kitchens or bathrooms. */
+    water: Run[];
+    partitions: Run[];
+    /** Existing doors, 1 m runs on existing walls; one on the outer wall is the entrance. */
+    doors: Run[];
+    windows: Run[];
+    uses: UseSpec[];
+    costs: { demolish: number; build: number; door: number };
+    /** Cost at or below which the « very economical » message is shown (a solution at this cost is checked by the tests). */
+    good_cost?: number;
+    /** Former use of each existing room, shown faintly: label and one cell inside it. */
+    former?: { label: Localized; at: [number, number] }[];
+  };
+  constraints: RenovateConstraint[];
+};

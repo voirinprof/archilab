@@ -1,4 +1,5 @@
 import {readdir,readFile,writeFile,mkdir} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 const dir = new URL('../activities/', import.meta.url);
@@ -84,9 +85,55 @@ function validateFurnish(a,fail){
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_passage_hint');
   validateCommonContent(a,fail);
 }
+/** Renovate mode: walls given as runs on grid lines, uses given to rooms, works priced. */
+function validateRenovate(a,fail){
+  const {plan,load_bearing,water,partitions,doors,windows,uses,costs,good_cost,former}=a.parameters;
+  if(!plan||!isInt(plan.width)||!isInt(plan.depth)||plan.width<1||plan.depth<1)fail('Invalid plan size');
+  const onLine=r=>Array.isArray(r)&&r.length===2&&r.every(p=>Array.isArray(p)&&p.length===2&&p.every(isInt))
+    &&(r[0][0]===r[1][0]||r[0][1]===r[1][1])&&!(r[0][0]===r[1][0]&&r[0][1]===r[1][1])
+    &&r.every(([x,y])=>x>=0&&y>=0&&x<=plan.width&&y<=plan.depth);
+  const keys=r=>{const [[x1,y1],[x2,y2]]=r;const out=[];if(x1===x2)for(let y=Math.min(y1,y2);y<Math.max(y1,y2);y++)out.push(`v:${x1}:${y}`);else for(let x=Math.min(x1,x2);x<Math.max(x1,x2);x++)out.push(`h:${x}:${y1}`);return out;};
+  const perimeter=k=>{const [d,x,y]=k.split(':');return d==='v'?(+x===0||+x===plan.width):(+y===0||+y===plan.depth);};
+  for(const [name,list] of Object.entries({load_bearing,water,partitions,doors,windows})){
+    if(!Array.isArray(list))fail(`Missing ${name}`);
+    for(const r of list)if(!onLine(r))fail(`Invalid run in ${name}: ${JSON.stringify(r)}`);
+  }
+  const walls=new Set([...load_bearing,...water,...partitions].flatMap(keys));
+  for(const k of walls)if(perimeter(k))fail(`Interior wall on the outer wall: ${k}`);
+  for(const r of windows)for(const k of keys(r))if(!perimeter(k))fail(`Window not on the outer wall: ${k}`);
+  const doorKeys=doors.flatMap(keys);
+  for(const k of doorKeys)if(!perimeter(k)&&!walls.has(k))fail(`Door without a wall: ${k}`);
+  if(!doorKeys.some(perimeter))fail('Missing entrance: no door on the outer wall');
+  if(!Array.isArray(uses)||!uses.length)fail('Missing uses');
+  const useIds=new Set();
+  for(const u of uses){
+    if(!/^[a-z0-9-]+$/.test(u?.id||'')||useIds.has(u.id))fail(`Invalid or duplicate use ${u?.id}`);
+    useIds.add(u.id);
+    if(!localized(u.label)||typeof u.color!=='string')fail(`Invalid use ${u.id}`);
+  }
+  if(!costs||!['demolish','build','door'].every(k=>Number.isFinite(costs[k])&&costs[k]>=0))fail('Invalid costs');
+  if(good_cost!==undefined&&(!Number.isFinite(good_cost)||!localized(a.feedback?.best)))fail('good_cost needs a number and feedback.best');
+  for(const f of former??[])if(!localized(f?.label)||!Array.isArray(f.at)||f.at.length!==2)fail('Invalid former use');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    const known=u=>useIds.has(u);
+    switch(c.type){
+      case 'use_count': if(!known(c.use)||!isInt(c.min)||c.min<1)fail('Invalid constraint use_count');break;
+      case 'use_min_area': if(!c.areas||!Object.entries(c.areas).every(([u,v])=>known(u)&&Number.isFinite(v)&&v>0))fail('Invalid constraint use_min_area');break;
+      case 'use_has_window': case 'use_touches_water': if(!Array.isArray(c.uses)||!c.uses.length||!c.uses.every(known))fail(`Invalid constraint ${c.type}`);break;
+      case 'all_assigned': case 'all_reachable': break;
+      case 'reachable_avoiding_use': if(!Array.isArray(c.uses)||!c.uses.every(known)||!known(c.avoid))fail('Invalid constraint reachable_avoiding_use');break;
+      case 'no_door_between_uses': if(!Array.isArray(c.uses)||c.uses.length!==2||!c.uses.every(known))fail('Invalid constraint no_door_between_uses');break;
+      case 'max_cost': if(!Number.isFinite(c.value)||c.value<0)fail('Invalid constraint max_cost');break;
+      default: fail(`Unknown constraint ${c.type} for mode renovate`);
+    }
+  }
+  validateCommonContent(a,fail);
+}
 function validateFloorplan(a,fail){
   const mode=a.parameters?.mode??'layout';
   if(mode==='furnish')return validateFurnish(a,fail);
+  if(mode==='renovate')return validateRenovate(a,fail);
   if(!['layout','doors'].includes(mode))fail(`Invalid mode ${mode}`);
   const {scale,boundary,reveal_zone_hint:reveal}=a.parameters??{};
   if(scale!==undefined&&!(Number.isFinite(scale)&&scale>0))fail('Invalid scale');
@@ -201,7 +248,45 @@ function validateBlocks(a,fail){
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_model_hint');
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks};
+/** Sun engine: a house turned on its site, rooms lit through their windows, obstacles casting shadows. */
+function validateSun(a,fail){
+  const P=a.parameters??{};
+  const box=b=>b&&[b.x,b.y,b.width,b.depth].every(Number.isFinite)&&b.width>0&&b.depth>0;
+  if(!(Number.isFinite(P.latitude)&&P.latitude>0&&P.latitude<66))fail('Invalid latitude (northern hemisphere, below the polar circle)');
+  if(!P.site||!(P.site.width>0&&P.site.depth>0))fail('Invalid site');
+  if(!P.house_at||![P.house_at.x,P.house_at.y].every(Number.isFinite))fail('Invalid house_at');
+  if(!Number.isFinite(P.rotation_step)||P.rotation_step<=0||360%P.rotation_step!==0)fail('rotation_step must divide 360');
+  if(!Number.isFinite(P.initial_rotation)||P.initial_rotation%P.rotation_step!==0)fail('initial_rotation must be a multiple of rotation_step');
+  const h=P.house;
+  if(!h||!(h.width>0&&h.depth>0)||!Array.isArray(h.rooms)||!h.rooms.length)fail('Invalid house');
+  const ids=new Set();
+  for(const r of h.rooms){
+    if(!/^[a-z0-9-]+$/.test(r?.id||'')||ids.has(r.id))fail(`Invalid or duplicate room id ${r?.id}`);
+    ids.add(r.id);
+    if(!localized(r.label)||!box(r.box)||r.box.x<0||r.box.y<0||r.box.x+r.box.width>h.width||r.box.y+r.box.depth>h.depth)fail(`Invalid room ${r.id}`);
+    for(const w of r.windows??[]){
+      const along=w.facade==='north'||w.facade==='south'?[r.box.x,r.box.x+r.box.width]:[r.box.y,r.box.y+r.box.depth];
+      const onWall={north:r.box.y===0,south:r.box.y+r.box.depth===h.depth,west:r.box.x===0,east:r.box.x+r.box.width===h.width}[w.facade];
+      if(!onWall)fail(`Window of ${r.id} is not on an outer wall`);
+      if(!(w.from>=along[0]&&w.to<=along[1]&&w.from<w.to))fail(`Window of ${r.id} is outside its room`);
+    }
+  }
+  const hw=Math.hypot(h.width,h.depth)/2;
+  for(const o of P.obstacles??[]){
+    if(!localized(o.label)||!box(o.box)||!(o.height>0))fail(`Invalid obstacle ${o.id}`);
+    // the house turns around its centre: an obstacle within that circle would cut through it
+    const nx=Math.max(o.box.x,Math.min(P.house_at.x,o.box.x+o.box.width)),ny=Math.max(o.box.y,Math.min(P.house_at.y,o.box.y+o.box.depth));
+    if(Math.hypot(nx-P.house_at.x,ny-P.house_at.y)<hw)fail(`Obstacle ${o.id} is too close to the house`);
+  }
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['min_sun_hours','max_sun_hours'].includes(c.type)||!Array.isArray(c.rooms)||!c.rooms.every(id=>ids.has(id))||!['winter','equinox','summer'].includes(c.season)
+      ||!(c.from>=0&&c.to<=24&&c.from<c.to)||!(c.value>=0))fail(`Invalid constraint ${c.type}`);
+  }
+  if(P.reveal_paths_hint!==undefined&&(!isInt(P.reveal_paths_hint)||P.reveal_paths_hint<1||P.reveal_paths_hint>a.hints.fr.length))fail('Invalid reveal_paths_hint');
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
@@ -211,6 +296,11 @@ for (const file of files){
   if(ids.has(a.id))fail('Duplicate id'); ids.add(a.id);
   if(!validators[a.engine])fail('Unknown engine');
   if(!categories.has(a.category))fail(`Unknown category ${a.category}`);
+  if(a.share_image!==undefined){
+    // optional share image for social networks: a 1200 × 630 file in public/
+    if(typeof a.share_image!=='string'||!/^\/[a-z0-9/_-]+\.(png|jpe?g)$/.test(a.share_image))fail('share_image must be a path like /og/my-challenge.png');
+    if(!existsSync(new URL(`../public${a.share_image}`,import.meta.url)))fail(`share_image not found in public/: ${a.share_image}`);
+  }
   for(const key of ['title','description','mission'])if(!a[key]?.fr||!a[key]?.en)fail(`Missing translations: ${key}`);
   if(!Array.isArray(a.hints?.fr)||!Array.isArray(a.hints?.en)||!a.feedback?.success?.fr||!a.feedback?.success?.en)fail('Missing hint/feedback translations');
   if(!Array.isArray(a.constraints)||!a.constraints.length)fail('Missing constraints');

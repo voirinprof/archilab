@@ -139,3 +139,118 @@
 @media(max-width:550px){.blocks-stage{grid-template-columns:1fr}
 }
 .editor-cell{-webkit-tap-highlight-color:transparent}
+.tool-switch{display:flex;gap:6px;background:#f0f4ef;border-radius:12px;padding:4px;width:max-content;max-width:100%;margin:10px 0 0}
+.tool-switch button{display:flex;align-items:center;gap:6px;border:0;background:none;border-radius:9px;padding:8px 12px;font-weight:700;font-size:13px;color:#53676b}
+.tool-switch button.active{background:#203d45;color:#fff}
+.rn-cell{stroke:#ffffff;stroke-width:.6;cursor:pointer}
+.rn-cell.selected{stroke:#142e37;stroke-width:1.5;filter:brightness(.93)}
+.rn-former{font-size:9px;font-style:italic;fill:#8a9894;pointer-events:none}
+.rn-label{pointer-events:none}
+.rn-unknown{fill:#8a9894}
+.rn-wall{fill:none;stroke-linecap:square}
+.rn-wall.exterior{stroke:#37545b;stroke-width:7}
+.rn-wall.bearing{stroke:#37545b;stroke-width:8}
+.rn-wall.bearing-core{stroke:#f3f5f1;stroke-width:2.5;stroke-dasharray:4 4;stroke-linecap:butt}
+.rn-wall.water{stroke:#3c8dbc;stroke-width:7}
+.rn-wall.partition{stroke:#6b7f84;stroke-width:3.5}
+.rn-wall.new{stroke:#d9822b;stroke-width:4}
+.rn-wall.removed{stroke:#c2553b;stroke-width:2;stroke-dasharray:3 4;stroke-linecap:butt;opacity:.8}
+.rn-focus{fill:none;outline:none;pointer-events:all}
+.rn-focus:focus-visible{stroke:#ef9a73;stroke-width:3}
+.renovate.tool-rooms .fp-wall-hit{display:none}
+.rn-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#66767b;margin:-6px 0 14px}
+.rn-legend span{display:flex;align-items:center;gap:6px}
+.rn-swatch{display:inline-block;width:22px;height:0;border-top:4px solid}
+.rn-swatch.bearing{border-top:7px solid #37545b}
+.rn-swatch.water{border-color:#3c8dbc}
+.rn-swatch.partition{border-color:#6b7f84}
+.rn-swatch.new{border-color:#d9822b}
+.rn-swatch.removed{border-top:2px dashed #c2553b}
+.rn-facts{display:flex;gap:14px;font-size:12px;color:#53676b;margin:-2px 0 10px}
+.rn-none{font-size:13px;color:#6b807b;margin:0}
+.metrics strong.over{color:#b0452d}
+.room-chips button svg{flex-shrink:0}
+.sun-drawing{padding:6px}
+.sun-svg{display:block;width:100%;max-height:min(560px,70vh);touch-action:manipulation}
+.sun-dome{fill:#e6f1f6;stroke:#c3dbe6;stroke-width:1.5}
+.sun-dome.night{fill:#d7dde6}
+.sun-ground{fill:#e3ecd9;stroke:#b8cbab;stroke-width:1.5}
+.sun-compass{font-size:14px;font-weight:800;fill:#77936b}
+.sun-path polyline{fill:none;stroke-width:2;stroke-dasharray:5 4}
+.sun-path text{font-size:11px;font-weight:800}
+.sun-path.winter polyline{stroke:#5b819d}
+.sun-path.winter text{fill:#5b819d}
+.sun-path.summer polyline{stroke:#d9822b}
+.sun-path.summer text{fill:#c06a1a}
+.sun-shadow{fill:#37545b33}
+.sun-obstacle rect{fill:#b9c0c4;stroke:#7e888c;stroke-width:1.5}
+.sun-obstacle text{font-size:11px;font-weight:700;fill:#3d4a4f}
+.sun-ray{stroke-width:2.5;stroke-linecap:round}
+.sun-ray.sun{stroke:#f2b632}
+.sun-ray.shade{stroke:#8d9aa0;stroke-dasharray:3 3}
+.sun-house{outline:none}
+.sun-house:focus-visible .sun-walls{stroke:#ef9a73}
+.sun-room{stroke:#ffffff;stroke-width:1}
+.sun-room.lit{filter:brightness(1.08) drop-shadow(0 0 6px #f6d36a)}
+.sun-room-label{font-size:11px;font-weight:700;fill:#1c333a;pointer-events:none}
+.sun-walls{fill:none;stroke:#37545b;stroke-width:4}
+.sun-window{stroke-width:4.5}
+.sun-window.none{stroke:#9fcfe4}
+.sun-window.sun{stroke:#f2b632}
+.sun-window.shade{stroke:#8d9aa0}
+.sun-handle-arm{stroke:#37545b;stroke-width:2}
+.sun-handle{fill:#203d45;stroke:#fff;stroke-width:2;cursor:grab;touch-action:none}
+.sun-icon circle{fill:#f6d36a;stroke:#e0a72a;stroke-width:2}
+.sun-icon text{font-size:16px;fill:#9b6a0c;pointer-events:none}
+.sun-controls{display:grid;gap:10px;margin-top:4px}
+.sun-rotation,.sun-time{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.sun-rotation span{margin-right:auto}
+.sun-rotation .subtle,.sun-time .subtle{padding:9px}
+.sun-rotation strong{min-width:42px;text-align:center}
+.sun-time input{flex:1;accent-color:#d9a43a;min-width:0}
+.sun-time strong{min-width:64px;text-align:right}
+.sun-status{margin:0;font-size:12px;color:#66767b}
+.sun-timelines{margin-bottom:14px}
+.sun-timeline{display:grid;grid-template-columns:86px 1fr;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#53676b;margin:5px 0}
+.sun-timeline svg{display:block;width:100%;height:16px;border-radius:4px}
+.slot.sun{fill:#f2b632}
+.slot.shade{fill:#a9b4b9}
+.slot.none{fill:#e4ebe6}
+.slot.night{fill:#c8d0da}
+.slot-now{stroke:#142e37;stroke-width:1.5}
+.sun-hours{position:relative;height:14px;margin-left:94px;font-size:10px;color:#81918d}
+.sun-hours span{position:absolute;transform:translateX(-50%)}
+.slot-swatch{display:inline-block;width:12px;height:12px;border-radius:3px}
+.slot-swatch.sun{background:#f2b632}
+.slot-swatch.shade{background:#a9b4b9}
+.slot-swatch.none{background:#e4ebe6;border:1px solid #cfd8d2}
+@media(max-width:550px){.sun-room-label{font-size:17px}
+.sun-obstacle text{font-size:15px}
+.sun-compass{font-size:20px}
+.sun-path text{font-size:16px}
+.sun-timeline{grid-template-columns:70px 1fr}
+.sun-hours{margin-left:78px}
+}
+/* links that replaced buttons (crawlable navigation) */
+a.brand,a.back,a.game-card,a.primary,.lang-switch a{text-decoration:none}
+a.game-card{display:block}
+a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
+.lang-item{display:inline-flex;align-items:center;gap:8px}
+.lang-switch a{color:#9bb7bb;font-weight:800}
+.lang-switch a.selected{color:#e3f4b7}
+.not-found{padding:80px 0 120px}
+.not-found h1{font:700 clamp(35px,5vw,54px) Arial,Helvetica,sans-serif;letter-spacing:-2px;margin:0 0 14px}
+.not-found p{color:#5f6f73;max-width:560px;line-height:1.7;margin:0 0 24px}
+/* text contrast: WCAG AA (4.5:1) on the light backgrounds */
+.challenge-head .eyebrow{color:#4d6b3f}
+.eyebrow.dark{color:#56724a}
+.game-meta{color:#5c6d70}
+.section-title p{color:#5f6f73}
+.floorplan-help{color:#5f6e6b}
+.range-ends{color:#66756f}
+.concepts{color:#5a6d68}
+.tiny-tag{color:#56665f}
+.privacy p{color:#5f7072}
+.rn-former{fill:#66726e}
+.challenge-head p{color:#5e6e6d}
+.view-caption{fill:#56724a}

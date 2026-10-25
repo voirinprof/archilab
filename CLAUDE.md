@@ -176,6 +176,8 @@ Maintenir la configuration Vite compatible avec le domaine personnalisé https:/
 
 Ne pas modifier le workflow de déploiement sans nécessité.
 
+Les pages sont pré-générées à la compilation (`src/entry-server.tsx`, `scripts/prerender.mjs`, `src/seo.ts`) : chaque activité obtient automatiquement ses pages `/fr/activities/<id>/` et `/en/activities/<id>/`, ses métadonnées (titre, description, Open Graph, données structurées) tirées du YAML, et son entrée dans le sitemap. Les composants doivent donc pouvoir s'afficher sans navigateur : ne pas lire `window`, `document` ou `location` pendant le rendu, seulement dans les effets et les gestionnaires d'événements.
+
 ## 9. Méthode de travail
 
 Lorsqu'un nouveau défi est demandé :
