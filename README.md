@@ -65,7 +65,7 @@ Each game has a `category`: `client`, `site`, `spaces`, `shapes`, `light`, `stru
 - React + TypeScript + Vite; YAML compiled to JSON at build time.
 - No backend, no accounts, no cookies, no localStorage/IndexedDB, no analytics.
 - Only temporary React state; refreshing resets the challenge.
-- The language switch uses in-memory state; FR is the default. No language preference is saved.
-- Game links use `?game=GAME_ID`, compatible with GitHub Pages without server-side routing.
-- The UI uses system fonts and local CSS/SVG assets; it does not request external fonts or analytics. Hosting itself can generate infrastructure access logs outside ArchiLab's control.
-- Site graphics are CSS/SVG and do not require external images.
+- Addresses: `/` and `/fr/` (French home), `/en/` (English home), `/fr/activities/<id>/` and `/en/activities/<id>/`. The language is part of the address; no preference is saved. Old `?game=<id>` links redirect to the new addresses.
+- SEO without a server: `npm run build` renders every page with React at build time (`src/entry-server.tsx`, `scripts/prerender.mjs`) and writes one static HTML file per address, each with its own title, description, canonical URL, `hreflang`, Open Graph/Twitter tags and JSON-LD, all taken from the YAML files (`src/seo.ts`). The browser then hydrates the page. `sitemap.xml` and `404.html` are generated the same way; `public/robots.txt` points to the sitemap. A new activity gets all of this automatically.
+- Share images (1200 × 630) are `public/og/eduarchi-fr.png` and `-en.png`. An activity may set `share_image: /og/<file>.png` (file in `public/og/`) to use its own. The site images are drawn from `scripts/og/og.html`; see `scripts/og/render.mjs` to regenerate them.
+- The UI uses system fonts and local CSS/SVG assets; it does not request external fonts or analytics. Hosting itself can generate infrastructure access logs outside EduArchi's control.

@@ -1,4 +1,5 @@
 import {readdir,readFile,writeFile,mkdir} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 const dir = new URL('../activities/', import.meta.url);
@@ -295,6 +296,11 @@ for (const file of files){
   if(ids.has(a.id))fail('Duplicate id'); ids.add(a.id);
   if(!validators[a.engine])fail('Unknown engine');
   if(!categories.has(a.category))fail(`Unknown category ${a.category}`);
+  if(a.share_image!==undefined){
+    // optional share image for social networks: a 1200 × 630 file in public/
+    if(typeof a.share_image!=='string'||!/^\/[a-z0-9/_-]+\.(png|jpe?g)$/.test(a.share_image))fail('share_image must be a path like /og/my-challenge.png');
+    if(!existsSync(new URL(`../public${a.share_image}`,import.meta.url)))fail(`share_image not found in public/: ${a.share_image}`);
+  }
   for(const key of ['title','description','mission'])if(!a[key]?.fr||!a[key]?.en)fail(`Missing translations: ${key}`);
   if(!Array.isArray(a.hints?.fr)||!Array.isArray(a.hints?.en)||!a.feedback?.success?.fr||!a.feedback?.success?.en)fail('Missing hint/feedback translations');
   if(!Array.isArray(a.constraints)||!a.constraints.length)fail('Missing constraints');

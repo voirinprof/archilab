@@ -231,3 +231,26 @@
 .sun-timeline{grid-template-columns:70px 1fr}
 .sun-hours{margin-left:78px}
 }
+/* links that replaced buttons (crawlable navigation) */
+a.brand,a.back,a.game-card,a.primary,.lang-switch a{text-decoration:none}
+a.game-card{display:block}
+a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
+.lang-item{display:inline-flex;align-items:center;gap:8px}
+.lang-switch a{color:#9bb7bb;font-weight:800}
+.lang-switch a.selected{color:#e3f4b7}
+.not-found{padding:80px 0 120px}
+.not-found h1{font:700 clamp(35px,5vw,54px) Arial,Helvetica,sans-serif;letter-spacing:-2px;margin:0 0 14px}
+.not-found p{color:#5f6f73;max-width:560px;line-height:1.7;margin:0 0 24px}
+/* text contrast: WCAG AA (4.5:1) on the light backgrounds */
+.challenge-head .eyebrow{color:#4d6b3f}
+.eyebrow.dark{color:#56724a}
+.game-meta{color:#5c6d70}
+.section-title p{color:#5f6f73}
+.floorplan-help{color:#5f6e6b}
+.range-ends{color:#66756f}
+.concepts{color:#5a6d68}
+.tiny-tag{color:#56665f}
+.privacy p{color:#5f7072}
+.rn-former{fill:#66726e}
+.challenge-head p{color:#5e6e6d}
+.view-caption{fill:#56724a}
