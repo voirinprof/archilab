@@ -494,3 +494,7 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 @media(max-width:800px){.ic-switch{display:flex}.ic-views{grid-template-columns:1fr}.ic-views.show-iso .ic-pane.plan,.ic-views.show-plan .ic-pane.iso{display:none}.ic-controls{grid-template-columns:1fr}}
 @media(max-width:550px){.ic-palette button{width:calc(33.3% - 6px)}.ic-legend{grid-template-columns:1fr}.ic-tools button{flex:1 1 30%;justify-content:center;padding:9px 6px}}
 @media(prefers-reduced-motion:no-preference){.ic-ghost{transition:opacity .1s}}
+.footer-contact{display:inline-flex;align-items:center;gap:6px;color:#d7ebac;font-weight:700;text-decoration:none}
+.footer-contact:hover{text-decoration:underline}
+.privacy .privacy-contact{margin-top:8px}
+.privacy-contact a{display:inline-flex;align-items:center;gap:5px;color:#2f6e4f;font-weight:700;text-decoration:underline}
