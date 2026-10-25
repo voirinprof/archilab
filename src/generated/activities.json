@@ -1006,6 +1006,658 @@
     }
   },
   {
+    "id": "construis-ton-quartier",
+    "engine": "district",
+    "category": "city",
+    "difficulty": "intermediate",
+    "duration_minutes": 10,
+    "icon": "district",
+    "color": "yellow",
+    "title": {
+      "fr": "Construis ton quartier",
+      "en": "Build Your Neighbourhood"
+    },
+    "description": {
+      "fr": "Place logements, services, parcs et chemins pour que chacun ait tout à 10 minutes à pied.",
+      "en": "Place homes, services, parks and paths so everyone has everything within a 10-minute walk."
+    },
+    "mission": {
+      "fr": "Ce terrain vague, traversé par une rue principale et longé par une voie rapide, doit accueillir au moins 400 habitants. Place les logements, les services, les espaces verts et les chemins pour que chacun ait l'école, les commerces, un parc et l'arrêt de bus à 10 minutes à pied, dans un quartier vert et calme.",
+      "en": "This empty land, crossed by a main street and lined by a motorway, must house at least 400 people. Place homes, services, green spaces and paths so everyone has the school, shops, a park and the bus stop within a 10-minute walk, in a green and quiet neighbourhood."
+    },
+    "concepts": {
+      "fr": [
+        "Urbanisme",
+        "Ville du quart d'heure",
+        "Densité",
+        "Espaces verts"
+      ],
+      "en": [
+        "Urban planning",
+        "15-minute city",
+        "Density",
+        "Green spaces"
+      ]
+    },
+    "parameters": {
+      "grid": {
+        "width": 10,
+        "height": 8
+      },
+      "plot_metres": 100,
+      "minutes_per_plot": 1.25,
+      "cooling": 0.6,
+      "noise": {
+        "source": "motorway",
+        "reach": 2
+      },
+      "tiles": [
+        {
+          "id": "motorway",
+          "fixed": true,
+          "walkable": false,
+          "permeable": 0,
+          "heat": 3,
+          "color": "#9aa3a6",
+          "icon": "🚗",
+          "label": {
+            "fr": "Voie rapide",
+            "en": "Motorway"
+          }
+        },
+        {
+          "id": "street",
+          "fixed": true,
+          "walkable": true,
+          "permeable": 0,
+          "heat": 3,
+          "color": "#d2d6d6",
+          "icon": "",
+          "label": {
+            "fr": "Rue principale",
+            "en": "Main street"
+          }
+        },
+        {
+          "id": "apartments",
+          "residents": 20,
+          "walkable": false,
+          "permeable": 0.4,
+          "heat": 2.5,
+          "color": "#e8b98f",
+          "icon": "🏢",
+          "label": {
+            "fr": "Petit immeuble (20 hab.)",
+            "en": "Apartment block (20 people)"
+          }
+        },
+        {
+          "id": "house",
+          "residents": 4,
+          "walkable": false,
+          "permeable": 0.5,
+          "heat": 2,
+          "color": "#f2d3b3",
+          "icon": "🏠",
+          "label": {
+            "fr": "Maison (4 hab.)",
+            "en": "House (4 people)"
+          }
+        },
+        {
+          "id": "school",
+          "service": true,
+          "walkable": false,
+          "permeable": 0.3,
+          "heat": 2,
+          "color": "#c9dcea",
+          "icon": "🏫",
+          "label": {
+            "fr": "École",
+            "en": "School"
+          }
+        },
+        {
+          "id": "shops",
+          "service": true,
+          "walkable": false,
+          "permeable": 0,
+          "heat": 2.5,
+          "color": "#f2c9b4",
+          "icon": "🛒",
+          "label": {
+            "fr": "Commerces",
+            "en": "Shops"
+          }
+        },
+        {
+          "id": "bus",
+          "service": true,
+          "walkable": true,
+          "permeable": 0,
+          "heat": 2.5,
+          "next_to": "street",
+          "color": "#f4e2a1",
+          "icon": "🚏",
+          "label": {
+            "fr": "Arrêt de bus",
+            "en": "Bus stop"
+          }
+        },
+        {
+          "id": "park",
+          "service": true,
+          "green": true,
+          "walkable": true,
+          "permeable": 1,
+          "heat": 0,
+          "color": "#b5d69a",
+          "icon": "🌳",
+          "label": {
+            "fr": "Parc",
+            "en": "Park"
+          }
+        },
+        {
+          "id": "trees",
+          "green": true,
+          "screen": true,
+          "walkable": true,
+          "permeable": 0.8,
+          "heat": 0.5,
+          "color": "#cfe5c0",
+          "icon": "🌲",
+          "label": {
+            "fr": "Allée d'arbres",
+            "en": "Tree-lined walk"
+          }
+        },
+        {
+          "id": "path",
+          "walkable": true,
+          "permeable": 0.6,
+          "heat": 1,
+          "color": "#efe6cf",
+          "icon": "",
+          "label": {
+            "fr": "Chemin piéton",
+            "en": "Footpath"
+          }
+        }
+      ],
+      "fixed": [
+        {
+          "type": "motorway",
+          "from": [
+            0,
+            0
+          ],
+          "to": [
+            9,
+            0
+          ]
+        },
+        {
+          "type": "street",
+          "from": [
+            0,
+            4
+          ],
+          "to": [
+            9,
+            4
+          ]
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "min_population",
+        "value": 400,
+        "label": {
+          "fr": "Au moins 400 habitants.",
+          "en": "At least 400 residents."
+        }
+      },
+      {
+        "type": "services_within",
+        "services": [
+          "school",
+          "shops",
+          "park",
+          "bus"
+        ],
+        "value": 8,
+        "label": {
+          "fr": "Chaque logement a l'école, les commerces, un parc et l'arrêt de bus à 10 minutes à pied au plus.",
+          "en": "Every home has the school, shops, a park and the bus stop within a 10-minute walk."
+        }
+      },
+      {
+        "type": "min_green_share",
+        "value": 25,
+        "label": {
+          "fr": "Au moins 25 % du terrain en espaces verts (parcs, allées d'arbres).",
+          "en": "At least 25% of the land as green space (parks, tree-lined walks)."
+        }
+      },
+      {
+        "type": "max_impermeable_share",
+        "value": 55,
+        "label": {
+          "fr": "Au plus 55 % de sol imperméable, pour que la pluie s'infiltre.",
+          "en": "At most 55% sealed ground, so rain can soak in."
+        }
+      },
+      {
+        "type": "no_noisy_homes",
+        "label": {
+          "fr": "Aucun logement n'est exposé au bruit de la voie rapide (à moins de 2 parcelles, sans écran d'arbres).",
+          "en": "No home is exposed to motorway noise (within 2 plots, with no screen of trees)."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "400 habitants avec des maisons de 4 personnes, c'est 100 parcelles : il n'y en a que 60 ! Les petits immeubles logent beaucoup plus de monde sur peu de place.",
+        "Active le calque « À pied » : chaque logement affiche le temps jusqu'au service le plus loin. On ne traverse pas un immeuble : chaque logement doit donner sur une rue, un chemin, une allée ou un parc.",
+        "Mets l'école, les commerces et l'arrêt de bus au centre, près de la rue. Les angles du terrain sont loin de tout : c'est la bonne place pour des parcs.",
+        "Une piste : une allée d'arbres le long de la voie rapide et une autre au fond, deux chemins qui descendent jusqu'à la rue, des immeubles entre eux, les services au centre et des parcs dans les coins."
+      ],
+      "en": [
+        "400 residents in 4-person houses means 100 plots: there are only 60! Apartment blocks house many more people on little land.",
+        "Turn on the « On foot » layer: each home shows the time to its furthest service. You can't walk through a building: every home must open onto a street, path, tree-lined walk or park.",
+        "Put the school, shops and bus stop in the middle, near the street. The corners of the land are far from everything: a good place for parks.",
+        "One idea: a tree-lined walk along the motorway and another at the back, two paths down to the street, apartment blocks between them, services in the middle and parks in the corners."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ton quartier est dense, vert, calme, et tout y est accessible à pied.",
+        "en": "Well done! Your neighbourhood is dense, green and quiet, and everything is within walking distance."
+      },
+      "failure": {
+        "fr": "Pas encore. Active les calques « À pied » et « Bruit » pour voir quels logements posent problème.",
+        "en": "Not yet. Turn on the « On foot » and « Noise » layers to see which homes have a problem."
+      }
+    },
+    "explanation": {
+      "fr": "Les urbanistes cherchent à organiser des quartiers où l'on vit bien sans dépendre de la voiture : la « ville du quart d'heure » rapproche les logements de l'école, des commerces, des parcs et des transports en commun. Loger plus de monde sur moins de terrain (la densité) laisse de la place pour la nature. Les arbres et les parcs rafraîchissent l'air en été (contre les îlots de chaleur), laissent la pluie s'infiltrer et protègent du bruit. Ce jeu simplifie beaucoup : distances en ligne de parcelles, bruit et chaleur très schématiques.",
+      "en": "Urban planners try to organise neighbourhoods where people live well without depending on the car: the « 15-minute city » brings homes close to schools, shops, parks and public transport. Housing more people on less land (density) leaves room for nature. Trees and parks cool the air in summer (against heat islands), let rain soak in and shield from noise. This game simplifies a lot: distances counted in plots, very rough noise and heat."
+    }
+  },
+  {
+    "id": "la-tour-qui-penche",
+    "engine": "truss",
+    "category": "structure",
+    "difficulty": "intermediate",
+    "duration_minutes": 6,
+    "icon": "tower",
+    "color": "mint",
+    "title": {
+      "fr": "La tour qui penche",
+      "en": "The Leaning Tower"
+    },
+    "description": {
+      "fr": "Le vent pousse une tour de 5 étages : ajoute quelques poutres pour qu'elle reste droite.",
+      "en": "The wind pushes a 5-storey tower: add a few beams to keep it standing."
+    },
+    "mission": {
+      "fr": "Les poteaux et les planchers de cette tour sont solides, mais assemblés en rectangles : au premier coup de vent d'ouest, elle se couche comme un château de cartes. Stabilise-la avec 6 poutres au maximum.",
+      "en": "This tower's columns and floors are strong, but they are joined as rectangles: at the first gust of west wind, it folds like a house of cards. Steady it with 6 beams at most."
+    },
+    "concepts": {
+      "fr": [
+        "Stabilité",
+        "Contreventement",
+        "Traction et compression",
+        "Vent"
+      ],
+      "en": [
+        "Stability",
+        "Bracing",
+        "Tension and compression",
+        "Wind"
+      ]
+    },
+    "parameters": {
+      "scene": "ground",
+      "grid": {
+        "x": [
+          -2,
+          4
+        ],
+        "y": [
+          0,
+          5
+        ]
+      },
+      "unit": 3,
+      "deck": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        [
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            5
+          ],
+          [
+            2,
+            5
+          ]
+        ]
+      ],
+      "deck_strength": 4,
+      "supports": [
+        [
+          -2,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "loads": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      "load": 8,
+      "load_direction": [
+        1,
+        0
+      ],
+      "load_label": {
+        "fr": "Vent d'ouest",
+        "en": "West wind"
+      },
+      "max_length": 2.3,
+      "tension_limit": 75,
+      "compression_limit": 100,
+      "reveal_pattern_hint": 4,
+      "pattern": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            5
+          ]
+        ]
+      ]
+    },
+    "constraints": [
+      {
+        "type": "stable",
+        "label": {
+          "fr": "La tour tient debout : aucun étage ne peut se déformer (contreventement).",
+          "en": "The tower stands: no storey can sway (bracing)."
+        }
+      },
+      {
+        "type": "strong",
+        "label": {
+          "fr": "Aucune poutre ne casse sous la poussée du vent.",
+          "en": "No beam breaks under the push of the wind."
+        }
+      },
+      {
+        "type": "max_bars",
+        "value": 6,
+        "label": {
+          "fr": "6 poutres au maximum.",
+          "en": "6 beams at most."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Chaque étage est un rectangle : sous le vent, il se déforme en parallélogramme. Une seule diagonale suffit à le rendre rigide.",
+        "Il faut contreventer chaque étage, du sol jusqu'au toit : un étage sans diagonale suffit pour que la tour se couche.",
+        "Le sens de la diagonale compte ! Les poutres bleues sont poussées et, longues, elles flambent. Oriente-les pour que le vent les tire (en rouge).",
+        "Regarde le modèle en pointillés : une diagonale par étage, qui monte du bas, côté vent, vers le haut, côté opposé. Tu peux aussi ancrer le pied de la tour au sol."
+      ],
+      "en": [
+        "Each storey is a rectangle: in the wind, it squashes into a parallelogram. A single diagonal is enough to make it rigid.",
+        "Every storey needs bracing, from the ground to the roof: one storey without a diagonal is enough for the tower to fall over.",
+        "The direction of the diagonal matters! Blue beams are pushed and, being long, they buckle. Turn them so the wind pulls them (in red).",
+        "Look at the dashed model: one diagonal per storey, rising from the bottom on the windward side to the top on the other side. You can also anchor the foot of the tower to the ground."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ta tour reste droite dans le vent, avec très peu de matière.",
+        "en": "Well done! Your tower stays upright in the wind, with very little material."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les points orange qui bougent, les poutres marquées ✕ qui cassent, ou le nombre de poutres.",
+        "en": "Not yet. Look at the orange points that move, the beams marked ✕ that break, or the number of beams."
+      }
+    },
+    "explanation": {
+      "fr": "Le vent pousse les bâtiments sur le côté. Des poteaux et des planchers assemblés en rectangles ne suffisent pas : chaque étage peut se déformer en parallélogramme. Les ingénieurs et les architectes ajoutent donc un contreventement : des diagonales qui forment des triangles, des murs rigides ou un noyau en béton. Une diagonale fine travaille bien quand elle est tirée (traction) ; poussée (compression), elle risque de flamber. C'est pourquoi on voit souvent des croix de Saint-André en façade : quel que soit le sens du vent, une des deux diagonales est tirée. Le calcul de ce jeu est très simplifié : ce n'est pas un outil d'ingénierie.",
+      "en": "Wind pushes buildings sideways. Columns and floors joined as rectangles are not enough: each storey can squash into a parallelogram. So engineers and architects add bracing: diagonals that form triangles, stiff walls or a concrete core. A thin diagonal works well when it is pulled (tension); pushed (compression), it may buckle. That's why X-shaped braces are often seen on façades: whichever way the wind blows, one of the two diagonals is pulled. This game's calculation is very simplified: it is not an engineering tool."
+    }
+  },
+  {
     "id": "le-batiment-transformable",
     "engine": "floorplan",
     "category": "client",
@@ -1510,6 +2162,377 @@
     }
   },
   {
+    "id": "le-pont-impossible",
+    "engine": "truss",
+    "category": "structure",
+    "difficulty": "intermediate",
+    "duration_minutes": 8,
+    "icon": "truss",
+    "color": "blue",
+    "title": {
+      "fr": "Le pont impossible",
+      "en": "The Impossible Bridge"
+    },
+    "description": {
+      "fr": "Construis un pont qui résiste au camion avec un nombre limité de poutres.",
+      "en": "Build a bridge that holds the truck with a limited number of beams."
+    },
+    "mission": {
+      "fr": "Un camion doit traverser ce ravin de 12 m. La route est posée, mais seule, elle s'effondre. Ajoute des poutres entre les points de la grille pour la soutenir, sans dépasser 16 poutres.",
+      "en": "A truck must cross this 12 m ravine. The road is in place, but on its own it collapses. Add beams between the grid points to hold it up, using no more than 16 beams."
+    },
+    "concepts": {
+      "fr": [
+        "Triangulation",
+        "Traction et compression",
+        "Flambement",
+        "Économie de matière"
+      ],
+      "en": [
+        "Triangulation",
+        "Tension and compression",
+        "Buckling",
+        "Using less material"
+      ]
+    },
+    "parameters": {
+      "grid": {
+        "x": [
+          1,
+          7
+        ],
+        "y": [
+          -2,
+          3
+        ]
+      },
+      "unit": 2,
+      "deck": [
+        [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ]
+        ],
+        [
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            0
+          ]
+        ],
+        [
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ]
+        ],
+        [
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        [
+          [
+            6,
+            0
+          ],
+          [
+            7,
+            0
+          ]
+        ]
+      ],
+      "supports": [
+        [
+          1,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          1,
+          -1
+        ],
+        [
+          7,
+          -1
+        ],
+        [
+          1,
+          -2
+        ],
+        [
+          7,
+          -2
+        ]
+      ],
+      "loads": [
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          0
+        ]
+      ],
+      "load": 10,
+      "load_label": {
+        "fr": "Camion",
+        "en": "Truck"
+      },
+      "max_length": 2.3,
+      "tension_limit": 75,
+      "compression_limit": 100,
+      "reveal_pattern_hint": 4,
+      "pattern": [
+        [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ]
+        ],
+        [
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        [
+          [
+            4,
+            1
+          ],
+          [
+            5,
+            1
+          ]
+        ],
+        [
+          [
+            5,
+            1
+          ],
+          [
+            6,
+            1
+          ]
+        ],
+        [
+          [
+            6,
+            1
+          ],
+          [
+            7,
+            0
+          ]
+        ],
+        [
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ]
+        ],
+        [
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        [
+          [
+            5,
+            0
+          ],
+          [
+            5,
+            1
+          ]
+        ],
+        [
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            1
+          ]
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            0
+          ]
+        ],
+        [
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            0
+          ]
+        ],
+        [
+          [
+            5,
+            1
+          ],
+          [
+            4,
+            0
+          ]
+        ],
+        [
+          [
+            6,
+            1
+          ],
+          [
+            5,
+            0
+          ]
+        ]
+      ]
+    },
+    "constraints": [
+      {
+        "type": "stable",
+        "label": {
+          "fr": "Le pont tient debout : aucune partie ne peut bouger (structure triangulée).",
+          "en": "The bridge stands: no part of it can move (a triangulated structure)."
+        }
+      },
+      {
+        "type": "strong",
+        "label": {
+          "fr": "Aucune poutre ne casse sous le poids du camion.",
+          "en": "No beam breaks under the weight of the truck."
+        }
+      },
+      {
+        "type": "max_bars",
+        "value": 16,
+        "label": {
+          "fr": "16 poutres au maximum (sans compter la route).",
+          "en": "16 beams at most (the road doesn't count)."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "La route seule ne tient pas : ses jonctions plient comme des charnières. Ajoute des poutres pour former des triangles.",
+        "Un carré se déforme en losange, un triangle ne bouge pas. Chaque case de ton pont doit être coupée par une diagonale.",
+        "Les poutres bleues sont comprimées : si elles sont longues, elles flambent et cassent. Là où ça pousse, préfère des poutres courtes.",
+        "Regarde le modèle en pointillés : un treillis au-dessus de la route, avec des montants et des diagonales. Tu peux aussi construire sous la route !"
+      ],
+      "en": [
+        "The road alone doesn't hold: its joints bend like hinges. Add beams to make triangles.",
+        "A square squashes into a diamond, a triangle doesn't move. Every box of your bridge needs a diagonal.",
+        "Blue beams are squeezed: if they are long, they buckle and break. Where the push is strong, use short beams.",
+        "Look at the dashed model: a truss above the road, with uprights and diagonals. You can also build under the road!"
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ton pont est rigide et assez solide pour le camion.",
+        "en": "Well done! Your bridge is rigid and strong enough for the truck."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les points orange qui bougent, les poutres marquées ✕ qui cassent, ou le nombre de poutres.",
+        "en": "Not yet. Look at the orange points that move, the beams marked ✕ that break, or the number of beams."
+      }
+    },
+    "explanation": {
+      "fr": "Une suite de poutres reliées par des articulations se plie comme une chaîne ; un triangle, lui, ne peut pas changer de forme. C'est pourquoi les ponts, les grues et les charpentes sont faits de triangles : c'est la triangulation. Sous une charge, certaines poutres sont tirées (traction, en rouge) et d'autres poussées (compression, en bleu). Une poutre longue et comprimée risque de flamber, c'est-à-dire de se courber brusquement : on la garde courte. Le calcul de ce jeu est très simplifié (assemblages articulés, matériau idéal, charge immobile) : ce n'est pas un outil d'ingénierie.",
+      "en": "Beams joined by hinges fold like a chain; a triangle, however, cannot change shape. That's why bridges, cranes and roof frames are made of triangles: this is triangulation. Under a load, some beams are pulled (tension, in red) and others pushed (compression, in blue). A long beam under compression may buckle, meaning it suddenly bends: so it is kept short. This game's calculation is very simplified (pinned joints, ideal material, a still load): it is not an engineering tool."
+    }
+  },
+  {
     "id": "mission-25m2",
     "engine": "dimensions",
     "category": "spaces",
@@ -1578,6 +2601,302 @@
         "fr": "Bravo ! Le plan répond aux besoins du client.",
         "en": "Well done! Your plan meets the client's needs."
       }
+    }
+  },
+  {
+    "id": "mission-carbone",
+    "engine": "carbon",
+    "category": "city",
+    "difficulty": "intermediate",
+    "duration_minutes": 7,
+    "icon": "leaf",
+    "color": "mint",
+    "title": {
+      "fr": "Mission carbone",
+      "en": "Carbon Mission"
+    },
+    "description": {
+      "fr": "Réduis l'empreinte carbone d'une maison, de sa construction à 50 ans de chauffage.",
+      "en": "Cut a house's carbon footprint, from building it to 50 years of heating."
+    },
+    "mission": {
+      "fr": "Cette maison familiale de 120 m² a été dessinée sans penser au climat : sur 50 ans, elle émettrait près de 380 tonnes de CO₂. Change sa forme, ses matériaux, son isolation, ses fenêtres et son chauffage pour passer sous 60 tonnes, sans sacrifier la lumière.",
+      "en": "This 120 m² family house was designed without thinking about the climate: over 50 years it would emit nearly 380 tonnes of CO₂. Change its shape, materials, insulation, windows and heating to get under 60 tonnes, without giving up daylight."
+    },
+    "concepts": {
+      "fr": [
+        "Empreinte carbone",
+        "Carbone de construction",
+        "Isolation",
+        "Énergie"
+      ],
+      "en": [
+        "Carbon footprint",
+        "Embodied carbon",
+        "Insulation",
+        "Energy"
+      ]
+    },
+    "parameters": {
+      "floor_area": 120,
+      "lifetime": 50,
+      "physics": {
+        "lambda": 0.04,
+        "surface_resistance": 0.5,
+        "ventilation_w_per_k": 30,
+        "degree_kilohours": 108,
+        "solar_gain_per_m2": 100,
+        "max_gain_share": 0.6
+      },
+      "shapes": [
+        {
+          "id": "long",
+          "kind": "long",
+          "storeys": 1,
+          "envelope": 383,
+          "label": {
+            "fr": "Allongée, de plain-pied",
+            "en": "Long, single storey"
+          }
+        },
+        {
+          "id": "ell",
+          "kind": "ell",
+          "storeys": 1,
+          "envelope": 400,
+          "label": {
+            "fr": "En L, de plain-pied",
+            "en": "L-shaped, single storey"
+          }
+        },
+        {
+          "id": "compact",
+          "kind": "compact",
+          "storeys": 2,
+          "envelope": 290,
+          "label": {
+            "fr": "Compacte, sur 2 étages",
+            "en": "Compact, two storeys"
+          }
+        }
+      ],
+      "structures": [
+        {
+          "id": "concrete",
+          "kg_per_m2": 300,
+          "color": "#b8bcbc",
+          "label": {
+            "fr": "Béton",
+            "en": "Concrete"
+          }
+        },
+        {
+          "id": "steel",
+          "kg_per_m2": 250,
+          "color": "#9fb1bd",
+          "label": {
+            "fr": "Acier",
+            "en": "Steel"
+          }
+        },
+        {
+          "id": "wood",
+          "kg_per_m2": 120,
+          "color": "#d9b27c",
+          "label": {
+            "fr": "Bois",
+            "en": "Timber"
+          }
+        },
+        {
+          "id": "straw",
+          "kg_per_m2": 80,
+          "color": "#e6cf8e",
+          "label": {
+            "fr": "Bois et paille",
+            "en": "Timber and straw"
+          }
+        }
+      ],
+      "insulations": [
+        {
+          "id": "polystyrene",
+          "kg_per_m2_cm": 0.9,
+          "label": {
+            "fr": "Polystyrène",
+            "en": "Polystyrene"
+          }
+        },
+        {
+          "id": "mineral",
+          "kg_per_m2_cm": 0.5,
+          "label": {
+            "fr": "Laine minérale",
+            "en": "Mineral wool"
+          }
+        },
+        {
+          "id": "biobased",
+          "kg_per_m2_cm": 0.15,
+          "label": {
+            "fr": "Fibre de bois",
+            "en": "Wood fibre"
+          }
+        }
+      ],
+      "thickness": {
+        "min": 5,
+        "max": 40,
+        "step": 5,
+        "initial": 5
+      },
+      "glazing": {
+        "min": 10,
+        "max": 40,
+        "step": 5,
+        "initial": 40
+      },
+      "windows": [
+        {
+          "id": "double",
+          "u": 1.4,
+          "kg_per_m2": 50,
+          "panes": 2,
+          "label": {
+            "fr": "Double vitrage",
+            "en": "Double glazing"
+          }
+        },
+        {
+          "id": "triple",
+          "u": 0.8,
+          "kg_per_m2": 70,
+          "panes": 3,
+          "label": {
+            "fr": "Triple vitrage",
+            "en": "Triple glazing"
+          }
+        }
+      ],
+      "heatings": [
+        {
+          "id": "gas",
+          "kind": "gas",
+          "efficiency": 0.9,
+          "kg_per_kwh": 0.23,
+          "embodied_kg": 500,
+          "label": {
+            "fr": "Chaudière au gaz",
+            "en": "Gas boiler"
+          }
+        },
+        {
+          "id": "electric",
+          "kind": "electric",
+          "efficiency": 1,
+          "kg_per_kwh": 0.06,
+          "embodied_kg": 300,
+          "label": {
+            "fr": "Radiateurs électriques",
+            "en": "Electric heaters"
+          }
+        },
+        {
+          "id": "heat-pump",
+          "kind": "heat-pump",
+          "efficiency": 3,
+          "kg_per_kwh": 0.06,
+          "embodied_kg": 1500,
+          "label": {
+            "fr": "Pompe à chaleur",
+            "en": "Heat pump"
+          }
+        },
+        {
+          "id": "pellets",
+          "kind": "wood",
+          "efficiency": 0.85,
+          "kg_per_kwh": 0.03,
+          "embodied_kg": 800,
+          "label": {
+            "fr": "Poêle à granulés",
+            "en": "Pellet stove"
+          }
+        }
+      ],
+      "initial": {
+        "shape": "long",
+        "structure": "concrete",
+        "insulation": "polystyrene",
+        "windows": "double",
+        "heating": "gas"
+      }
+    },
+    "constraints": [
+      {
+        "type": "max",
+        "metric": "total",
+        "value": 60,
+        "label": {
+          "fr": "Moins de 60 t de CO₂ en tout, sur 50 ans.",
+          "en": "Less than 60 t of CO₂ in total, over 50 years."
+        }
+      },
+      {
+        "type": "max",
+        "metric": "embodied",
+        "value": 25,
+        "label": {
+          "fr": "Moins de 25 t de CO₂ pour la construction (matériaux et équipements).",
+          "en": "Less than 25 t of CO₂ for building it (materials and equipment)."
+        }
+      },
+      {
+        "type": "max",
+        "metric": "heating_need",
+        "value": 60,
+        "label": {
+          "fr": "Un besoin de chauffage de 60 kWh par m² et par an au plus : une maison sobre et confortable.",
+          "en": "A heating need of at most 60 kWh per m² per year: a frugal, comfortable house."
+        }
+      },
+      {
+        "type": "min",
+        "metric": "glazing",
+        "value": 15,
+        "label": {
+          "fr": "Au moins 15 % de vitrage, pour la lumière naturelle.",
+          "en": "At least 15% glazing, for daylight."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Regarde le graphique : au départ, presque tout vient du chauffage au gaz pendant 50 ans. Commence par garder la chaleur dans la maison.",
+        "Une maison compacte a moins de murs et de toit par où la chaleur s'échappe. Plus d'isolant et un vitrage plus raisonnable réduisent aussi les pertes.",
+        "Une fois la maison bien isolée, le chauffage pèse peu : ce sont alors les matériaux qui comptent. Le béton émet beaucoup plus que le bois.",
+        "Une piste : forme compacte, structure en bois, 30 cm de fibre de bois, 20 % de triple vitrage et une pompe à chaleur. Plusieurs autres combinaisons marchent aussi !"
+      ],
+      "en": [
+        "Look at the chart: at first, almost everything comes from 50 years of gas heating. Start by keeping the heat inside the house.",
+        "A compact house has fewer walls and less roof for heat to escape through. More insulation and a more reasonable amount of glass cut losses too.",
+        "Once the house is well insulated, heating weighs little: then materials are what count. Concrete emits much more than timber.",
+        "One idea: compact shape, timber structure, 30 cm of wood fibre, 20% triple glazing and a heat pump. Several other combinations work too!"
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ta maison émet des dizaines de fois moins de CO₂, tout en restant lumineuse et confortable.",
+        "en": "Well done! Your house emits dozens of times less CO₂ while staying bright and comfortable."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde quelle barre dépasse l'objectif : la construction ou le chauffage ?",
+        "en": "Not yet. Look at which bar goes over the target: building it, or heating it?"
+      }
+    },
+    "explanation": {
+      "fr": "L'empreinte carbone d'un bâtiment se mesure sur toute sa vie. Il y a le carbone de la construction (extraire et fabriquer les matériaux, les équipements) et celui de l'utilisation (surtout le chauffage pendant des dizaines d'années). Une forme compacte, une bonne isolation et un vitrage bien dosé réduisent les besoins ; un chauffage peu émetteur fait le reste. Quand l'utilisation devient sobre, les matériaux pèsent le plus lourd : le bois, la paille ou la fibre de bois émettent bien moins que le béton, l'acier ou le polystyrène. Les chiffres de ce jeu sont des ordres de grandeur simplifiés : une vraie analyse du cycle de vie est beaucoup plus détaillée, et l'électricité émet plus ou moins selon la façon dont elle est produite.",
+      "en": "A building's carbon footprint is measured over its whole life. There is the carbon of building it (extracting and making materials and equipment) and the carbon of using it (mostly heating for decades). A compact shape, good insulation and well-measured glazing cut the needs; low-carbon heating does the rest. Once use becomes frugal, materials weigh the most: timber, straw or wood fibre emit far less than concrete, steel or polystyrene. The figures in this game are simplified orders of magnitude: a real life-cycle assessment is much more detailed, and electricity emits more or less depending on how it is produced."
     }
   },
   {

@@ -1,0 +1,86 @@
+id: construis-ton-quartier
+engine: district
+category: city
+difficulty: intermediate
+duration_minutes: 10
+icon: district
+color: yellow
+title:
+  fr: "Construis ton quartier"
+  en: "Build Your Neighbourhood"
+description:
+  fr: "Place logements, services, parcs et chemins pour que chacun ait tout à 10 minutes à pied."
+  en: "Place homes, services, parks and paths so everyone has everything within a 10-minute walk."
+mission:
+  fr: "Ce terrain vague, traversé par une rue principale et longé par une voie rapide, doit accueillir au moins 400 habitants. Place les logements, les services, les espaces verts et les chemins pour que chacun ait l'école, les commerces, un parc et l'arrêt de bus à 10 minutes à pied, dans un quartier vert et calme."
+  en: "This empty land, crossed by a main street and lined by a motorway, must house at least 400 people. Place homes, services, green spaces and paths so everyone has the school, shops, a park and the bus stop within a 10-minute walk, in a green and quiet neighbourhood."
+concepts:
+  fr: ["Urbanisme", "Ville du quart d'heure", "Densité", "Espaces verts"]
+  en: ["Urban planning", "15-minute city", "Density", "Green spaces"]
+parameters:
+  grid: {width: 10, height: 8}
+  plot_metres: 100
+  minutes_per_plot: 1.25
+  cooling: 0.6
+  noise: {source: motorway, reach: 2}
+  tiles:
+    - {id: motorway, fixed: true, walkable: false, permeable: 0, heat: 3, color: "#9aa3a6", icon: "🚗", label: {fr: "Voie rapide", en: "Motorway"}}
+    - {id: street, fixed: true, walkable: true, permeable: 0, heat: 3, color: "#d2d6d6", icon: "", label: {fr: "Rue principale", en: "Main street"}}
+    - {id: apartments, residents: 20, walkable: false, permeable: 0.4, heat: 2.5, color: "#e8b98f", icon: "🏢", label: {fr: "Petit immeuble (20 hab.)", en: "Apartment block (20 people)"}}
+    - {id: house, residents: 4, walkable: false, permeable: 0.5, heat: 2, color: "#f2d3b3", icon: "🏠", label: {fr: "Maison (4 hab.)", en: "House (4 people)"}}
+    - {id: school, service: true, walkable: false, permeable: 0.3, heat: 2, color: "#c9dcea", icon: "🏫", label: {fr: "École", en: "School"}}
+    - {id: shops, service: true, walkable: false, permeable: 0, heat: 2.5, color: "#f2c9b4", icon: "🛒", label: {fr: "Commerces", en: "Shops"}}
+    - {id: bus, service: true, walkable: true, permeable: 0, heat: 2.5, next_to: street, color: "#f4e2a1", icon: "🚏", label: {fr: "Arrêt de bus", en: "Bus stop"}}
+    - {id: park, service: true, green: true, walkable: true, permeable: 1, heat: 0, color: "#b5d69a", icon: "🌳", label: {fr: "Parc", en: "Park"}}
+    - {id: trees, green: true, screen: true, walkable: true, permeable: 0.8, heat: 0.5, color: "#cfe5c0", icon: "🌲", label: {fr: "Allée d'arbres", en: "Tree-lined walk"}}
+    - {id: path, walkable: true, permeable: 0.6, heat: 1, color: "#efe6cf", icon: "", label: {fr: "Chemin piéton", en: "Footpath"}}
+  fixed:
+    - {type: motorway, from: [0, 0], to: [9, 0]}
+    - {type: street, from: [0, 4], to: [9, 4]}
+constraints:
+  - type: min_population
+    value: 400
+    label:
+      fr: "Au moins 400 habitants."
+      en: "At least 400 residents."
+  - type: services_within
+    services: [school, shops, park, bus]
+    value: 8
+    label:
+      fr: "Chaque logement a l'école, les commerces, un parc et l'arrêt de bus à 10 minutes à pied au plus."
+      en: "Every home has the school, shops, a park and the bus stop within a 10-minute walk."
+  - type: min_green_share
+    value: 25
+    label:
+      fr: "Au moins 25 % du terrain en espaces verts (parcs, allées d'arbres)."
+      en: "At least 25% of the land as green space (parks, tree-lined walks)."
+  - type: max_impermeable_share
+    value: 55
+    label:
+      fr: "Au plus 55 % de sol imperméable, pour que la pluie s'infiltre."
+      en: "At most 55% sealed ground, so rain can soak in."
+  - type: no_noisy_homes
+    label:
+      fr: "Aucun logement n'est exposé au bruit de la voie rapide (à moins de 2 parcelles, sans écran d'arbres)."
+      en: "No home is exposed to motorway noise (within 2 plots, with no screen of trees)."
+hints:
+  fr:
+    - "400 habitants avec des maisons de 4 personnes, c'est 100 parcelles : il n'y en a que 60 ! Les petits immeubles logent beaucoup plus de monde sur peu de place."
+    - "Active le calque « À pied » : chaque logement affiche le temps jusqu'au service le plus loin. On ne traverse pas un immeuble : chaque logement doit donner sur une rue, un chemin, une allée ou un parc."
+    - "Mets l'école, les commerces et l'arrêt de bus au centre, près de la rue. Les angles du terrain sont loin de tout : c'est la bonne place pour des parcs."
+    - "Une piste : une allée d'arbres le long de la voie rapide et une autre au fond, deux chemins qui descendent jusqu'à la rue, des immeubles entre eux, les services au centre et des parcs dans les coins."
+  en:
+    - "400 residents in 4-person houses means 100 plots: there are only 60! Apartment blocks house many more people on little land."
+    - "Turn on the « On foot » layer: each home shows the time to its furthest service. You can't walk through a building: every home must open onto a street, path, tree-lined walk or park."
+    - "Put the school, shops and bus stop in the middle, near the street. The corners of the land are far from everything: a good place for parks."
+    - "One idea: a tree-lined walk along the motorway and another at the back, two paths down to the street, apartment blocks between them, services in the middle and parks in the corners."
+feedback:
+  success:
+    fr: "Bravo ! Ton quartier est dense, vert, calme, et tout y est accessible à pied."
+    en: "Well done! Your neighbourhood is dense, green and quiet, and everything is within walking distance."
+  failure:
+    fr: "Pas encore. Active les calques « À pied » et « Bruit » pour voir quels logements posent problème."
+    en: "Not yet. Turn on the « On foot » and « Noise » layers to see which homes have a problem."
+explanation:
+  fr: "Les urbanistes cherchent à organiser des quartiers où l'on vit bien sans dépendre de la voiture : la « ville du quart d'heure » rapproche les logements de l'école, des commerces, des parcs et des transports en commun. Loger plus de monde sur moins de terrain (la densité) laisse de la place pour la nature. Les arbres et les parcs rafraîchissent l'air en été (contre les îlots de chaleur), laissent la pluie s'infiltrer et protègent du bruit. Ce jeu simplifie beaucoup : distances en ligne de parcelles, bruit et chaleur très schématiques."
+  en: "Urban planners try to organise neighbourhoods where people live well without depending on the car: the « 15-minute city » brings homes close to schools, shops, parks and public transport. Housing more people on less land (density) leaves room for nature. Trees and parks cool the air in summer (against heat islands), let rain soak in and shield from noise. This game simplifies a lot: distances counted in plots, very rough noise and heat."

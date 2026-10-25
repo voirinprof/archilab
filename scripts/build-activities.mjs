@@ -286,7 +286,86 @@ function validateSun(a,fail){
   if(P.reveal_paths_hint!==undefined&&(!isInt(P.reveal_paths_hint)||P.reveal_paths_hint<1||P.reveal_paths_hint>a.hints.fr.length))fail('Invalid reveal_paths_hint');
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun};
+/** Truss engine: beams between grid points, a given road, supports and loads. */
+function validateTruss(a,fail){
+  const P=a.parameters??{};
+  const range=r=>Array.isArray(r)&&r.length===2&&r.every(isInt)&&r[0]<r[1];
+  if(!P.grid||!range(P.grid.x)||!range(P.grid.y))fail('Invalid grid');
+  const inGrid=p=>Array.isArray(p)&&p.length===2&&p.every(isInt)&&p[0]>=P.grid.x[0]&&p[0]<=P.grid.x[1]&&p[1]>=P.grid.y[0]&&p[1]<=P.grid.y[1];
+  const bar=b=>Array.isArray(b)&&b.length===2&&b.every(inGrid)&&!(b[0][0]===b[1][0]&&b[0][1]===b[1][1]);
+  if(!Array.isArray(P.deck)||!P.deck.length||!P.deck.every(bar))fail('Invalid deck');
+  if(!Array.isArray(P.supports)||P.supports.length<2||!P.supports.every(inGrid))fail('Invalid supports (at least two points on the grid)');
+  if(!Array.isArray(P.loads)||!P.loads.length||!P.loads.every(inGrid))fail('Invalid loads');
+  for(const k of ['unit','load','max_length','tension_limit','compression_limit'])if(!(Number.isFinite(P[k])&&P[k]>0))fail(`Invalid ${k}`);
+  if(P.pattern!==undefined&&(!Array.isArray(P.pattern)||!P.pattern.every(bar)))fail('Invalid pattern');
+  if(P.scene!==undefined&&!['ravine','ground'].includes(P.scene))fail(`Invalid scene ${P.scene}`);
+  if(P.load_direction!==undefined&&!(Array.isArray(P.load_direction)&&P.load_direction.length===2&&P.load_direction.every(Number.isFinite)&&Math.abs(Math.hypot(...P.load_direction)-1)<1e-6))fail('load_direction must be a unit vector [x, y]');
+  if(P.load_label!==undefined&&!localized(P.load_label))fail('Missing translations: load_label');
+  if(P.deck_strength!==undefined&&!(Number.isFinite(P.deck_strength)&&P.deck_strength>0))fail('Invalid deck_strength');
+  if(P.reveal_pattern_hint!==undefined&&(!isInt(P.reveal_pattern_hint)||P.reveal_pattern_hint<1||P.reveal_pattern_hint>a.hints.fr.length||!P.pattern))fail('Invalid reveal_pattern_hint');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['stable','strong','max_bars'].includes(c.type)||(c.type==='max_bars'&&!(isInt(c.value)&&c.value>0)))fail(`Invalid constraint ${c.type}`);
+  }
+  validateCommonContent(a,fail);
+}
+/** Carbon engine: design options with their (simplified) carbon and thermal factors. */
+function validateCarbon(a,fail){
+  const P=a.parameters??{};
+  const pos=v=>Number.isFinite(v)&&v>0, nonNeg=v=>Number.isFinite(v)&&v>=0;
+  if(!pos(P.floor_area)||!isInt(P.lifetime)||P.lifetime<1)fail('Invalid floor_area or lifetime');
+  const ph=P.physics??{};
+  if(!['lambda','surface_resistance','degree_kilohours'].every(k=>pos(ph[k]))||!['ventilation_w_per_k','solar_gain_per_m2'].every(k=>nonNeg(ph[k]))||!(ph.max_gain_share>=0&&ph.max_gain_share<1))fail('Invalid physics');
+  const lists={shapes:o=>['compact','long','ell'].includes(o.kind)&&pos(o.envelope)&&isInt(o.storeys)&&o.storeys>0,structures:o=>nonNeg(o.kg_per_m2)&&typeof o.color==='string',insulations:o=>nonNeg(o.kg_per_m2_cm),windows:o=>pos(o.u)&&nonNeg(o.kg_per_m2)&&isInt(o.panes)&&o.panes>0,heatings:o=>['gas','electric','heat-pump','wood'].includes(o.kind)&&pos(o.efficiency)&&nonNeg(o.kg_per_kwh)&&nonNeg(o.embodied_kg)};
+  for(const [k,ok] of Object.entries(lists)){
+    if(!Array.isArray(P[k])||!P[k].length)fail(`Missing ${k}`);
+    const ids=new Set();
+    for(const o of P[k]){if(!/^[a-z0-9-]+$/.test(o?.id||'')||ids.has(o.id)||!localized(o.label)||!ok(o))fail(`Invalid option in ${k}: ${o?.id}`);ids.add(o.id);}
+  }
+  for(const k of ['thickness','glazing']){const s=P[k];if(!s||![s.min,s.max,s.step,s.initial].every(Number.isFinite)||s.min>s.max||s.step<=0||s.initial<s.min||s.initial>s.max)fail(`Invalid ${k}`);}
+  const largestWindows=P.glazing.max/100*P.floor_area;
+  for(const s of P.shapes)if(s.envelope<=largestWindows)fail(`Shape ${s.id}: envelope smaller than the largest glazing`);
+  const init=P.initial??{};
+  for(const [k,list] of [['shape','shapes'],['structure','structures'],['insulation','insulations'],['windows','windows'],['heating','heatings']])if(!P[list].some(o=>o.id===init[k]))fail(`Invalid initial ${k}`);
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['max','min'].includes(c.type)||!['total','embodied','operational','heating_need','glazing'].includes(c.metric)||!Number.isFinite(c.value))fail(`Invalid constraint ${c.type} ${c.metric}`);
+  }
+  validateCommonContent(a,fail);
+}
+/** District engine: a grid of plots, plot types described by their effects, fixed areas, noise and walking rules. */
+function validateDistrict(a,fail){
+  const P=a.parameters??{};
+  if(!P.grid||!isInt(P.grid.width)||!isInt(P.grid.height)||P.grid.width<2||P.grid.height<2||P.grid.width>20||P.grid.height>20)fail('Invalid grid');
+  for(const k of ['plot_metres','minutes_per_plot'])if(!(Number.isFinite(P[k])&&P[k]>0))fail(`Invalid ${k}`);
+  if(!(Number.isFinite(P.cooling)&&P.cooling>=0))fail('Invalid cooling');
+  if(!Array.isArray(P.tiles)||!P.tiles.length)fail('Missing tiles');
+  const ids=new Set();
+  for(const t of P.tiles){
+    if(!/^[a-z0-9-]+$/.test(t?.id||'')||t.id==='empty'||ids.has(t.id))fail(`Invalid or duplicate tile id ${t?.id}`);
+    ids.add(t.id);
+    if(!localized(t.label)||typeof t.color!=='string'||typeof t.icon!=='string'||typeof t.walkable!=='boolean'||!(t.permeable>=0&&t.permeable<=1)||!(Number.isFinite(t.heat)&&t.heat>=0))fail(`Invalid tile ${t.id}`);
+    if(t.residents!==undefined&&!(isInt(t.residents)&&t.residents>0))fail(`Invalid residents: ${t.id}`);
+  }
+  for(const t of P.tiles)if(t.next_to!==undefined&&!ids.has(t.next_to))fail(`Unknown next_to in ${t.id}`);
+  const inGrid=c=>Array.isArray(c)&&c.length===2&&c.every(isInt)&&c[0]>=0&&c[1]>=0&&c[0]<P.grid.width&&c[1]<P.grid.height;
+  if(!Array.isArray(P.fixed))fail('Missing fixed');
+  for(const f of P.fixed)if(!ids.has(f.type)||!P.tiles.find(t=>t.id===f.type).fixed||!inGrid(f.from)||!inGrid(f.to))fail(`Invalid fixed area ${f.type}`);
+  if(!P.tiles.some(t=>!t.fixed))fail('No tile to place');
+  if(!P.noise||!ids.has(P.noise.source)||!isInt(P.noise.reach)||P.noise.reach<1)fail('Invalid noise');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    switch(c.type){
+      case 'min_population': if(!isInt(c.value)||c.value<1)fail('Invalid min_population');break;
+      case 'services_within': if(!Array.isArray(c.services)||!c.services.length||!c.services.every(s=>P.tiles.find(t=>t.id===s)?.service)||!isInt(c.value)||c.value<1)fail('Invalid services_within');break;
+      case 'min_green_share': case 'max_impermeable_share': if(!(c.value>=0&&c.value<=100))fail(`Invalid ${c.type}`);break;
+      case 'no_noisy_homes': break;
+      default: fail(`Unknown constraint ${c.type}`);
+    }
+  }
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss,carbon:validateCarbon,district:validateDistrict};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});

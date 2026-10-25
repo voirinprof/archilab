@@ -1,0 +1,89 @@
+id: le-pont-impossible
+engine: truss
+category: structure
+difficulty: intermediate
+duration_minutes: 8
+icon: truss
+color: blue
+title:
+  fr: "Le pont impossible"
+  en: "The Impossible Bridge"
+description:
+  fr: "Construis un pont qui résiste au camion avec un nombre limité de poutres."
+  en: "Build a bridge that holds the truck with a limited number of beams."
+mission:
+  fr: "Un camion doit traverser ce ravin de 12 m. La route est posée, mais seule, elle s'effondre. Ajoute des poutres entre les points de la grille pour la soutenir, sans dépasser 16 poutres."
+  en: "A truck must cross this 12 m ravine. The road is in place, but on its own it collapses. Add beams between the grid points to hold it up, using no more than 16 beams."
+concepts:
+  fr: ["Triangulation", "Traction et compression", "Flambement", "Économie de matière"]
+  en: ["Triangulation", "Tension and compression", "Buckling", "Using less material"]
+parameters:
+  # grid points in grid units: x to the right, y upwards (0 = road level); 1 unit = 2 m
+  grid: {x: [1, 7], y: [-2, 3]}
+  unit: 2
+  deck:
+    - [[1, 0], [2, 0]]
+    - [[2, 0], [3, 0]]
+    - [[3, 0], [4, 0]]
+    - [[4, 0], [5, 0]]
+    - [[5, 0], [6, 0]]
+    - [[6, 0], [7, 0]]
+  supports: [[1, 0], [7, 0], [1, -1], [7, -1], [1, -2], [7, -2]]
+  loads: [[2, 0], [3, 0], [4, 0], [5, 0], [6, 0]]
+  load: 10
+  load_label: {fr: "Camion", en: "Truck"}
+  max_length: 2.3
+  tension_limit: 75
+  compression_limit: 100
+  reveal_pattern_hint: 4
+  pattern:
+    - [[1, 0], [2, 1]]
+    - [[2, 1], [3, 1]]
+    - [[3, 1], [4, 1]]
+    - [[4, 1], [5, 1]]
+    - [[5, 1], [6, 1]]
+    - [[6, 1], [7, 0]]
+    - [[2, 0], [2, 1]]
+    - [[3, 0], [3, 1]]
+    - [[4, 0], [4, 1]]
+    - [[5, 0], [5, 1]]
+    - [[6, 0], [6, 1]]
+    - [[2, 1], [3, 0]]
+    - [[3, 1], [4, 0]]
+    - [[5, 1], [4, 0]]
+    - [[6, 1], [5, 0]]
+constraints:
+  - type: stable
+    label:
+      fr: "Le pont tient debout : aucune partie ne peut bouger (structure triangulée)."
+      en: "The bridge stands: no part of it can move (a triangulated structure)."
+  - type: strong
+    label:
+      fr: "Aucune poutre ne casse sous le poids du camion."
+      en: "No beam breaks under the weight of the truck."
+  - type: max_bars
+    value: 16
+    label:
+      fr: "16 poutres au maximum (sans compter la route)."
+      en: "16 beams at most (the road doesn't count)."
+hints:
+  fr:
+    - "La route seule ne tient pas : ses jonctions plient comme des charnières. Ajoute des poutres pour former des triangles."
+    - "Un carré se déforme en losange, un triangle ne bouge pas. Chaque case de ton pont doit être coupée par une diagonale."
+    - "Les poutres bleues sont comprimées : si elles sont longues, elles flambent et cassent. Là où ça pousse, préfère des poutres courtes."
+    - "Regarde le modèle en pointillés : un treillis au-dessus de la route, avec des montants et des diagonales. Tu peux aussi construire sous la route !"
+  en:
+    - "The road alone doesn't hold: its joints bend like hinges. Add beams to make triangles."
+    - "A square squashes into a diamond, a triangle doesn't move. Every box of your bridge needs a diagonal."
+    - "Blue beams are squeezed: if they are long, they buckle and break. Where the push is strong, use short beams."
+    - "Look at the dashed model: a truss above the road, with uprights and diagonals. You can also build under the road!"
+feedback:
+  success:
+    fr: "Bravo ! Ton pont est rigide et assez solide pour le camion."
+    en: "Well done! Your bridge is rigid and strong enough for the truck."
+  failure:
+    fr: "Pas encore. Regarde les points orange qui bougent, les poutres marquées ✕ qui cassent, ou le nombre de poutres."
+    en: "Not yet. Look at the orange points that move, the beams marked ✕ that break, or the number of beams."
+explanation:
+  fr: "Une suite de poutres reliées par des articulations se plie comme une chaîne ; un triangle, lui, ne peut pas changer de forme. C'est pourquoi les ponts, les grues et les charpentes sont faits de triangles : c'est la triangulation. Sous une charge, certaines poutres sont tirées (traction, en rouge) et d'autres poussées (compression, en bleu). Une poutre longue et comprimée risque de flamber, c'est-à-dire de se courber brusquement : on la garde courte. Le calcul de ce jeu est très simplifié (assemblages articulés, matériau idéal, charge immobile) : ce n'est pas un outil d'ingénierie."
+  en: "Beams joined by hinges fold like a chain; a triangle, however, cannot change shape. That's why bridges, cranes and roof frames are made of triangles: this is triangulation. Under a load, some beams are pulled (tension, in red) and others pushed (compression, in blue). A long beam under compression may buckle, meaning it suddenly bends: so it is kept short. This game's calculation is very simplified (pinned joints, ideal material, a still load): it is not an engineering tool."
