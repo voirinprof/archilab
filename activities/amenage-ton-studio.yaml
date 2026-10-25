@@ -1,0 +1,140 @@
+id: amenage-ton-studio
+engine: floorplan
+category: comfort
+difficulty: intermediate
+duration_minutes: 8
+icon: sofa
+color: coral
+title:
+  fr: "Aménage ton studio"
+  en: "Furnish Your Studio"
+description:
+  fr: "Installe tes meubles dans 25 m² en gardant de la place pour vivre."
+  en: "Fit your furniture into 25 m² while keeping room to live."
+mission:
+  fr: "Tu emménages dans un studio de 5 m × 5 m. La salle de bain et la cuisinette sont déjà installées. Place ton lit, ton bureau, ton armoire, ton canapé et ta table pour que tout soit vraiment utilisable."
+  en: "You are moving into a 5 m × 5 m studio. The bathroom and kitchenette are already in place. Arrange your bed, desk, wardrobe, sofa and table so that everything is actually usable."
+concepts:
+  fr: ["Ergonomie", "Espace d'usage", "Circulation", "Lumière naturelle"]
+  en: ["Ergonomics", "Usage space", "Circulation", "Daylight"]
+parameters:
+  mode: furnish
+  plan: {width: 5, depth: 5}
+  scale: 80
+  step: 0.5
+  reveal_passage_hint: 4
+  openings:
+    - id: entrance
+      kind: door
+      label: {fr: "Porte d'entrée", en: "Front door"}
+      side: north
+      at: 2
+      width: 1
+      swing: 1
+    - id: window
+      kind: window
+      label: {fr: "Fenêtre", en: "Window"}
+      side: south
+      at: 1
+      width: 2
+  items:
+    - id: bathroom
+      label: {fr: "Salle de bain", en: "Bathroom"}
+      color: mint
+      fixed: true
+      size: {width: 2, depth: 2}
+      initial: {x: 0, y: 0, rotation: 0}
+      usage: {front: 0.5}
+    - id: kitchenette
+      label: {fr: "Cuisinette", en: "Kitchenette"}
+      color: grey
+      fixed: true
+      size: {width: 2.5, depth: 0.5}
+      initial: {x: 4.5, y: 0, rotation: 90}
+      usage: {front: 1}
+    - id: bed
+      label: {fr: "Lit", en: "Bed"}
+      color: blue
+      size: {width: 1.5, depth: 2}
+      initial: {x: 2.5, y: 0.5, rotation: 0}
+      usage: {left: 0.5}
+    - id: desk
+      label: {fr: "Bureau", en: "Desk"}
+      color: yellow
+      size: {width: 1, depth: 0.5}
+      initial: {x: 0, y: 2.5, rotation: 0}
+      usage: {front: 1}
+    - id: wardrobe
+      label: {fr: "Armoire", en: "Wardrobe"}
+      color: coral
+      size: {width: 1, depth: 0.5}
+      initial: {x: 0, y: 4.5, rotation: 0}
+      usage: {front: 1}
+    - id: sofa
+      label: {fr: "Canapé", en: "Sofa"}
+      color: yellow
+      size: {width: 2, depth: 1}
+      initial: {x: 1.5, y: 4, rotation: 0}
+      usage: {front: 0.5}
+    - id: table
+      label: {fr: "Table", en: "Table"}
+      color: coral
+      size: {width: 1, depth: 1}
+      initial: {x: 3.5, y: 3.5, rotation: 0}
+      usage: {front: 0.5, back: 0.5}
+constraints:
+  - type: usage_clear
+    items: [entrance]
+    label:
+      fr: "La porte d'entrée peut s'ouvrir complètement."
+      en: "The front door can open all the way."
+  - type: usage_clear
+    items: [bed, desk, wardrobe, sofa, table]
+    label:
+      fr: "Chaque meuble garde son espace d'usage libre (zone hachurée)."
+      en: "Every piece of furniture keeps its usage space clear (hatched area)."
+  - type: usage_clear
+    items: [bathroom, kitchenette]
+    label:
+      fr: "On peut entrer dans la salle de bain et cuisiner sans obstacle."
+      en: "You can enter the bathroom and cook without obstacles."
+  - type: min_passage
+    from: entrance
+    to: [bed, desk, wardrobe, sofa, table, bathroom, kitchenette]
+    width: 0.8
+    label:
+      fr: "Un passage d'au moins 80 cm mène de l'entrée à chaque meuble, à la salle de bain et à la cuisinette."
+      en: "A passage at least 80 cm wide leads from the entrance to every piece of furniture, the bathroom and the kitchenette."
+  - type: max_distance
+    rooms: [desk, window]
+    value: 1
+    label:
+      fr: "Le bureau est à 1 m au plus de la fenêtre, pour travailler à la lumière du jour."
+      en: "The desk is at most 1 m from the window, to work in daylight."
+  - type: min_distance
+    rooms: [bed, kitchenette]
+    value: 1.5
+    label:
+      fr: "Le lit est à au moins 1,5 m de la cuisinette (bruit, odeurs)."
+      en: "The bed is at least 1.5 m from the kitchenette (noise, smells)."
+hints:
+  fr:
+    - "Les zones hachurées montrent la place qu'il faut pour utiliser chaque meuble : ouvrir l'armoire, tirer la chaise, se glisser dans le lit. Elles doivent rester libres."
+    - "Utilise le bouton « Pivoter » : un meuble contre un mur doit tourner son côté utile vers la pièce."
+    - "Range les grands meubles (lit, canapé) contre les murs et garde le centre de la pièce pour circuler. Le bureau va près de la fenêtre, au sud."
+    - "Regarde le plan : la zone bleutée montre où une personne peut circuler avec 80 cm de passage. Chaque meuble doit la toucher."
+  en:
+    - "The hatched areas show the space needed to use each piece of furniture: opening the wardrobe, pulling out the chair, getting into bed. They must stay clear."
+    - "Use the Rotate button: furniture against a wall must turn its useful side towards the room."
+    - "Put the big pieces (bed, sofa) against the walls and keep the middle of the room for moving around. The desk goes near the window, on the south side."
+    - "Look at the plan: the bluish area shows where a person can walk with an 80 cm passage. Every piece of furniture must touch it."
+feedback:
+  success:
+    fr: "Bravo ! Ton studio est petit, mais tout y est utilisable."
+    en: "Well done! Your studio is small, but everything in it is usable."
+  failure:
+    fr: "Pas encore. Cherche les zones hachurées en rouge et les meubles marqués ⚠ : on ne peut pas les utiliser ou les atteindre."
+    en: "Not yet. Look for hatched areas in red and furniture marked ⚠: they can't be used or reached."
+explanation:
+  fr: "L'ergonomie, c'est adapter l'espace au corps humain et à ses gestes. Un meuble ne prend pas seulement sa propre place : il lui faut un espace d'usage pour ouvrir une porte, tirer une chaise ou faire son lit, et il faut pouvoir circuler entre les meubles. Les architectes utilisent des dimensions de référence, comme 80 à 90 cm pour un passage. Dans ce défi, les dimensions sont arrondies à 50 cm pour simplifier."
+  en: "Ergonomics means fitting space to the human body and its movements. A piece of furniture doesn't only take up its own footprint: it needs usage space to open a door, pull out a chair or make the bed, and people must be able to move between pieces. Architects use reference dimensions, such as 80 to 90 cm for a passage. In this challenge, sizes are rounded to 50 cm to keep things simple."
