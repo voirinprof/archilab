@@ -298,6 +298,10 @@ function validateTruss(a,fail){
   if(!Array.isArray(P.loads)||!P.loads.length||!P.loads.every(inGrid))fail('Invalid loads');
   for(const k of ['unit','load','max_length','tension_limit','compression_limit'])if(!(Number.isFinite(P[k])&&P[k]>0))fail(`Invalid ${k}`);
   if(P.pattern!==undefined&&(!Array.isArray(P.pattern)||!P.pattern.every(bar)))fail('Invalid pattern');
+  if(P.scene!==undefined&&!['ravine','ground'].includes(P.scene))fail(`Invalid scene ${P.scene}`);
+  if(P.load_direction!==undefined&&!(Array.isArray(P.load_direction)&&P.load_direction.length===2&&P.load_direction.every(Number.isFinite)&&Math.abs(Math.hypot(...P.load_direction)-1)<1e-6))fail('load_direction must be a unit vector [x, y]');
+  if(P.load_label!==undefined&&!localized(P.load_label))fail('Missing translations: load_label');
+  if(P.deck_strength!==undefined&&!(Number.isFinite(P.deck_strength)&&P.deck_strength>0))fail('Invalid deck_strength');
   if(P.reveal_pattern_hint!==undefined&&(!isInt(P.reveal_pattern_hint)||P.reveal_pattern_hint<1||P.reveal_pattern_hint>a.hints.fr.length||!P.pattern))fail('Invalid reveal_pattern_hint');
   for(const c of a.constraints){
     if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);

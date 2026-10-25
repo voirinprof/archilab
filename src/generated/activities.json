@@ -1006,6 +1006,377 @@
     }
   },
   {
+    "id": "la-tour-qui-penche",
+    "engine": "truss",
+    "category": "structure",
+    "difficulty": "intermediate",
+    "duration_minutes": 6,
+    "icon": "tower",
+    "color": "mint",
+    "title": {
+      "fr": "La tour qui penche",
+      "en": "The Leaning Tower"
+    },
+    "description": {
+      "fr": "Le vent pousse une tour de 5 étages : ajoute quelques poutres pour qu'elle reste droite.",
+      "en": "The wind pushes a 5-storey tower: add a few beams to keep it standing."
+    },
+    "mission": {
+      "fr": "Les poteaux et les planchers de cette tour sont solides, mais assemblés en rectangles : au premier coup de vent d'ouest, elle se couche comme un château de cartes. Stabilise-la avec 6 poutres au maximum.",
+      "en": "This tower's columns and floors are strong, but they are joined as rectangles: at the first gust of west wind, it folds like a house of cards. Steady it with 6 beams at most."
+    },
+    "concepts": {
+      "fr": [
+        "Stabilité",
+        "Contreventement",
+        "Traction et compression",
+        "Vent"
+      ],
+      "en": [
+        "Stability",
+        "Bracing",
+        "Tension and compression",
+        "Wind"
+      ]
+    },
+    "parameters": {
+      "scene": "ground",
+      "grid": {
+        "x": [
+          -2,
+          4
+        ],
+        "y": [
+          0,
+          5
+        ]
+      },
+      "unit": 3,
+      "deck": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        [
+          [
+            2,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            5
+          ],
+          [
+            2,
+            5
+          ]
+        ]
+      ],
+      "deck_strength": 4,
+      "supports": [
+        [
+          -2,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "loads": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      "load": 8,
+      "load_direction": [
+        1,
+        0
+      ],
+      "load_label": {
+        "fr": "Vent d'ouest",
+        "en": "West wind"
+      },
+      "max_length": 2.3,
+      "tension_limit": 75,
+      "compression_limit": 100,
+      "reveal_pattern_hint": 4,
+      "pattern": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            5
+          ]
+        ]
+      ]
+    },
+    "constraints": [
+      {
+        "type": "stable",
+        "label": {
+          "fr": "La tour tient debout : aucun étage ne peut se déformer (contreventement).",
+          "en": "The tower stands: no storey can sway (bracing)."
+        }
+      },
+      {
+        "type": "strong",
+        "label": {
+          "fr": "Aucune poutre ne casse sous la poussée du vent.",
+          "en": "No beam breaks under the push of the wind."
+        }
+      },
+      {
+        "type": "max_bars",
+        "value": 6,
+        "label": {
+          "fr": "6 poutres au maximum.",
+          "en": "6 beams at most."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Chaque étage est un rectangle : sous le vent, il se déforme en parallélogramme. Une seule diagonale suffit à le rendre rigide.",
+        "Il faut contreventer chaque étage, du sol jusqu'au toit : un étage sans diagonale suffit pour que la tour se couche.",
+        "Le sens de la diagonale compte ! Les poutres bleues sont poussées et, longues, elles flambent. Oriente-les pour que le vent les tire (en rouge).",
+        "Regarde le modèle en pointillés : une diagonale par étage, qui monte du bas, côté vent, vers le haut, côté opposé. Tu peux aussi ancrer le pied de la tour au sol."
+      ],
+      "en": [
+        "Each storey is a rectangle: in the wind, it squashes into a parallelogram. A single diagonal is enough to make it rigid.",
+        "Every storey needs bracing, from the ground to the roof: one storey without a diagonal is enough for the tower to fall over.",
+        "The direction of the diagonal matters! Blue beams are pushed and, being long, they buckle. Turn them so the wind pulls them (in red).",
+        "Look at the dashed model: one diagonal per storey, rising from the bottom on the windward side to the top on the other side. You can also anchor the foot of the tower to the ground."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Ta tour reste droite dans le vent, avec très peu de matière.",
+        "en": "Well done! Your tower stays upright in the wind, with very little material."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les points orange qui bougent, les poutres marquées ✕ qui cassent, ou le nombre de poutres.",
+        "en": "Not yet. Look at the orange points that move, the beams marked ✕ that break, or the number of beams."
+      }
+    },
+    "explanation": {
+      "fr": "Le vent pousse les bâtiments sur le côté. Des poteaux et des planchers assemblés en rectangles ne suffisent pas : chaque étage peut se déformer en parallélogramme. Les ingénieurs et les architectes ajoutent donc un contreventement : des diagonales qui forment des triangles, des murs rigides ou un noyau en béton. Une diagonale fine travaille bien quand elle est tirée (traction) ; poussée (compression), elle risque de flamber. C'est pourquoi on voit souvent des croix de Saint-André en façade : quel que soit le sens du vent, une des deux diagonales est tirée. Le calcul de ce jeu est très simplifié : ce n'est pas un outil d'ingénierie.",
+      "en": "Wind pushes buildings sideways. Columns and floors joined as rectangles are not enough: each storey can squash into a parallelogram. So engineers and architects add bracing: diagonals that form triangles, stiff walls or a concrete core. A thin diagonal works well when it is pulled (tension); pushed (compression), it may buckle. That's why X-shaped braces are often seen on façades: whichever way the wind blows, one of the two diagonals is pulled. This game's calculation is very simplified: it is not an engineering tool."
+    }
+  },
+  {
     "id": "le-batiment-transformable",
     "engine": "floorplan",
     "category": "client",
@@ -1666,6 +2037,10 @@
         ]
       ],
       "load": 10,
+      "load_label": {
+        "fr": "Camion",
+        "en": "Truck"
+      },
       "max_length": 2.3,
       "tension_limit": 75,
       "compression_limit": 100,

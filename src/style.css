@@ -299,3 +299,5 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 @media(max-width:550px){.metrics.three:has(.truss-actions){grid-template-columns:1fr 1fr}
 .metrics.three .truss-actions{grid-column:1/-1}
 }
+.truss-ground{fill:#c9d8b6}
+.truss-frame{stroke:#6f7a7e;stroke-width:8;stroke-linecap:round}

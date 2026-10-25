@@ -70,3 +70,40 @@ test('Le pont impossible : a stable but skimpy bridge breaks, a big one is over 
   const tooMany = [...P.pattern!, b(2, 0, 3, 1), b(3, 0, 4, 1)]; // two extra crossing diagonals: still stable, but 17 beams
   assert.deepEqual(run(tooMany).constraints, [true, true, false]);
 });
+
+test('a sideways load: the load direction is applied', () => {
+  // a triangle pushed to the right at its top: the left leg is pulled, the right leg pushed
+  const bars: Bar[] = [[[0, 0], [1, 1]], [[1, 1], [2, 0]]];
+  const a = analyse({ bars, supports: [[0, 0], [2, 0]], loads: [[1, 1]], ...limits, loadDirection: [1, 0] });
+  assert.ok(a.stable);
+  near(a.bars[0].force, 10 / (2 * Math.SQRT1_2));
+  near(a.bars[1].force, -10 / (2 * Math.SQRT1_2));
+});
+
+const tower = YAML.parse(readFileSync(new URL('../activities/la-tour-qui-penche.yaml', import.meta.url), 'utf8')) as TrussActivity;
+const T = tower.parameters;
+const runTower = (bars: Bar[]) => {
+  const a = analyse({
+    bars: [...T.deck, ...bars], supports: T.supports, loads: T.loads, load: T.load, loadDirection: T.load_direction,
+    tensionLimit: T.tension_limit, compressionLimit: T.compression_limit, strongBars: { bars: T.deck, factor: T.deck_strength ?? 1 },
+  });
+  return { a, ...evaluateTruss(tower.constraints, a, bars.length) };
+};
+const rising = [0, 1, 2, 3, 4].map(y => b(0, y, 2, y + 1)); // from the windward foot up to the leeward side: pulled
+const falling = [0, 1, 2, 3, 4].map(y => b(2, y, 0, y + 1)); // the other way: pushed
+
+test('La tour qui penche : the unbraced frame falls over in the wind', () => {
+  const r = runTower([]);
+  assert.equal(r.a.stable, false);
+  assert.equal(runTower(rising.slice(0, 4)).a.stable, false, 'one storey without bracing is enough to fail');
+});
+
+test('La tour qui penche : pulled diagonals hold, pushed ones buckle', () => {
+  assert.equal(runTower(rising).solved, true);
+  assert.ok(runTower(rising).a.stable && runTower(rising).a.bars.filter(r => rising.some(s => s === r.bar)).every(r => r.force > 0));
+  assert.deepEqual(runTower(falling).constraints, [true, false, true]);
+  // anchoring the foot of the tower to the ground (a short tie) instead of the first diagonal also works
+  assert.equal(runTower([b(1, 0, 2, 1), ...rising.slice(1)]).solved, true);
+  // bracing both ways is too many beams, and the pushed half still buckles here
+  assert.deepEqual(runTower([...rising, ...falling]).constraints, [true, false, false]);
+});

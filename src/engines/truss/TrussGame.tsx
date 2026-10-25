@@ -9,26 +9,32 @@ import { Feedback, NeedsList } from '../../components/Feedback.tsx';
 
 const ui = {
   fr: {
-    mission: 'Ta mission', title: 'À toi de construire', check: 'Faire passer le camion',
+    mission: 'Ta mission', title: 'À toi de construire',
+    scenes: {
+      ravine: { check: 'Faire passer le camion', stable: 'Le pont tient debout.', collapse: 'Le pont s’effondre : les points orange peuvent bouger. Ajoute des triangles !', drawing: 'Côté du pont', given: 'route', cause: 'sous le camion' },
+      ground: { check: 'Faire souffler le vent', stable: 'La tour tient debout.', collapse: 'La tour se couche : les points orange peuvent bouger. Ajoute des triangles !', drawing: 'Façade de la tour', given: 'structure existante', cause: 'sous la poussée du vent' },
+    },
     help: 'Touche un point, puis un autre pour poser une poutre entre eux. Touche une poutre pour la retirer. Au clavier : flèches pour choisir un point, Entrée pour commencer ou finir une poutre, Échap pour annuler, Suppr pour retirer la dernière poutre.',
     bars: 'Poutres', worst: 'Poutre la plus sollicitée', undo: 'Retirer la dernière poutre', deform: 'Montrer la déformation (exagérée)',
-    stable: 'Le pont tient debout.', collapse: 'Le pont s’effondre : les points orange peuvent bouger. Ajoute des triangles !',
-    broken: (n: number) => `${n} poutre${n > 1 ? 's cassent' : ' casse'} sous le camion.`,
+    broken: (n: number, cause: string) => `${n} poutre${n > 1 ? 's cassent' : ' casse'} ${cause}.`,
     tooLong: 'Trop long : une poutre ne peut pas dépasser', exists: 'Cette poutre existe déjà.', budget: 'Plus de poutres disponibles.',
-    legend: { tension: 'traction (tirée)', compression: 'compression (poussée)', broken: 'cassée', road: 'route' },
-    truck: (n: number, load: number) => `Camion : ${n} × ${load} kN`, point: (x: number, y: number) => `Point ${x}, ${y}`,
-    start: 'début de la poutre', drawing: 'Côté du pont',
+    legend: { tension: 'traction (tirée)', compression: 'compression (poussée)', broken: 'cassée' },
+    load: (name: string, n: number, load: number) => `${name} : ${n} × ${load} kN`, point: (x: number, y: number) => `Point ${x}, ${y}`,
+    start: 'début de la poutre',
   },
   en: {
-    mission: 'Your mission', title: 'Time to build', check: 'Send the truck across',
+    mission: 'Your mission', title: 'Time to build',
+    scenes: {
+      ravine: { check: 'Send the truck across', stable: 'The bridge stands.', collapse: 'The bridge collapses: the orange points can move. Add triangles!', drawing: 'Side view of the bridge', given: 'road', cause: 'under the truck' },
+      ground: { check: 'Let the wind blow', stable: 'The tower stands.', collapse: 'The tower falls over: the orange points can move. Add triangles!', drawing: 'Side of the tower', given: 'existing structure', cause: 'under the push of the wind' },
+    },
     help: 'Tap a point, then another to put a beam between them. Tap a beam to remove it. With a keyboard: arrows to pick a point, Enter to start or finish a beam, Escape to cancel, Delete to remove the last beam.',
     bars: 'Beams', worst: 'Most loaded beam', undo: 'Remove the last beam', deform: 'Show the deformation (exaggerated)',
-    stable: 'The bridge stands.', collapse: 'The bridge collapses: the orange points can move. Add triangles!',
-    broken: (n: number) => `${n} beam${n > 1 ? 's break' : ' breaks'} under the truck.`,
+    broken: (n: number, cause: string) => `${n} beam${n > 1 ? 's break' : ' breaks'} ${cause}.`,
     tooLong: 'Too long: a beam can’t be longer than', exists: 'This beam already exists.', budget: 'No beams left.',
-    legend: { tension: 'tension (pulled)', compression: 'compression (pushed)', broken: 'broken', road: 'road' },
-    truck: (n: number, load: number) => `Truck: ${n} × ${load} kN`, point: (x: number, y: number) => `Point ${x}, ${y}`,
-    start: 'start of the beam', drawing: 'Side view of the bridge',
+    legend: { tension: 'tension (pulled)', compression: 'compression (pushed)', broken: 'broken' },
+    load: (name: string, n: number, load: number) => `${name}: ${n} × ${load} kN`, point: (x: number, y: number) => `Point ${x}, ${y}`,
+    start: 'start of the beam',
   },
 };
 
@@ -39,6 +45,9 @@ const PAD = 40;
 export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
   const t = ui[lang];
   const P = game.parameters;
+  const scene = P.scene ?? 'ravine';
+  const st = t.scenes[scene];
+  const [ldx, ldy] = P.load_direction ?? [0, -1];
   const budget = game.constraints.find(c => c.type === 'max_bars');
   const maxBars = budget?.type === 'max_bars' ? budget.value : Infinity;
   const [bars, setBars] = useState<Bar[]>([]);
@@ -51,7 +60,10 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
   const [hint, setHint] = useState(-1);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const analysis = analyse({ bars: [...P.deck, ...bars], supports: P.supports, loads: P.loads, load: P.load, tensionLimit: P.tension_limit, compressionLimit: P.compression_limit });
+  const analysis = analyse({
+    bars: [...P.deck, ...bars], supports: P.supports, loads: P.loads, load: P.load, loadDirection: P.load_direction,
+    tensionLimit: P.tension_limit, compressionLimit: P.compression_limit, strongBars: { bars: P.deck, factor: P.deck_strength ?? 1 },
+  });
   const result = evaluateTruss(game.constraints, analysis, bars.length);
   const forceOf = (bar: Bar): BarResult | undefined => (analysis.stable ? analysis.bars.find(r => sameBar(r.bar, bar)) : undefined);
   const brokenCount = analysis.stable ? analysis.bars.filter(r => r.ratio > 1 + 1e-9).length : 0;
@@ -151,20 +163,31 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
             viewBox={`0 0 ${width} ${height}`}
             className="truss-svg"
             role="group"
-            aria-label={t.drawing}
+            aria-label={st.drawing}
             onPointerMove={e => setHover(toGrid(e))}
             onPointerLeave={() => setHover(null)}
           >
             <rect x={0} y={0} width={width} height={height} className="truss-sky" />
-            <rect x={X(P.grid.x[0])} y={Y(bottom + 0.35)} width={(P.grid.x[1] - P.grid.x[0]) * S} height={0.75 * S} className="truss-river" />
-            <polygon points={`0,${Y(0)} ${X(P.grid.x[0])},${Y(0)} ${X(P.grid.x[0])},${height} 0,${height}`} className="truss-cliff" />
-            <polygon points={`${X(P.grid.x[1])},${Y(0)} ${width},${Y(0)} ${width},${height} ${X(P.grid.x[1])},${height}`} className="truss-cliff" />
-            <text x={X((P.grid.x[0] + P.grid.x[1]) / 2)} y={Y(bottom + 0.35) + 0.45 * S} textAnchor="middle" className="truss-span">
-              ← {(P.grid.x[1] - P.grid.x[0]) * P.unit} m →
-            </text>
+            {scene === 'ravine' ? (
+              <>
+                <rect x={X(P.grid.x[0])} y={Y(bottom + 0.35)} width={(P.grid.x[1] - P.grid.x[0]) * S} height={0.75 * S} className="truss-river" />
+                <polygon points={`0,${Y(0)} ${X(P.grid.x[0])},${Y(0)} ${X(P.grid.x[0])},${height} 0,${height}`} className="truss-cliff" />
+                <polygon points={`${X(P.grid.x[1])},${Y(0)} ${width},${Y(0)} ${width},${height} ${X(P.grid.x[1])},${height}`} className="truss-cliff" />
+                <text x={X((P.grid.x[0] + P.grid.x[1]) / 2)} y={Y(bottom + 0.35) + 0.45 * S} textAnchor="middle" className="truss-span">
+                  ← {(P.grid.x[1] - P.grid.x[0]) * P.unit} m →
+                </text>
+              </>
+            ) : (
+              <>
+                <rect x={0} y={Y(0)} width={width} height={height - Y(0)} className="truss-ground" />
+                <text x={X(P.grid.x[1]) + 0.5 * S} y={Y((P.grid.y[0] + P.grid.y[1]) / 2)} textAnchor="middle" transform={`rotate(-90 ${X(P.grid.x[1]) + 0.5 * S} ${Y((P.grid.y[0] + P.grid.y[1]) / 2)})`} className="truss-span">
+                  ← {(P.grid.y[1] - P.grid.y[0]) * P.unit} m →
+                </text>
+              </>
+            )}
             {points.map(p => <circle key={pointKey(p)} cx={X(p[0])} cy={Y(p[1])} r={3} className="truss-dot" />)}
             {showPattern && P.pattern!.map(b => line(b, 'truss-pattern', `pattern-${barKey(b)}`))}
-            {P.deck.map(b => line(b, 'truss-road', `deck-${barKey(b)}`))}
+            {P.deck.map(b => line(b, scene === 'ravine' ? 'truss-road' : 'truss-frame', `deck-${barKey(b)}`))}
             {bars.map(b => {
               const r = forceOf(b);
               const kind = !r ? 'idle' : r.ratio > 1 + 1e-9 ? 'broken' : r.force >= 0 ? 'tension' : 'compression';
@@ -181,13 +204,20 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
             })}
             {preview && <line x1={X(preview[0][0])} y1={Y(preview[0][1])} x2={X(preview[1][0])} y2={Y(preview[1][1])} className={`truss-preview${previewOk ? '' : ' bad'}`} />}
             {P.supports.map(p => (
-              <path key={`s-${pointKey(p)}`} d={`M${X(p[0])} ${Y(p[1])}l${p[0] <= P.grid.x[0] ? -12 : 12} -8v16z`} className="truss-support" />
+              <path
+                key={`s-${pointKey(p)}`}
+                d={scene === 'ground' ? `M${X(p[0])} ${Y(p[1])}l-8 12h16z` : `M${X(p[0])} ${Y(p[1])}l${p[0] <= P.grid.x[0] ? -12 : 12} -8v16z`}
+                className="truss-support"
+              />
             ))}
             {P.loads.map(p => {
               const [x, y] = deform ? moved(p) : p;
-              return <path key={`l-${pointKey(p)}`} d={`M${X(x)} ${Y(y) - 34}v24m-6 -8l6 8l6 -8`} className="truss-load" />;
+              // arrow of 26 px ending at the point, along the load direction (screen y points down)
+              const ex = X(x) - ldx * 8, ey = Y(y) + ldy * 8, sx = ex - ldx * 26, sy = ey + ldy * 26;
+              const hx = -ldx * 8, hy = ldy * 8, px = -ldy * 6, py = -ldx * 6;
+              return <path key={`l-${pointKey(p)}`} d={`M${sx} ${sy}L${ex} ${ey}M${ex + hx + px} ${ey + hy + py}L${ex} ${ey}L${ex + hx - px} ${ey + hy - py}`} className="truss-load" />;
             })}
-            <text x={X(P.grid.x[0])} y={Y(P.grid.y[1]) - 16} className="truss-truck">🚚 {t.truck(P.loads.length, P.load)}</text>
+            <text x={X(P.grid.x[0])} y={Y(P.grid.y[1]) - 16} className="truss-truck">{scene === 'ravine' ? '🚚' : '🌬️'} {t.load(P.load_label?.[lang] ?? '', P.loads.length, P.load)}</text>
             {points.map(p => {
               const k = pointKey(p);
               const isStart = !!start && pointKey(start) === k;
@@ -213,7 +243,7 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
           <span><i className="swatch tension" />{t.legend.tension}</span>
           <span><i className="swatch compression" />{t.legend.compression}</span>
           <span><i className="swatch broken" />{t.legend.broken}</span>
-          <span><i className="swatch road" />{t.legend.road}</span>
+          <span><i className="swatch road" />{st.given}</span>
         </div>
         <div className="metrics three">
           <div><small>{t.bars}</small><strong>{bars.length}{Number.isFinite(maxBars) && ` / ${maxBars}`}</strong></div>
@@ -226,7 +256,7 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
       <aside className="controls">
         <h2>{t.title}</h2>
         <p className={`note ${analysis.stable ? (brokenCount ? 'warn' : 'truss-ok') : 'warn'}`} role="status">
-          {!analysis.stable ? t.collapse : brokenCount ? t.broken(brokenCount) : t.stable}
+          {!analysis.stable ? st.collapse : brokenCount ? t.broken(brokenCount, st.cause) : st.stable}
         </p>
         {message && <p className="note warn">{message}</p>}
         <label className="truss-toggle"><input type="checkbox" checked={deform} onChange={e => setDeform(e.target.checked)} disabled={!analysis.stable} /> {t.deform}</label>
@@ -240,7 +270,7 @@ export function TrussGame({ game, lang }: { game: TrussActivity; lang: Lang }) {
           hint={hint}
           onHint={() => setHint(h => Math.min(h + 1, game.hints[lang].length - 1))}
           onReset={reset}
-          checkLabel={t.check}
+          checkLabel={st.check}
         />
       </aside>
     </div>

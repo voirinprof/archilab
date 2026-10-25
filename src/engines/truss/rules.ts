@@ -31,6 +31,10 @@ export type TrussModel = {
   supports: Point[];
   loads: Point[];
   load: number;
+  /** Unit vector of the load; downwards by default. */
+  loadDirection?: [number, number];
+  /** Bars that are this many times stronger than the others (the given structure). */
+  strongBars?: { bars: Bar[]; factor: number };
   tensionLimit: number;
   compressionLimit: number;
 };
@@ -60,7 +64,12 @@ export function analyse(m: TrussModel): Analysis {
       K[2 * i + r][2 * j + q] -= v; K[2 * j + r][2 * i + q] -= v;
     }
   }
-  for (const p of m.loads) F[2 * keys.get(pointKey(p))! + 1] -= m.load;
+  const [dx, dy] = m.loadDirection ?? [0, -1];
+  for (const p of m.loads) {
+    const i = keys.get(pointKey(p))!;
+    F[2 * i] += m.load * dx;
+    F[2 * i + 1] += m.load * dy;
+  }
   const fixed = new Set(m.supports.flatMap(p => { const i = keys.get(pointKey(p))!; return [2 * i, 2 * i + 1]; }));
   const free = [...Array(n).keys()].filter(d => !fixed.has(d));
 
@@ -117,7 +126,8 @@ export function analyse(m: TrussModel): Analysis {
     const i = keys.get(pointKey(a))!, j = keys.get(pointKey(b))!;
     const L = length(bar), c = (b[0] - a[0]) / L, s = (b[1] - a[1]) / L;
     const force = (EA / L) * ((disp[2 * j] - disp[2 * i]) * c + (disp[2 * j + 1] - disp[2 * i + 1]) * s);
-    const ratio = force >= 0 ? force / m.tensionLimit : -force / compressionCapacity(bar, m.compressionLimit);
+    const factor = m.strongBars?.bars.some(s => sameBar(s, bar)) ? m.strongBars.factor : 1;
+    const ratio = (force >= 0 ? force / m.tensionLimit : -force / compressionCapacity(bar, m.compressionLimit)) / factor;
     return { bar, force, ratio };
   });
   return { stable: true, bars, displacements, maxRatio: Math.max(0, ...bars.map(b => b.ratio)) };
