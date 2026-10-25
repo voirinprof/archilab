@@ -1,13 +1,12 @@
 import type { ReactNode, Ref, SVGProps } from 'react';
-import { CheckCircle2, Circle, Lightbulb, RotateCcw, XCircle } from 'lucide-react';
 import type { Lang } from '../../types.ts';
-import type { FloorplanActivity, Plan, Rect } from './types.ts';
+import type { Plan, Rect } from './types.ts';
+
+export { Feedback, NeedsList } from '../../components/Feedback.tsx';
 
 export const ui = {
   fr: {
-    mission: 'Ta mission', needs: 'Besoins des occupants', check: 'Vérifier mon plan', hint: 'Un indice', reset: 'Recommencer',
-    success: 'Mission accomplie !', retry: 'Pas encore !', principle: 'Le principe', concepts: 'Notions explorées',
-    south: 'SUD', north: 'N', plan: 'Plan du logement', remaining: (n: number) => `${n} besoin${n > 1 ? 's' : ''} à résoudre`,
+    mission: 'Ta mission', south: 'SUD', north: 'N', plan: 'Plan du logement',
     // layout mode
     design: 'À toi d’aménager', layoutHelp: 'Glisse une pièce pour la déplacer et tire sa poignée ◢ pour l’agrandir. Au clavier : flèches pour déplacer, Maj + flèches pour redimensionner.',
     selected: 'Pièce sélectionnée', width: 'Largeur', depth: 'Profondeur', more: 'Agrandir', less: 'Réduire',
@@ -32,9 +31,7 @@ export const ui = {
     door: 'porte',
   },
   en: {
-    mission: 'Your mission', needs: 'Occupants’ needs', check: 'Check my plan', hint: 'Get a hint', reset: 'Start over',
-    success: 'Mission complete!', retry: 'Not quite!', principle: 'The idea', concepts: 'Concepts explored',
-    south: 'SOUTH', north: 'N', plan: 'Home floor plan', remaining: (n: number) => `${n} need${n > 1 ? 's' : ''} left to meet`,
+    mission: 'Your mission', south: 'SOUTH', north: 'N', plan: 'Home floor plan',
     design: 'Time to lay it out', layoutHelp: 'Drag a room to move it and pull its ◢ handle to resize it. With a keyboard: arrows to move, Shift + arrows to resize.',
     selected: 'Selected room', width: 'Width', depth: 'Depth', more: 'Enlarge', less: 'Shrink',
     home: 'Home', rooms: 'Rooms', free: 'Circulation',
@@ -124,56 +121,6 @@ export function RoomLabel({ rect, label, detail, scale = SCALE }: { rect: Rect; 
     <>
       <text x={x + w / 2} y={cy} textAnchor="middle" className="fp-label" fontSize={small ? 10 : 13}>{label}</text>
       {detail && <text x={x + w / 2} y={y + h / 2 + 13} textAnchor="middle" className="fp-area" fontSize={small ? 11 : 14}>{detail}</text>}
-    </>
-  );
-}
-
-export function NeedsList({ lang, items }: { lang: Lang; items: { label: string; ok: boolean }[] }) {
-  const t = ui[lang];
-  const remaining = items.filter(i => !i.ok).length;
-  return (
-    <div className="needs">
-      <div className="needs-head"><span>{t.needs}</span><small>{remaining === 0 ? '✓' : t.remaining(remaining)}</small></div>
-      <ul>
-        {items.map((item, i) => (
-          <li key={i} className={item.ok ? 'ok' : ''}>{item.ok ? <CheckCircle2 size={18} /> : <Circle size={18} />}{item.label}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-type FeedbackProps = {
-  game: Pick<FloorplanActivity, 'hints' | 'feedback' | 'explanation' | 'concepts'>;
-  lang: Lang;
-  solved: boolean;
-  checked: boolean;
-  onCheck: () => void;
-  hint: number;
-  onHint: () => void;
-  onReset: () => void;
-  /** Shown under the success message, e.g. when the best possible result is reached. */
-  extra?: string;
-};
-
-/** Check button, progressive hints, verdict, explanation, reset and concepts. */
-export function Feedback({ game, lang, solved, checked, onCheck, hint, onHint, onReset, extra }: FeedbackProps) {
-  const t = ui[lang];
-  const hints = game.hints[lang];
-  return (
-    <>
-      <button className="primary full" onClick={onCheck}><CheckCircle2 size={18} />{t.check}</button>
-      <button className="subtle full" onClick={onHint}><Lightbulb size={17} />{t.hint}{hint >= 0 && ` (${hint + 1}/${hints.length})`}</button>
-      {hint >= 0 && <div className="note">{hints[hint]}</div>}
-      {checked && (
-        <div className={`result ${solved ? 'won' : 'try'}`} role="status">
-          {solved ? <CheckCircle2 size={22} /> : <XCircle size={22} />}
-          <div><strong>{solved ? t.success : t.retry}</strong><p>{solved ? game.feedback.success[lang] : game.feedback.failure[lang]}</p>{solved && extra && <p className="result-extra">{extra}</p>}</div>
-        </div>
-      )}
-      {checked && solved && <div className="note principle"><strong>{t.principle}</strong><p>{game.explanation[lang]}</p></div>}
-      <button className="subtle full" onClick={onReset}><RotateCcw size={17} />{t.reset}</button>
-      <div className="concepts"><span>{t.concepts}</span><div>{game.concepts[lang].map(c => <em key={c}>{c}</em>)}</div></div>
     </>
   );
 }

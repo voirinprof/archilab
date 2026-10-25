@@ -30,7 +30,7 @@ function circulationIsConnected(plan,rooms){
   }
   return seen.size===free.length;
 }
-function validateCommonFloorplan(a,fail){
+function validateCommonContent(a,fail){
   if(!localized(a.feedback?.failure))fail('Missing translations: feedback.failure');
   if(!localized(a.explanation))fail('Missing translations: explanation');
   if(!Array.isArray(a.concepts?.fr)||!Array.isArray(a.concepts?.en))fail('Missing translations: concepts');
@@ -82,7 +82,7 @@ function validateFurnish(a,fail){
     }
   }
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_passage_hint');
-  validateCommonFloorplan(a,fail);
+  validateCommonContent(a,fail);
 }
 function validateFloorplan(a,fail){
   const mode=a.parameters?.mode??'layout';
@@ -177,9 +177,31 @@ function validateFloorplan(a,fail){
       default: fail(`Unknown constraint ${c.type}`);
     }
   }
-  validateCommonFloorplan(a,fail);
+  validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan};
+/** Blocks engine: target buildings given as height grids, compared through their views. */
+function validateBlocks(a,fail){
+  const {grid,max_height:maxH,models,reveal_model_hint:reveal}=a.parameters??{};
+  if(!grid||!isInt(grid.width)||!isInt(grid.depth)||grid.width<1||grid.depth<1||grid.width>10)fail('Invalid grid');
+  if(!isInt(maxH)||maxH<1)fail('Invalid max_height');
+  if(!Array.isArray(models)||!models.length)fail('Missing models');
+  const ids=new Set();
+  for(const m of models){
+    if(!/^[a-z0-9-]+$/.test(m?.id||'')||ids.has(m.id))fail(`Invalid or duplicate model id ${m?.id}`);
+    ids.add(m.id);
+    if(!localized(m.label))fail(`Missing translations: model ${m.id}`);
+    const h=m.heights;
+    if(!Array.isArray(h)||h.length!==grid.depth||!h.every(row=>Array.isArray(row)&&row.length===grid.width&&row.every(n=>isInt(n)&&n>=0&&n<=maxH)))fail(`Invalid heights: model ${m.id} must be ${grid.depth} rows of ${grid.width} integers between 0 and ${maxH}`);
+    if(!h.flat().some(n=>n>0))fail(`Empty model ${m.id}`);
+  }
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(c.type!=='view_matches'||!['top','south','east'].includes(c.view))fail(`Invalid constraint ${c.type}`);
+  }
+  if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_model_hint');
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});

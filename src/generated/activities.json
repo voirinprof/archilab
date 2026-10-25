@@ -322,6 +322,204 @@
     }
   },
   {
+    "id": "architecte-en-blocs",
+    "engine": "blocks",
+    "category": "shapes",
+    "difficulty": "intermediate",
+    "duration_minutes": 8,
+    "icon": "blocks",
+    "color": "yellow",
+    "title": {
+      "fr": "Architecte en blocs",
+      "en": "Building with Blocks"
+    },
+    "description": {
+      "fr": "Reconstruis des bâtiments en 3D à partir de leur plan et de leurs façades.",
+      "en": "Rebuild buildings in 3D from their plan and façades."
+    },
+    "mission": {
+      "fr": "L'architecte t'a laissé le plan et deux façades de trois petits bâtiments. Empile les blocs pour reconstruire chacun d'eux : ta construction doit correspondre aux trois dessins.",
+      "en": "The architect left you the plan and two façades of three small buildings. Stack the blocks to rebuild each one: your building must match all three drawings."
+    },
+    "concepts": {
+      "fr": [
+        "Géométrie 3D",
+        "Plan et élévations",
+        "Volumes",
+        "Lecture de vues"
+      ],
+      "en": [
+        "3D geometry",
+        "Plans and elevations",
+        "Volumes",
+        "Reading views"
+      ]
+    },
+    "parameters": {
+      "grid": {
+        "width": 4,
+        "depth": 4
+      },
+      "max_height": 4,
+      "reveal_model_hint": 4,
+      "models": [
+        {
+          "id": "maison-en-l",
+          "label": {
+            "fr": "La maison en L",
+            "en": "The L-shaped house"
+          },
+          "heights": [
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              1,
+              1
+            ],
+            [
+              2,
+              2,
+              1,
+              1
+            ]
+          ]
+        },
+        {
+          "id": "tour-terrasse",
+          "label": {
+            "fr": "La tour et sa terrasse",
+            "en": "The tower and its terrace"
+          },
+          "heights": [
+            [
+              0,
+              3,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              3,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "id": "immeuble-gradins",
+          "label": {
+            "fr": "L'immeuble à gradins",
+            "en": "The stepped building"
+          },
+          "heights": [
+            [
+              3,
+              3,
+              3,
+              2
+            ],
+            [
+              2,
+              2,
+              3,
+              2
+            ],
+            [
+              1,
+              1,
+              2,
+              1
+            ],
+            [
+              0,
+              1,
+              1,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "view_matches",
+        "view": "top",
+        "label": {
+          "fr": "La vue de dessus correspond au plan.",
+          "en": "The top view matches the plan."
+        }
+      },
+      {
+        "type": "view_matches",
+        "view": "south",
+        "label": {
+          "fr": "La façade sud correspond.",
+          "en": "The south façade matches."
+        }
+      },
+      {
+        "type": "view_matches",
+        "view": "east",
+        "label": {
+          "fr": "La façade est correspond.",
+          "en": "The east façade matches."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Commence par le plan : il montre sur quelles cases il faut poser au moins un bloc.",
+        "La façade sud donne la hauteur la plus haute de chaque colonne, vue depuis le sud. La façade est fait de même pour chaque rangée, vue depuis l'est.",
+        "Une case doit respecter les deux façades en même temps : sa hauteur ne peut pas dépasser la plus petite des deux hauteurs indiquées.",
+        "Regarde la vue 3D : le bâtiment cible apparaît maintenant en pointillés. Tourne la vue pour bien le lire."
+      ],
+      "en": [
+        "Start with the plan: it shows which cells need at least one block.",
+        "The south façade gives the tallest height of each column, seen from the south. The east façade does the same for each row, seen from the east.",
+        "A cell must respect both façades at once: its height can't be more than the smaller of the two heights shown.",
+        "Look at the 3D view: the target building now appears with dashed lines. Turn the view to read it well."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Tu as reconstruit les trois bâtiments à partir de leurs dessins.",
+        "en": "Well done! You rebuilt all three buildings from their drawings."
+      },
+      "failure": {
+        "fr": "Pas encore : tous les bâtiments ne correspondent pas à leurs dessins. Cherche les cases rouges (blocs en trop) et en pointillés (blocs qui manquent).",
+        "en": "Not yet: not every building matches its drawings. Look for red cells (too many blocks) and dashed cells (missing blocks)."
+      }
+    },
+    "explanation": {
+      "fr": "Un bâtiment en 3D se décrit en 2D grâce à des vues : le plan (vu de dessus) et les élévations, ou façades (vues de côté). C'est le langage commun de l'architecte et du chantier. Tu as peut-être remarqué que des constructions différentes peuvent avoir exactement les mêmes trois vues : c'est pour cela que les architectes ajoutent des coupes et des vues en 3D, pour qu'il n'y ait aucun doute.",
+      "en": "A 3D building is described in 2D with views: the plan (seen from above) and the elevations, or façades (seen from the sides). It's the shared language of architects and builders. You may have noticed that different buildings can have exactly the same three views: that's why architects add sections and 3D views, so there is no doubt."
+    }
+  },
+  {
     "id": "attention-aux-voisins",
     "engine": "floorplan",
     "category": "site",
