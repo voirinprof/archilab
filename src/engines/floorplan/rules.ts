@@ -191,10 +191,9 @@ export function reachableSpaces(doorSegments: WallSegment[], avoid?: string): Se
 /**
  * Floor a person needing `width` metres can reach from `starts`, cut into grid cells of `step` metres:
  * a block of k×k free cells (k = width rounded up to the grid) moves cell by cell between the obstacles.
- * `reaches` tells whether that area touches a rectangle (a room, a usage zone…) along an edge;
- * with `corners`, touching at a single corner is enough (the furnish mode's original rule).
+ * `reaches` tells whether that area touches a rectangle (a room, a usage zone…) along an edge.
  */
-export function walkableArea(plan: Plan, step: number, obstacles: Rect[], starts: Rect[], width: number, { corners = false } = {}) {
+export function walkableArea(plan: Plan, step: number, obstacles: Rect[], starts: Rect[], width: number) {
   const nx = Math.round(plan.width / step), ny = Math.round(plan.depth / step);
   const k = Math.max(1, Math.ceil(width / step - EPSILON));
   const cellRect = (i: number, j: number, size = 1): Rect => ({ x: i * step, y: j * step, width: size * step, depth: size * step });
@@ -207,7 +206,6 @@ export function walkableArea(plan: Plan, step: number, obstacles: Rect[], starts
   // touching means sharing a stretch of edge (or overlapping): a corner alone lets nobody through
   const touches = (i: number, j: number, rects: Rect[]) => rects.some(r => {
     const b = cellRect(i, j, k);
-    if (corners) return gap(b, r) < EPSILON;
     const ox = Math.min(b.x + b.width, r.x + r.width) - Math.max(b.x, r.x);
     const oy = Math.min(b.y + b.depth, r.y + r.depth) - Math.max(b.y, r.y);
     return (ox > EPSILON && oy > -EPSILON) || (oy > EPSILON && ox > -EPSILON);
