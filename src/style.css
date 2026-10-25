@@ -254,3 +254,48 @@ a:focus-visible{outline:3px solid #ef9a73;outline-offset:3px}
 .rn-former{fill:#66726e}
 .challenge-head p{color:#5e6e6d}
 .view-caption{fill:#56724a}
+.truss-drawing{padding:6px}
+.truss-svg{display:block;width:100%;max-height:min(560px,70vh);user-select:none;-webkit-user-select:none}
+.truss-sky{fill:#eaf3f6}
+.truss-river{fill:#9fcfe4;opacity:.8}
+.truss-cliff{fill:#b9a58a;stroke:#8f7c63;stroke-width:2}
+.truss-span{font-size:13px;font-weight:700;fill:#3d6f86}
+.truss-dot{fill:#9fb3b8}
+.truss-road{stroke:#37545b;stroke-width:9;stroke-linecap:round}
+.truss-pattern{stroke:#2f6e4f;stroke-width:2.5;stroke-dasharray:6 5;opacity:.7;pointer-events:none}
+.truss-bar{cursor:pointer}
+.truss-hit{stroke:transparent;stroke-width:16}
+.truss-beam{stroke-linecap:round;pointer-events:none}
+.truss-bar.idle .truss-beam{stroke:#b9894f}
+.truss-bar.tension .truss-beam{stroke:#d1553a}
+.truss-bar.compression .truss-beam{stroke:#3d79c2}
+.truss-bar.broken .truss-beam{stroke:#7a1f12;stroke-dasharray:6 4}
+.truss-x{font-size:18px;font-weight:800;fill:#7a1f12;pointer-events:none}
+.truss-preview{stroke:#2f6e4f;stroke-width:4;stroke-dasharray:6 4;pointer-events:none}
+.truss-preview.bad{stroke:#c2553b}
+.truss-support{fill:#37545b}
+.truss-load{fill:none;stroke:#5d6b66;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.truss-truck{font-size:13px;font-weight:700;fill:#37545b}
+.truss-node{fill:transparent;cursor:pointer}
+.truss-node:hover{fill:#2f6e4f22}
+.truss-node.start{fill:#2f6e4f44;stroke:#2f6e4f;stroke-width:2}
+.truss-node.loose{fill:#ef9a73aa;stroke:#c2553b;stroke-width:2;animation:truss-wobble 1s ease-in-out infinite}
+@keyframes truss-wobble{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.truss-node.loose{animation:none}}
+.truss-cursor{fill:none;outline:none;pointer-events:none}
+.truss-cursor:focus-visible{stroke:#ef9a73;stroke-width:3}
+.truss-legend{margin:-6px 0 14px}
+.truss-legend .swatch{display:inline-block;width:20px;height:5px;border-radius:3px}
+.swatch.tension{background:#d1553a}
+.swatch.compression{background:#3d79c2}
+.swatch.broken{background:repeating-linear-gradient(90deg,#7a1f12 0 5px,transparent 5px 8px)}
+.swatch.road{background:#37545b;height:8px}
+.truss-actions{display:flex;align-items:center}
+.truss-actions .subtle{width:100%;font-size:13px}
+.truss-actions .subtle:disabled{opacity:.45;cursor:default}
+.note.truss-ok{background:#e4f5e7;color:#2a6941}
+.truss-toggle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#53676b;margin:0 0 14px}
+@media(max-width:550px){.truss-span,.truss-truck{font-size:20px}}
+@media(max-width:550px){.metrics.three:has(.truss-actions){grid-template-columns:1fr 1fr}
+.metrics.three .truss-actions{grid-column:1/-1}
+}

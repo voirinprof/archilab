@@ -286,7 +286,26 @@ function validateSun(a,fail){
   if(P.reveal_paths_hint!==undefined&&(!isInt(P.reveal_paths_hint)||P.reveal_paths_hint<1||P.reveal_paths_hint>a.hints.fr.length))fail('Invalid reveal_paths_hint');
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun};
+/** Truss engine: beams between grid points, a given road, supports and loads. */
+function validateTruss(a,fail){
+  const P=a.parameters??{};
+  const range=r=>Array.isArray(r)&&r.length===2&&r.every(isInt)&&r[0]<r[1];
+  if(!P.grid||!range(P.grid.x)||!range(P.grid.y))fail('Invalid grid');
+  const inGrid=p=>Array.isArray(p)&&p.length===2&&p.every(isInt)&&p[0]>=P.grid.x[0]&&p[0]<=P.grid.x[1]&&p[1]>=P.grid.y[0]&&p[1]<=P.grid.y[1];
+  const bar=b=>Array.isArray(b)&&b.length===2&&b.every(inGrid)&&!(b[0][0]===b[1][0]&&b[0][1]===b[1][1]);
+  if(!Array.isArray(P.deck)||!P.deck.length||!P.deck.every(bar))fail('Invalid deck');
+  if(!Array.isArray(P.supports)||P.supports.length<2||!P.supports.every(inGrid))fail('Invalid supports (at least two points on the grid)');
+  if(!Array.isArray(P.loads)||!P.loads.length||!P.loads.every(inGrid))fail('Invalid loads');
+  for(const k of ['unit','load','max_length','tension_limit','compression_limit'])if(!(Number.isFinite(P[k])&&P[k]>0))fail(`Invalid ${k}`);
+  if(P.pattern!==undefined&&(!Array.isArray(P.pattern)||!P.pattern.every(bar)))fail('Invalid pattern');
+  if(P.reveal_pattern_hint!==undefined&&(!isInt(P.reveal_pattern_hint)||P.reveal_pattern_hint<1||P.reveal_pattern_hint>a.hints.fr.length||!P.pattern))fail('Invalid reveal_pattern_hint');
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['stable','strong','max_bars'].includes(c.type)||(c.type==='max_bars'&&!(isInt(c.value)&&c.value>0)))fail(`Invalid constraint ${c.type}`);
+  }
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun,truss:validateTruss};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
