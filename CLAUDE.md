@@ -10,7 +10,7 @@ Les élèves doivent pouvoir expérimenter, manipuler des éléments, résoudre 
 
 Le projet est accessible sur GitHub Pages :
 
-https://pythongeolab.com/archilab/
+https://eduarchi.xyz/
 
 Dépôt GitHub : https://github.com/voirinprof/archilab
 
@@ -172,7 +172,7 @@ Vérifier que le projet compile avec :
 npm run build
 ```
 
-Maintenir la configuration Vite compatible avec le chemin `/archilab/` sur GitHub Pages.
+Maintenir la configuration Vite compatible avec le domaine personnalisé https://eduarchi.xyz/ sur GitHub Pages : le site est servi à la racine, donc `base: '/'` dans `vite.config.ts`.
 
 Ne pas modifier le workflow de déploiement sans nécessité.
 

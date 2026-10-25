@@ -11,7 +11,7 @@ npm install --no-audit --no-fund
 npm run dev
 ```
 
-Open the local URL shown by Vite (typically http://localhost:5173/archilab/).
+Open the local URL shown by Vite (typically http://localhost:5173/).
 
 Production check:
 
@@ -35,10 +35,10 @@ git push -u origin main
 ```
 
 3. On GitHub open **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. Check the **Actions** tab for the deployment. Your URL is `https://YOUR_USERNAME.github.io/archilab/`.
+4. Check the **Actions** tab for the deployment. The site is published at https://eduarchi.xyz/ (custom domain set in **Settings → Pages**).
 5. Future changes are published by `git add`, `git commit`, and `git push` to `main`.
 
-If you use a custom domain at the root, change `GITHUB_PAGES_BASE` in `.github/workflows/deploy.yml` to `/` and configure your domain in GitHub Pages settings.
+Because the site is served at the root of its domain, `base` is `/` in `vite.config.ts`. To publish under a sub-path instead (for example `https://USER.github.io/archilab/`), set `base` to that path.
 
 ## Add a game
 
