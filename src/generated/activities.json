@@ -740,6 +740,272 @@
     }
   },
   {
+    "id": "chasse-au-soleil",
+    "engine": "sun",
+    "category": "light",
+    "difficulty": "intermediate",
+    "duration_minutes": 7,
+    "icon": "sun",
+    "color": "yellow",
+    "title": {
+      "fr": "Chasse au soleil",
+      "en": "Chasing Sunlight"
+    },
+    "description": {
+      "fr": "Oriente la maison pour que chaque pièce reçoive le soleil au bon moment.",
+      "en": "Turn the house so each room gets the sun at the right time."
+    },
+    "mission": {
+      "fr": "Cette maison est dessinée, mais on peut encore la tourner sur son terrain. Un immeuble de 15 m se dresse à l'est. Trouve l'orientation qui éclaire chaque pièce au bon moment de la journée et de l'année.",
+      "en": "This house is designed, but it can still be turned on its lot. A 15 m building stands to the east. Find the orientation that lights each room at the right time of day and year."
+    },
+    "concepts": {
+      "fr": [
+        "Orientation solaire",
+        "Course du soleil",
+        "Ombre portée",
+        "Architecture bioclimatique"
+      ],
+      "en": [
+        "Solar orientation",
+        "Sun path",
+        "Cast shadows",
+        "Bioclimatic design"
+      ]
+    },
+    "parameters": {
+      "latitude": 45,
+      "site": {
+        "width": 34,
+        "depth": 30
+      },
+      "house_at": {
+        "x": 15,
+        "y": 15
+      },
+      "initial_rotation": 180,
+      "rotation_step": 15,
+      "reveal_paths_hint": 4,
+      "house": {
+        "width": 10,
+        "depth": 8,
+        "rooms": [
+          {
+            "id": "office",
+            "label": {
+              "fr": "Bureau",
+              "en": "Study"
+            },
+            "color": "mint",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "width": 4,
+              "depth": 4
+            },
+            "windows": [
+              {
+                "facade": "north",
+                "from": 1,
+                "to": 3
+              }
+            ]
+          },
+          {
+            "id": "hall",
+            "label": {
+              "fr": "Entrée",
+              "en": "Hall"
+            },
+            "color": "grey",
+            "box": {
+              "x": 4,
+              "y": 0,
+              "width": 2,
+              "depth": 4
+            },
+            "windows": []
+          },
+          {
+            "id": "bedroom",
+            "label": {
+              "fr": "Chambre",
+              "en": "Bedroom"
+            },
+            "color": "blue",
+            "box": {
+              "x": 6,
+              "y": 0,
+              "width": 4,
+              "depth": 4
+            },
+            "windows": [
+              {
+                "facade": "east",
+                "from": 1,
+                "to": 3
+              }
+            ]
+          },
+          {
+            "id": "living",
+            "label": {
+              "fr": "Séjour",
+              "en": "Living room"
+            },
+            "color": "yellow",
+            "box": {
+              "x": 0,
+              "y": 4,
+              "width": 6,
+              "depth": 4
+            },
+            "windows": [
+              {
+                "facade": "south",
+                "from": 1,
+                "to": 5
+              },
+              {
+                "facade": "west",
+                "from": 5,
+                "to": 7
+              }
+            ]
+          },
+          {
+            "id": "kitchen",
+            "label": {
+              "fr": "Cuisine",
+              "en": "Kitchen"
+            },
+            "color": "coral",
+            "box": {
+              "x": 6,
+              "y": 4,
+              "width": 4,
+              "depth": 4
+            },
+            "windows": [
+              {
+                "facade": "east",
+                "from": 5,
+                "to": 7
+              },
+              {
+                "facade": "south",
+                "from": 7,
+                "to": 9
+              }
+            ]
+          }
+        ]
+      },
+      "obstacles": [
+        {
+          "id": "tower",
+          "label": {
+            "fr": "Immeuble (15 m)",
+            "en": "Building (15 m)"
+          },
+          "box": {
+            "x": 25,
+            "y": 9,
+            "width": 8,
+            "depth": 8
+          },
+          "height": 15
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "type": "min_sun_hours",
+        "rooms": [
+          "bedroom"
+        ],
+        "season": "equinox",
+        "from": 6,
+        "to": 10,
+        "value": 1,
+        "label": {
+          "fr": "La chambre reçoit au moins 1 h de soleil le matin (6 h – 10 h, au printemps et à l'automne).",
+          "en": "The bedroom gets at least 1 hour of morning sun (6 am – 10 am, in spring and autumn)."
+        }
+      },
+      {
+        "type": "min_sun_hours",
+        "rooms": [
+          "living"
+        ],
+        "season": "winter",
+        "from": 11,
+        "to": 17,
+        "value": 3,
+        "label": {
+          "fr": "Le séjour reçoit au moins 3 h de soleil en hiver (11 h – 17 h) : de la chaleur gratuite.",
+          "en": "The living room gets at least 3 hours of sun in winter (11 am – 5 pm): free heat."
+        }
+      },
+      {
+        "type": "max_sun_hours",
+        "rooms": [
+          "office"
+        ],
+        "season": "equinox",
+        "from": 9,
+        "to": 17,
+        "value": 0,
+        "label": {
+          "fr": "Le bureau ne reçoit aucun soleil direct pendant les heures de travail (9 h – 17 h, au printemps et à l'automne) : pas d'éblouissement.",
+          "en": "The study gets no direct sun during working hours (9 am – 5 pm, in spring and autumn): no glare."
+        }
+      },
+      {
+        "type": "max_sun_hours",
+        "rooms": [
+          "bedroom"
+        ],
+        "season": "summer",
+        "from": 17,
+        "to": 20,
+        "value": 0,
+        "label": {
+          "fr": "La chambre ne reçoit pas le soleil couchant en été (après 17 h) : elle reste fraîche pour la nuit.",
+          "en": "The bedroom doesn't get the setting sun in summer (after 5 pm): it stays cool for the night."
+        }
+      }
+    ],
+    "hints": {
+      "fr": [
+        "Fais défiler les heures avec le curseur : le soleil se lève à l'est, passe au sud à midi et se couche à l'ouest.",
+        "Regarde les frises : elles montrent, quart d'heure par quart d'heure, quand chaque pièce reçoit le soleil. Change de saison pour comparer.",
+        "L'immeuble à l'est cache le soleil du matin. Tourne la maison pour que la fenêtre de la chambre regarde un peu plus vers le sud-est, à côté de l'immeuble.",
+        "La course du soleil est maintenant dessinée : en hiver, il reste bas vers le sud ; en été, il monte haut et se couche au nord-ouest. Essaie une rotation entre 15° et 45°."
+      ],
+      "en": [
+        "Move the time slider: the sun rises in the east, passes south at noon and sets in the west.",
+        "Look at the timelines: they show, quarter of an hour by quarter of an hour, when each room gets the sun. Switch seasons to compare.",
+        "The building to the east hides the morning sun. Turn the house so the bedroom window looks a little more towards the south-east, beside the building.",
+        "The sun paths are now drawn: in winter the sun stays low in the south; in summer it climbs high and sets in the north-west. Try a rotation between 15° and 45°."
+      ]
+    },
+    "feedback": {
+      "success": {
+        "fr": "Bravo ! Chaque pièce reçoit le soleil quand il le faut, malgré l'immeuble voisin.",
+        "en": "Well done! Every room gets the sun when it should, despite the building next door."
+      },
+      "failure": {
+        "fr": "Pas encore. Regarde les frises des pièces et les besoins non cochés, puis essaie une autre orientation.",
+        "en": "Not yet. Look at the room timelines and the unticked needs, then try another orientation."
+      }
+    },
+    "explanation": {
+      "fr": "Le soleil se lève à l'est, passe au sud à midi et se couche à l'ouest ; il est bas en hiver et haut en été. En orientant bien un bâtiment, l'architecte offre le soleil du matin aux chambres, la chaleur gratuite de l'hiver au séjour, et une lumière douce sans éblouissement au bureau. Il tient compte aussi des ombres des bâtiments voisins. C'est la base de l'architecture bioclimatique. Ici, le calcul est simplifié (latitude 45° Nord, comme Montréal ou Sherbrooke, heure solaire, une seule ombre) : il ne remplace pas une vraie étude d'ensoleillement.",
+      "en": "The sun rises in the east, passes south at noon and sets in the west; it is low in winter and high in summer. By orienting a building well, the architect gives bedrooms the morning sun, gives the living room free winter heat, and gives the study soft light without glare. Shadows from neighbouring buildings count too. This is the basis of bioclimatic design. Here the calculation is simplified (latitude 45° North, like Montréal or Sherbrooke, solar time, a single shadow): it doesn't replace a real sunlight study."
+    }
+  },
+  {
     "id": "le-batiment-transformable",
     "engine": "floorplan",
     "category": "client",

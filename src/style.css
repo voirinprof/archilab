@@ -170,3 +170,64 @@
 .rn-none{font-size:13px;color:#6b807b;margin:0}
 .metrics strong.over{color:#b0452d}
 .room-chips button svg{flex-shrink:0}
+.sun-drawing{padding:6px}
+.sun-svg{display:block;width:100%;max-height:min(560px,70vh);touch-action:manipulation}
+.sun-dome{fill:#e6f1f6;stroke:#c3dbe6;stroke-width:1.5}
+.sun-dome.night{fill:#d7dde6}
+.sun-ground{fill:#e3ecd9;stroke:#b8cbab;stroke-width:1.5}
+.sun-compass{font-size:14px;font-weight:800;fill:#77936b}
+.sun-path polyline{fill:none;stroke-width:2;stroke-dasharray:5 4}
+.sun-path text{font-size:11px;font-weight:800}
+.sun-path.winter polyline{stroke:#5b819d}
+.sun-path.winter text{fill:#5b819d}
+.sun-path.summer polyline{stroke:#d9822b}
+.sun-path.summer text{fill:#c06a1a}
+.sun-shadow{fill:#37545b33}
+.sun-obstacle rect{fill:#b9c0c4;stroke:#7e888c;stroke-width:1.5}
+.sun-obstacle text{font-size:11px;font-weight:700;fill:#3d4a4f}
+.sun-ray{stroke-width:2.5;stroke-linecap:round}
+.sun-ray.sun{stroke:#f2b632}
+.sun-ray.shade{stroke:#8d9aa0;stroke-dasharray:3 3}
+.sun-house{outline:none}
+.sun-house:focus-visible .sun-walls{stroke:#ef9a73}
+.sun-room{stroke:#ffffff;stroke-width:1}
+.sun-room.lit{filter:brightness(1.08) drop-shadow(0 0 6px #f6d36a)}
+.sun-room-label{font-size:11px;font-weight:700;fill:#1c333a;pointer-events:none}
+.sun-walls{fill:none;stroke:#37545b;stroke-width:4}
+.sun-window{stroke-width:4.5}
+.sun-window.none{stroke:#9fcfe4}
+.sun-window.sun{stroke:#f2b632}
+.sun-window.shade{stroke:#8d9aa0}
+.sun-handle-arm{stroke:#37545b;stroke-width:2}
+.sun-handle{fill:#203d45;stroke:#fff;stroke-width:2;cursor:grab;touch-action:none}
+.sun-icon circle{fill:#f6d36a;stroke:#e0a72a;stroke-width:2}
+.sun-icon text{font-size:16px;fill:#9b6a0c;pointer-events:none}
+.sun-controls{display:grid;gap:10px;margin-top:4px}
+.sun-rotation,.sun-time{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.sun-rotation span{margin-right:auto}
+.sun-rotation .subtle,.sun-time .subtle{padding:9px}
+.sun-rotation strong{min-width:42px;text-align:center}
+.sun-time input{flex:1;accent-color:#d9a43a;min-width:0}
+.sun-time strong{min-width:64px;text-align:right}
+.sun-status{margin:0;font-size:12px;color:#66767b}
+.sun-timelines{margin-bottom:14px}
+.sun-timeline{display:grid;grid-template-columns:86px 1fr;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#53676b;margin:5px 0}
+.sun-timeline svg{display:block;width:100%;height:16px;border-radius:4px}
+.slot.sun{fill:#f2b632}
+.slot.shade{fill:#a9b4b9}
+.slot.none{fill:#e4ebe6}
+.slot.night{fill:#c8d0da}
+.slot-now{stroke:#142e37;stroke-width:1.5}
+.sun-hours{position:relative;height:14px;margin-left:94px;font-size:10px;color:#81918d}
+.sun-hours span{position:absolute;transform:translateX(-50%)}
+.slot-swatch{display:inline-block;width:12px;height:12px;border-radius:3px}
+.slot-swatch.sun{background:#f2b632}
+.slot-swatch.shade{background:#a9b4b9}
+.slot-swatch.none{background:#e4ebe6;border:1px solid #cfd8d2}
+@media(max-width:550px){.sun-room-label{font-size:17px}
+.sun-obstacle text{font-size:15px}
+.sun-compass{font-size:20px}
+.sun-path text{font-size:16px}
+.sun-timeline{grid-template-columns:70px 1fr}
+.sun-hours{margin-left:78px}
+}

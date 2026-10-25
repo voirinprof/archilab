@@ -247,7 +247,45 @@ function validateBlocks(a,fail){
   if(reveal!==undefined&&(!isInt(reveal)||reveal<1||reveal>a.hints.fr.length))fail('Invalid reveal_model_hint');
   validateCommonContent(a,fail);
 }
-const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks};
+/** Sun engine: a house turned on its site, rooms lit through their windows, obstacles casting shadows. */
+function validateSun(a,fail){
+  const P=a.parameters??{};
+  const box=b=>b&&[b.x,b.y,b.width,b.depth].every(Number.isFinite)&&b.width>0&&b.depth>0;
+  if(!(Number.isFinite(P.latitude)&&P.latitude>0&&P.latitude<66))fail('Invalid latitude (northern hemisphere, below the polar circle)');
+  if(!P.site||!(P.site.width>0&&P.site.depth>0))fail('Invalid site');
+  if(!P.house_at||![P.house_at.x,P.house_at.y].every(Number.isFinite))fail('Invalid house_at');
+  if(!Number.isFinite(P.rotation_step)||P.rotation_step<=0||360%P.rotation_step!==0)fail('rotation_step must divide 360');
+  if(!Number.isFinite(P.initial_rotation)||P.initial_rotation%P.rotation_step!==0)fail('initial_rotation must be a multiple of rotation_step');
+  const h=P.house;
+  if(!h||!(h.width>0&&h.depth>0)||!Array.isArray(h.rooms)||!h.rooms.length)fail('Invalid house');
+  const ids=new Set();
+  for(const r of h.rooms){
+    if(!/^[a-z0-9-]+$/.test(r?.id||'')||ids.has(r.id))fail(`Invalid or duplicate room id ${r?.id}`);
+    ids.add(r.id);
+    if(!localized(r.label)||!box(r.box)||r.box.x<0||r.box.y<0||r.box.x+r.box.width>h.width||r.box.y+r.box.depth>h.depth)fail(`Invalid room ${r.id}`);
+    for(const w of r.windows??[]){
+      const along=w.facade==='north'||w.facade==='south'?[r.box.x,r.box.x+r.box.width]:[r.box.y,r.box.y+r.box.depth];
+      const onWall={north:r.box.y===0,south:r.box.y+r.box.depth===h.depth,west:r.box.x===0,east:r.box.x+r.box.width===h.width}[w.facade];
+      if(!onWall)fail(`Window of ${r.id} is not on an outer wall`);
+      if(!(w.from>=along[0]&&w.to<=along[1]&&w.from<w.to))fail(`Window of ${r.id} is outside its room`);
+    }
+  }
+  const hw=Math.hypot(h.width,h.depth)/2;
+  for(const o of P.obstacles??[]){
+    if(!localized(o.label)||!box(o.box)||!(o.height>0))fail(`Invalid obstacle ${o.id}`);
+    // the house turns around its centre: an obstacle within that circle would cut through it
+    const nx=Math.max(o.box.x,Math.min(P.house_at.x,o.box.x+o.box.width)),ny=Math.max(o.box.y,Math.min(P.house_at.y,o.box.y+o.box.depth));
+    if(Math.hypot(nx-P.house_at.x,ny-P.house_at.y)<hw)fail(`Obstacle ${o.id} is too close to the house`);
+  }
+  for(const c of a.constraints){
+    if(!localized(c.label))fail(`Missing translations: constraint ${c.type}`);
+    if(!['min_sun_hours','max_sun_hours'].includes(c.type)||!Array.isArray(c.rooms)||!c.rooms.every(id=>ids.has(id))||!['winter','equinox','summer'].includes(c.season)
+      ||!(c.from>=0&&c.to<=24&&c.from<c.to)||!(c.value>=0))fail(`Invalid constraint ${c.type}`);
+  }
+  if(P.reveal_paths_hint!==undefined&&(!isInt(P.reveal_paths_hint)||P.reveal_paths_hint<1||P.reveal_paths_hint>a.hints.fr.length))fail('Invalid reveal_paths_hint');
+  validateCommonContent(a,fail);
+}
+const validators={dimensions:validateDimensions,floorplan:validateFloorplan,blocks:validateBlocks,sun:validateSun};
 const activities=[];
 for (const file of files){
   const a=YAML.parse(await readFile(new URL(file,dir),'utf8'),{uniqueKeys:true});
